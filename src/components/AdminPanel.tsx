@@ -1289,22 +1289,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             {/* Supabase Global Persistence Status */}
-            {state.supabaseActive ? (
-              <div className="p-5 bg-emerald-950/40 border border-emerald-500/30 rounded-2xl flex items-start gap-4 shadow-lg">
-                <div className="p-3 bg-emerald-900/40 rounded-xl text-emerald-400 shrink-0">
-                  <Database className="w-6 h-6 animate-pulse" />
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
-                    <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400">Base de Datos Supabase Conectada</h4>
-                  </div>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    ¡La sincronización en la nube está activa! Todos los textos de la portada, la información general, las noticias, el inventario y las FAQs se almacenan y replican globalmente en tiempo real para todos los visitantes del mundo.
-                  </p>
-                </div>
-              </div>
-            ) : (
+            {!state.supabaseActive ? (
               <div className="p-5 bg-amber-950/30 border border-amber-500/30 rounded-2xl flex items-start gap-4 shadow-lg">
                 <div className="p-3 bg-amber-900/30 rounded-xl text-amber-500 shrink-0">
                   <AlertOctagon className="w-6 h-6" />
@@ -1318,6 +1303,64 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <div><b>SUPABASE_URL</b> = <span className="text-slate-300">https://your-project.supabase.co</span></div>
                     <div><b>SUPABASE_KEY</b> = <span className="text-slate-300">su_clave_secreta_api</span></div>
                   </div>
+                </div>
+              </div>
+            ) : state.supabaseTableMissing ? (
+              <div className="p-5 bg-rose-950/30 border border-rose-500/30 rounded-2xl flex flex-col gap-4 shadow-lg">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-rose-900/40 rounded-xl text-rose-400 shrink-0">
+                    <AlertOctagon className="w-6 h-6 animate-bounce" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-black uppercase tracking-wider text-rose-400">⚠️ TABLA 'website_state' NO ENCONTRADA EN SUPABASE</h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      ¡Tu cliente de Supabase se ha inicializado en Vercel, pero no se encuentra la tabla <code className="bg-slate-800 px-1 py-0.5 rounded text-rose-300 font-mono">website_state</code> en tu base de datos!
+                    </p>
+                    <p className="text-[11px] text-rose-300 leading-relaxed font-bold mt-1">
+                      Debido a esto, los datos del Excel no se pueden guardar en la nube y se perderán cuando la función de Vercel se apague.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-3">
+                  <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">¿Cómo solucionarlo en 1 minuto?</div>
+                  <ol className="list-decimal list-inside text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                    <li>Abre tu panel de control de <b>Supabase</b>.</li>
+                    <li>Haz clic en <b>SQL Editor</b> (icono de terminal en la barra lateral izquierda).</li>
+                    <li>Haz clic en <b>"New query"</b> (Nueva consulta).</li>
+                    <li>Pega la siguiente consulta SQL y haz clic en el botón <b>"Run"</b> (Ejecutar):</li>
+                  </ol>
+
+                  <div className="relative group">
+                    <pre className="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[10px] text-slate-300 overflow-x-auto select-all leading-relaxed whitespace-pre">
+{`CREATE TABLE IF NOT EXISTS website_state (
+  id BIGINT PRIMARY KEY,
+  state JSONB NOT NULL
+);
+
+INSERT INTO website_state (id, state)
+VALUES (1, '{}'::jsonb)
+ON CONFLICT (id) DO NOTHING;`}
+                    </pre>
+                    <div className="text-[9px] text-slate-500 text-right mt-1">
+                      Haz doble clic o arrastra para copiar todo el bloque de código SQL
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-5 bg-emerald-950/40 border border-emerald-500/30 rounded-2xl flex items-start gap-4 shadow-lg">
+                <div className="p-3 bg-emerald-900/40 rounded-xl text-emerald-400 shrink-0">
+                  <Database className="w-6 h-6 animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+                    <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400">Base de Datos Supabase Conectada</h4>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    ¡La Sincronización en la nube está activa! Todos los textos de la portada, la información general, las noticias, el inventario y las FAQs se almacenan y replican globalmente en tiempo real para todos los visitantes del mundo.
+                  </p>
                 </div>
               </div>
             )}
@@ -1397,6 +1440,52 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <label htmlFor="autosync_chk" className="text-sm font-bold text-slate-200 cursor-pointer">
                   Activar consulta automática al Excel cada 10 minutos en segundo plano
                 </label>
+              </div>
+
+              {/* --- DIAGNÓSTICO DE SINCRONIZACIÓN CON EXCEL --- */}
+              <div className="pt-6 border-t border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-black uppercase text-[#008CBA] tracking-wider">
+                    📋 Diagnóstico de Sincronización (Excel)
+                  </h4>
+                  {state.lastSyncTime && (
+                    <span className="text-[10px] font-bold text-slate-500">
+                      Última vez: {new Date(state.lastSyncTime).toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+                
+                {state.syncLogs && state.syncLogs.length > 0 ? (
+                  <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden divide-y divide-slate-900 shadow-inner">
+                    {state.syncLogs.slice(0, 5).map((log) => (
+                      <div key={log.id} className="p-3 text-[11px] leading-relaxed flex items-start gap-2">
+                        <span className={`w-2 h-2 rounded-full shrink-0 mt-1 ${
+                          log.status === 'success' ? 'bg-emerald-500 shadow-sm' : 'bg-rose-500 shadow-sm shadow-rose-500/50 animate-pulse'
+                        }`} />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`font-bold uppercase tracking-wider text-[10px] ${
+                              log.status === 'success' ? 'text-emerald-400' : 'text-rose-400'
+                            }`}>
+                              {log.status === 'success' ? '✓ Éxito' : '✗ Error'}
+                            </span>
+                            <span className="text-slate-600 font-mono text-[9px]">
+                              {log.timestamp}
+                            </span>
+                          </div>
+                          <p className="text-slate-300 mt-0.5">{log.message}</p>
+                          {log.kilosUpdated !== undefined && (
+                            <span className="inline-block mt-1 px-1.5 py-0.5 bg-slate-900 rounded border border-slate-800 text-[9px] text-slate-400 font-mono">
+                              Kilos totales en base de datos: {log.kilosUpdated.toLocaleString()} kg
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500 italic">No se registran intentos de sincronización todavía. Haz clic en el botón "Sincronizar Drive Sheet" en la esquina superior del panel de control para iniciar la prueba.</p>
+                )}
               </div>
 
               {/* --- CONTROL DE VISIBILIDAD DE BLOQUES DE LA WEB --- */}

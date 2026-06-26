@@ -90,6 +90,7 @@ export interface GlobalState {
   suggestions: SuggestionItem[];
   hasNewDonationAlert?: boolean;
   supabaseActive?: boolean;
+  supabaseTableMissing?: boolean;
   adminUsers?: AdminUser[];
   userChangeLogs?: UserChangeLog[];
   visibleBlocks?: {

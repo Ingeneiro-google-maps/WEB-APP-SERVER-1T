@@ -68,7 +68,9 @@ export default function App() {
           supplies: data.supplies || prev.supplies,
           syncLogs: data.logs || prev.syncLogs,
           lastSyncTime: data.lastSyncTime || prev.lastSyncTime,
-          nextSyncTime: data.nextSyncTime || prev.nextSyncTime
+          nextSyncTime: data.nextSyncTime || prev.nextSyncTime,
+          supabaseActive: data.supabaseActive !== undefined ? data.supabaseActive : prev.supabaseActive,
+          supabaseTableMissing: data.supabaseTableMissing !== undefined ? data.supabaseTableMissing : prev.supabaseTableMissing
         }));
       }
     } catch (err) {
@@ -83,11 +85,15 @@ export default function App() {
     setState(nextState);
 
     try {
-      await fetch('/api/state', {
+      const res = await fetch('/api/state', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newPartial)
       });
+      const data = await res.json();
+      if (data && data.state) {
+        setState(data.state);
+      }
     } catch (e) {
       console.error('State Update Error:', e);
     }

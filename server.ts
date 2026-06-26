@@ -11,6 +11,7 @@ dotenv.config();
 
 // In-memory persistent state across requests
 let appState: GlobalState = JSON.parse(JSON.stringify(INITIAL_STATE));
+let supabaseTableMissing = false;
 
 // Initialize Supabase Client if credentials are provided
 const supabaseUrl = process.env.SUPABASE_URL || '';
@@ -32,7 +33,11 @@ async function saveStateToSupabase() {
       .upsert({ id: 1, state: appState });
     if (error) {
       console.error('❌ Error al guardar estado en Supabase:', error);
+      if (error.message && error.message.includes('relation "public.website_state" does not exist')) {
+        supabaseTableMissing = true;
+      }
     } else {
+      supabaseTableMissing = false;
       console.log('💾 [Supabase] Base de datos de la web actualizada y guardada con éxito.');
     }
   } catch (err: any) {
@@ -52,6 +57,7 @@ async function loadStateFromSupabase() {
 
     if (error) {
       if (error.code === 'PGRST116') {
+        supabaseTableMissing = false;
         console.log('🌱 No se encontró el registro inicial de la web en Supabase. Creándolo ahora...');
         const { error: insertError } = await supabase
           .from('website_state')
@@ -62,6 +68,7 @@ async function loadStateFromSupabase() {
           console.log('✅ Registro inicial creado con éxito en Supabase.');
         }
       } else if (error.message && error.message.includes('relation "public.website_state" does not exist')) {
+        supabaseTableMissing = true;
         console.warn('⚠️ La tabla "website_state" no existe en Supabase.');
         console.warn('💡 Para solucionarlo y habilitar la persistencia global, ejecuta esta consulta SQL en el panel de Supabase:');
         console.warn(`
@@ -78,6 +85,7 @@ async function loadStateFromSupabase() {
         console.error('⚠️ Error al cargar el estado desde Supabase:', error.message || error);
       }
     } else if (data && data.state) {
+      supabaseTableMissing = false;
       if (typeof data.state === 'object' && (data.state as any).campaignTitle) {
         appState = data.state as GlobalState;
         console.log('✅ [Supabase] ¡El estado de la web ha sido cargado con éxito desde la nube!');
@@ -284,18 +292,34 @@ function parseCSVToPledges(text: string): { pledges: DonorPledge[], kilosByCateg
 // Ensure initial calculation
 let totalKilos = recalculateTotalKilos(appState);
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+export const app = express();
+const PORT = 3000;
 
-  // Cargar estado de Supabase si está disponible
+app.use(express.json());
+
+// Middleware crucial para mantener sincronizado Supabase en entornos Serverless (como Vercel)
+const ensureLatestState = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (supabase) {
-    console.log('🔄 Intentando cargar el estado de la web desde Supabase...');
-    await loadStateFromSupabase();
-    totalKilos = recalculateTotalKilos(appState);
+    try {
+      await loadStateFromSupabase();
+    } catch (err: any) {
+      console.error('❌ Error cargando estado de Supabase en middleware:', err.message || err);
+    }
   }
+  next();
+};
 
-  app.use(express.json());
+app.use('/api', ensureLatestState);
+
+// Cargar estado inicial de Supabase de forma asíncrona al arrancar el servidor o instanciar la función
+if (supabase) {
+  console.log('🔄 Cargando estado inicial desde Supabase...');
+  loadStateFromSupabase().then(() => {
+    totalKilos = recalculateTotalKilos(appState);
+  }).catch(err => {
+    console.error('❌ Error al cargar estado inicial de Supabase:', err);
+  });
+}
 
   // API Routes
   app.get('/api/health', (req, res) => {
@@ -307,6 +331,7 @@ async function startServer() {
     res.json({
       ...appState,
       supabaseActive: !!supabase,
+      supabaseTableMissing: supabaseTableMissing,
       totalCollectedKilos: recalculateTotalKilos(appState)
     });
   });
@@ -457,7 +482,7 @@ async function startServer() {
         lastSyncTime: new Date().toISOString()
       };
       await saveStateToSupabase();
-      res.json({ success: true, state: { ...appState, supabaseActive: !!supabase } });
+      res.json({ success: true, state: { ...appState, supabaseActive: !!supabase, supabaseTableMissing: supabaseTableMissing } });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
@@ -579,7 +604,9 @@ async function startServer() {
         supplies: appState.supplies,
         pledges: appState.pledges,
         lastSyncTime: appState.lastSyncTime,
-        nextSyncTime: appState.nextSyncTime
+        nextSyncTime: appState.nextSyncTime,
+        supabaseActive: !!supabase,
+        supabaseTableMissing: supabaseTableMissing
       });
     } catch (error: any) {
       const errLog: SyncLog = {
@@ -777,13 +804,16 @@ Genera un reporte breve de 4 puntos con: 1) Estado general de la meta, 2) Cuello
     }
   });
 
-  // Vite Middleware for Development
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
+  // Vite Middleware for Development (except on Vercel)
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    createViteServer({
       server: { middlewareMode: true },
       appType: 'spa'
+    }).then(vite => {
+      app.use(vite.middlewares);
+    }).catch(err => {
+      console.error('❌ Error creating Vite server:', err);
     });
-    app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
@@ -793,9 +823,9 @@ Genera un reporte breve de 4 puntos con: 1) Estado general de la meta, 2) Cuello
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Servidor Humanitario Por 1T ejecutándose en http://localhost:${PORT}`);
-  });
-}
-
-startServer();
+  // Only start listening if we are not in a Serverless environment like Vercel
+  if (!process.env.VERCEL) {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Servidor Humanitario Por 1T ejecutándose en http://localhost:${PORT}`);
+    });
+  }
