@@ -52,6 +52,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   // Search query for user changes log
   const [logSearchQuery, setLogSearchQuery] = useState('');
+  
+  // Search query for web access history
+  const [accessSearchQuery, setAccessSearchQuery] = useState('');
 
   // "Borrar todo" Password modal/input
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
@@ -675,6 +678,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           >
             <History className="w-5 h-5 text-yellow-300" />
             <span>📜 Histórico de Cambios Web ({state.userChangeLogs?.length || 0})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('accesos_web')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'accesos_web' 
+                ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-500/20' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Activity className="w-5 h-5 text-indigo-400 animate-pulse" />
+            <span>🌐 Historial de Acceso a la Web ({state.webAccessLogs?.length || 0})</span>
           </button>
 
           <button
@@ -1337,6 +1352,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   id BIGINT PRIMARY KEY,
   state JSONB NOT NULL
 );
+
+-- DESACTIVAR RLS PARA EVITAR ERRORES DE PERMISOS CON LA CLAVE PUBLIC/ANON
+ALTER TABLE website_state DISABLE ROW LEVEL SECURITY;
 
 INSERT INTO website_state (id, state)
 VALUES (1, '{}'::jsonb)
@@ -2098,6 +2116,170 @@ ON CONFLICT (id) DO NOTHING;`}
                           <td className="p-4 sm:p-5 whitespace-nowrap">
                             <span className="px-2 py-0.5 bg-slate-950 text-slate-600 rounded text-[9px] font-mono border border-slate-850 select-all uppercase">
                               {l.id}
+                            </span>
+                          </td>
+                        </tr>
+                      ));
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: HISTORIAL DE ACCESO A LA WEB --- */}
+        {activeTab === 'accesos_web' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-indigo-900/60 via-slate-900 to-slate-900 p-8 rounded-3xl border border-indigo-500/40 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 font-sans">
+              <div>
+                <span className="px-3 py-1 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-full">Tráfico en Tiempo Real</span>
+                <h2 className="text-2xl sm:text-3xl font-black uppercase text-white mt-3 flex items-center gap-2.5">
+                  <Activity className="w-8 h-8 text-indigo-400 animate-pulse" />
+                  <span>🌐 HISTORIAL DE ACCESO A LA WEB</span>
+                </h2>
+                <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+                  Registro detallado de acceso y tráfico a nivel de usuario. Monitorea en tiempo real el tiempo de conexión, ubicación aproximada (zona horaria/país), dispositivo, sistema operativo, resolución de pantalla y dirección IP de los visitantes.
+                </p>
+              </div>
+            </div>
+
+            {/* Tarjetas de Estadísticas de Tráfico */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md">
+                <div className="text-slate-400 text-xs font-black uppercase tracking-wider">Total Accesos</div>
+                <div className="text-2xl font-black text-white mt-1">{(state.webAccessLogs || []).length}</div>
+                <div className="text-[10px] text-slate-500 mt-1">Registros en caché de base de datos</div>
+              </div>
+              <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md">
+                <div className="text-slate-400 text-xs font-black uppercase tracking-wider">Móvil (Teléfonos)</div>
+                <div className="text-2xl font-black text-indigo-400 mt-1">
+                  {(state.webAccessLogs || []).filter(l => (l.device || '').includes('📱')).length}
+                </div>
+                <div className="text-[10px] text-slate-500 mt-1">Accesos desde smartphones</div>
+              </div>
+              <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md">
+                <div className="text-slate-400 text-xs font-black uppercase tracking-wider">Escritorio (PCs)</div>
+                <div className="text-2xl font-black text-emerald-400 mt-1">
+                  {(state.webAccessLogs || []).filter(l => (l.device || '').includes('💻')).length}
+                </div>
+                <div className="text-[10px] text-slate-500 mt-1">Accesos desde computadoras</div>
+              </div>
+              <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md">
+                <div className="text-slate-400 text-xs font-black uppercase tracking-wider">Tablets y Otros</div>
+                <div className="text-2xl font-black text-amber-400 mt-1">
+                  {(state.webAccessLogs || []).filter(l => (l.device || '').includes('📟') || (!(l.device || '').includes('📱') && !(l.device || '').includes('💻'))).length}
+                </div>
+                <div className="text-[10px] text-slate-500 mt-1">Otros navegadores y agentes</div>
+              </div>
+            </div>
+
+            <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
+              
+              {/* Barra de Filtro y Buscador */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                <div className="relative max-w-md w-full">
+                  <Search className="w-4 h-4 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Filtrar por IP, dispositivo, ubicación, página..."
+                    value={accessSearchQuery}
+                    onChange={(e) => setAccessSearchQuery(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-2xl text-sm focus:bg-slate-900 focus:border-indigo-500 focus:outline-none transition font-medium text-white"
+                  />
+                  {accessSearchQuery && (
+                    <button 
+                      onClick={() => setAccessSearchQuery('')} 
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+                  Resultados: <b className="text-white">
+                    {(state.webAccessLogs || []).filter(l => {
+                      if (!accessSearchQuery) return true;
+                      const q = accessSearchQuery.toLowerCase();
+                      return (l.ip || '').toLowerCase().includes(q) ||
+                             (l.device || '').toLowerCase().includes(q) ||
+                             (l.location || '').toLowerCase().includes(q) ||
+                             (l.page || '').toLowerCase().includes(q);
+                    }).length}
+                  </b> de <b className="text-slate-400">{(state.webAccessLogs || []).length}</b>
+                </div>
+              </div>
+
+              {/* Tabla de Registros de Acceso */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-800/80">
+                <table className="w-full border-collapse text-left font-sans">
+                  <thead>
+                    <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest select-none">
+                      <th className="p-4 sm:p-5">Día y Hora</th>
+                      <th className="p-4 sm:p-5">Ubicación / Región</th>
+                      <th className="p-4 sm:p-5">Equipo / Pantalla / Entorno</th>
+                      <th className="p-4 sm:p-5">Página</th>
+                      <th className="p-4 sm:p-5">Dirección IP</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-850/60 text-slate-300">
+                    {(() => {
+                      const logs = (state.webAccessLogs || []).filter(l => {
+                        if (!accessSearchQuery) return true;
+                        const q = accessSearchQuery.toLowerCase();
+                        return (l.ip || '').toLowerCase().includes(q) ||
+                               (l.device || '').toLowerCase().includes(q) ||
+                               (l.location || '').toLowerCase().includes(q) ||
+                               (l.page || '').toLowerCase().includes(q);
+                      });
+
+                      if (logs.length === 0) {
+                        return (
+                          <tr>
+                            <td colSpan={5} className="p-10 text-center text-slate-500 text-sm font-bold uppercase tracking-wider bg-slate-950/40">
+                              No se encontraron registros de accesos que coincidan.
+                            </td>
+                          </tr>
+                        );
+                      }
+
+                      return logs.map((l) => (
+                        <tr key={l.id} className="hover:bg-slate-800/20 transition-all duration-150">
+                          <td className="p-4 sm:p-5 whitespace-nowrap">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-white font-mono font-bold text-xs flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+                                {new Date(l.timestamp).toLocaleDateString()}
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-mono font-bold flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                                {new Date(l.timestamp).toLocaleTimeString()}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-4 sm:p-5">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                              <div>
+                                <span className="text-white font-bold text-xs sm:text-sm block">{l.location}</span>
+                                <span className="text-[9px] text-slate-400 font-medium block">Geolocalización aproximada</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4 sm:p-5">
+                            <span className="text-slate-100 font-semibold bg-slate-950/80 px-2.5 py-1.5 rounded-xl border border-slate-850 block shadow-inner text-xs">
+                              {l.device}
+                            </span>
+                          </td>
+                          <td className="p-4 sm:p-5">
+                            <span className="px-2 py-1 bg-slate-950 text-indigo-400 font-mono font-black text-[10px] rounded border border-slate-850">
+                              {l.page}
+                            </span>
+                          </td>
+                          <td className="p-4 sm:p-5 whitespace-nowrap">
+                            <span className="px-2 py-1 bg-slate-950 text-slate-400 rounded text-[11px] font-mono border border-slate-850 select-all font-bold">
+                              {l.ip}
                             </span>
                           </td>
                         </tr>

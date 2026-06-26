@@ -102,6 +102,16 @@ export interface GlobalState {
     suggestionsSection?: boolean;
   };
   donationPassword?: string;
+  webAccessLogs?: WebAccessLog[];
+}
+
+export interface WebAccessLog {
+  id: string;
+  timestamp: string;      // ISO string
+  ip?: string;            // Visitor IP
+  device: string;         // Device description / Browser / Operating System
+  location: string;       // Country, city, or approximation
+  page: string;           // Page path (e.g. "/" or "/admin")
 }
 
 export interface AdminUser {

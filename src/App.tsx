@@ -38,6 +38,52 @@ export default function App() {
         }
       })
       .catch(err => console.error('Error fetching state:', err));
+
+    // Log access of this user
+    const gatherAndLogAccess = async () => {
+      try {
+        const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+        const isTablet = /Tablet|iPad/i.test(navigator.userAgent);
+        const deviceType = isMobile ? '📱 Móvil' : isTablet ? '📟 Tablet' : '💻 Escritorio';
+
+        let os = 'Desconocido';
+        const ua = navigator.userAgent;
+        if (ua.indexOf('Win') !== -1) os = 'Windows';
+        else if (ua.indexOf('Mac') !== -1) os = 'macOS';
+        else if (ua.indexOf('Linux') !== -1) os = 'Linux';
+        else if (ua.indexOf('Android') !== -1) os = 'Android';
+        else if (ua.indexOf('like Mac') !== -1) os = 'iOS';
+
+        const screenRes = `${window.innerWidth}x${window.innerHeight}`;
+        const location = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Detectando...';
+        const language = navigator.language || 'es';
+        const page = window.location.pathname;
+
+        const res = await fetch('/api/log-access', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            device: `${deviceType} (${os})`,
+            location,
+            page,
+            screenRes,
+            language
+          })
+        });
+        const data = await res.json();
+        if (data && data.state) {
+          setState(prev => ({
+            ...prev,
+            webAccessLogs: data.state.webAccessLogs || prev.webAccessLogs
+          }));
+        }
+      } catch (err) {
+        console.error('Error logging access:', err);
+      }
+    };
+
+    const timer = setTimeout(gatherAndLogAccess, 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   // Automatic Hourly Sync with Google Drive Excel
@@ -61,7 +107,7 @@ export default function App() {
         body: JSON.stringify({ manualTrigger: manual })
       });
       const data = await res.json();
-      if (data.success) {
+      if (data) {
         setState(prev => ({
           ...prev,
           pledges: data.pledges || prev.pledges,

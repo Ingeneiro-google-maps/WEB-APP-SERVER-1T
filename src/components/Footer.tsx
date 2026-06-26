@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, Lock, KeyRound, AlertCircle, X } from 'lucide-react';
+import { Heart, Lock, KeyRound, AlertCircle, X, Instagram } from 'lucide-react';
 
 interface FooterProps {
   onUnlockAdmin?: () => void;
@@ -42,8 +42,19 @@ export const Footer: React.FC<FooterProps> = ({ onUnlockAdmin }) => {
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <span>© 2026 Por 1T — Solidaridad ONG España con Venezuela 🇻🇪</span>
               </p>
-              <p className="text-[10px] font-bold text-[#008CBA] uppercase tracking-widest mt-0.5">
-                Desarrollo web realizado por el Ingeniero. Orlando Galdámez - 2026
+              <p className="text-[10px] font-bold text-[#008CBA] uppercase tracking-widest mt-0.5 flex items-center gap-1.5 flex-wrap">
+                <span>Desarrollo web realizado por el Ingeniero. Orlando Galdámez</span>
+                <a 
+                  href="https://www.instagram.com/ing.orlando.galdamez" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center gap-1 text-pink-600 hover:text-pink-700 bg-pink-50 hover:bg-pink-100 px-2 py-0.5 rounded-md transition normal-case shrink-0"
+                  title="Instagram de Orlando Galdámez"
+                >
+                  <Instagram className="w-3 h-3 text-pink-500 shrink-0" />
+                  <span className="text-[9px] font-black lowercase font-sans">@ing.orlando.galdamez</span>
+                </a>
+                <span>- 2026</span>
               </p>
             </div>
           </div>

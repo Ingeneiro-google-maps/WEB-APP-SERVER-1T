@@ -3,7 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { INITIAL_STATE } from './src/data/initialData';
-import { GlobalState, DonorPledge, SyncLog, NewsItem, SuggestionItem } from './src/types';
+import { GlobalState, DonorPledge, SyncLog, NewsItem, SuggestionItem, WebAccessLog } from './src/types';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 
@@ -13,13 +13,13 @@ dotenv.config();
 let appState: GlobalState = JSON.parse(JSON.stringify(INITIAL_STATE));
 let supabaseTableMissing = false;
 
-// Initialize Supabase Client if credentials are provided
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_KEY || '';
+// Initialize Supabase Client if credentials are provided (checking standard, service, anon and framework prefixes)
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
 if (supabase) {
-  console.log('✅ Cliente de Supabase inicializado correctamente.');
+  console.log('✅ Cliente de Supabase inicializado correctamente con URL:', supabaseUrl);
 } else {
   console.warn('⚠️ No se encontraron credenciales de Supabase (SUPABASE_URL / SUPABASE_KEY). Funcionando en modo local (in-memory).');
 }
@@ -334,6 +334,71 @@ if (supabase) {
       supabaseTableMissing: supabaseTableMissing,
       totalCollectedKilos: recalculateTotalKilos(appState)
     });
+  });
+
+  // Log Web Access
+  app.post('/api/log-access', async (req, res) => {
+    try {
+      const { device, location, page, screenRes, language } = req.body || {};
+      
+      // Extract IP address from headers
+      const rawIp = req.headers['x-forwarded-for'] as string || 
+                    req.headers['x-real-ip'] as string || 
+                    req.socket.remoteAddress || 
+                    '127.0.0.1';
+      const ip = rawIp.split(',')[0].trim();
+
+      // Detect Vercel / Cloudflare country headers
+      const cfCountry = req.headers['cf-ipcountry'] as string;
+      const vercelCountry = req.headers['x-vercel-ip-country'] as string;
+      const headerCountry = cfCountry || vercelCountry || '';
+
+      let finalLocation = location || '';
+      if (headerCountry) {
+        finalLocation = finalLocation ? `${finalLocation} (${headerCountry})` : headerCountry;
+      }
+      if (!finalLocation || finalLocation === 'Detectando...') {
+        finalLocation = 'Acceso Web';
+      }
+
+      // Format device description
+      let deviceDescription = device || 'Dispositivo';
+      if (screenRes) {
+        deviceDescription += ` [Pantalla: ${screenRes}]`;
+      }
+      if (language) {
+        deviceDescription += ` (${language})`;
+      }
+
+      const newAccessLog: WebAccessLog = {
+        id: 'acc_' + Math.random().toString(36).substring(2, 11),
+        timestamp: new Date().toISOString(),
+        ip,
+        device: deviceDescription,
+        location: finalLocation,
+        page: page || '/'
+      };
+
+      if (!appState.webAccessLogs) {
+        appState.webAccessLogs = [];
+      }
+
+      // Add to front of array
+      appState.webAccessLogs.unshift(newAccessLog);
+      
+      // Limit to last 250 records to prevent DB bloat
+      if (appState.webAccessLogs.length > 250) {
+        appState.webAccessLogs = appState.webAccessLogs.slice(0, 250);
+      }
+
+      // Save to Supabase DB if active
+      await saveStateToSupabase();
+
+      res.json({ success: true, log: newAccessLog, state: { ...appState, supabaseActive: !!supabase, supabaseTableMissing: supabaseTableMissing } });
+    } catch (err: any) {
+      console.error('❌ Error en /api/log-access:', err);
+      res.status(500).json({ error: err.message });
+    }
   });
 
   // Forensic Analysis for Supabase connections
