@@ -213,6 +213,7 @@ export default function App() {
         onClose={() => setIsDonationOpen(false)}
         onPledgeSubmitted={handlePledgeSubmitted}
         centersCities={centersCities}
+        correctPassword={state.donationPassword || 'VENEZUELAVIVE2026'}
       />
 
       <AiAssistantModal

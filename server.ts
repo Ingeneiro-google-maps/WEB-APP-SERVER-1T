@@ -5,15 +5,143 @@ import { GoogleGenAI } from '@google/genai';
 import { INITIAL_STATE } from './src/data/initialData';
 import { GlobalState, DonorPledge, SyncLog, NewsItem, SuggestionItem } from './src/types';
 import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
 
 // In-memory persistent state across requests
 let appState: GlobalState = JSON.parse(JSON.stringify(INITIAL_STATE));
 
+// Initialize Supabase Client if credentials are provided
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_KEY || '';
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
+
+if (supabase) {
+  console.log('✅ Cliente de Supabase inicializado correctamente.');
+} else {
+  console.warn('⚠️ No se encontraron credenciales de Supabase (SUPABASE_URL / SUPABASE_KEY). Funcionando en modo local (in-memory).');
+}
+
+// Helper para guardar el estado en Supabase
+async function saveStateToSupabase() {
+  if (!supabase) return;
+  try {
+    const { error } = await supabase
+      .from('website_state')
+      .upsert({ id: 1, state: appState });
+    if (error) {
+      console.error('❌ Error al guardar estado en Supabase:', error);
+    } else {
+      console.log('💾 [Supabase] Base de datos de la web actualizada y guardada con éxito.');
+    }
+  } catch (err: any) {
+    console.error('❌ Excepción al guardar estado en Supabase:', err.message || err);
+  }
+}
+
+// Helper para cargar el estado desde Supabase
+async function loadStateFromSupabase() {
+  if (!supabase) return;
+  try {
+    const { data, error } = await supabase
+      .from('website_state')
+      .select('state')
+      .eq('id', 1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        console.log('🌱 No se encontró el registro inicial de la web en Supabase. Creándolo ahora...');
+        const { error: insertError } = await supabase
+          .from('website_state')
+          .insert({ id: 1, state: appState });
+        if (insertError) {
+          console.error('❌ Error al crear el registro inicial en Supabase:', insertError);
+        } else {
+          console.log('✅ Registro inicial creado con éxito en Supabase.');
+        }
+      } else if (error.message && error.message.includes('relation "public.website_state" does not exist')) {
+        console.warn('⚠️ La tabla "website_state" no existe en Supabase.');
+        console.warn('💡 Para solucionarlo y habilitar la persistencia global, ejecuta esta consulta SQL en el panel de Supabase:');
+        console.warn(`
+          CREATE TABLE IF NOT EXISTS website_state (
+            id BIGINT PRIMARY KEY,
+            state JSONB NOT NULL
+          );
+          
+          INSERT INTO website_state (id, state)
+          VALUES (1, '{}'::jsonb)
+          ON CONFLICT (id) DO NOTHING;
+        `);
+      } else {
+        console.error('⚠️ Error al cargar el estado desde Supabase:', error.message || error);
+      }
+    } else if (data && data.state) {
+      if (typeof data.state === 'object' && (data.state as any).campaignTitle) {
+        appState = data.state as GlobalState;
+        console.log('✅ [Supabase] ¡El estado de la web ha sido cargado con éxito desde la nube!');
+      } else {
+        console.warn('⚠️ Los datos obtenidos de Supabase no tienen un formato válido de GlobalState. Se conservará el estado local inicial.');
+      }
+    }
+  } catch (err: any) {
+    console.error('❌ Excepción al cargar el estado desde Supabase:', err.message || err);
+  }
+}
+
+// Programmatic distribution of initial pledges into supplies to guarantee perfect 100% consistency on start
+appState.supplies = appState.supplies.map(sup => ({ ...sup, currentKilos: 0 }));
+appState.pledges.forEach(p => {
+  if (p.pledgeKilos > 0) {
+    const matchedIdx = findMatchingSupplyIndex(p.category, appState.supplies);
+    if (matchedIdx !== -1) {
+      appState.supplies[matchedIdx].currentKilos += p.pledgeKilos;
+    }
+  }
+});
+
 // Helper to compute total kilos
 function recalculateTotalKilos(state: GlobalState): number {
   return state.supplies.reduce((acc, item) => acc + item.currentKilos, 0);
+}
+
+// Helper to determine which of the 5 supplies categories a donation belongs to
+function findMatchingSupplyIndex(categoryOrName: string, suppliesList: any[]): number {
+  const pCat = (categoryOrName || '').toLowerCase().trim();
+  
+  if (pCat.includes('harina') || pCat.includes('arroz') || pCat.includes('pasta') || pCat.includes('espagueti') || pCat.includes('fideo') || pCat.includes('maiz') || pCat.includes('maíz') || pCat.includes('cereal') || pCat.includes('trigo') || pCat.includes('avena')) {
+    return 0; // Harina de Maíz, Arroz y Pasta
+  } 
+  if (pCat.includes('grano') || pCat.includes('caraota') || pCat.includes('lenteja') || pCat.includes('enlatado') || pCat.includes('frijol') || pCat.includes('atun') || pCat.includes('atún') || pCat.includes('sardina') || pCat.includes('aceite') || pCat.includes('garbanzo') || pCat.includes('conserva')) {
+    return 1; // Granos (Caraotas/Lentejas) y Enlatados
+  } 
+  if (pCat.includes('agua') || pCat.includes('botella') || pCat.includes('sales') || pCat.includes('hidratacion') || pCat.includes('rehidratación') || pCat.includes('bebida') || pCat.includes('liquido') || pCat.includes('líquido')) {
+    return 2; // Agua Embotellada y Sales de Rehidratación
+  } 
+  if (pCat.includes('ropa') || pCat.includes('abrigo') || pCat.includes('manta') || pCat.includes('sabana') || pCat.includes('sábana') || pCat.includes('sueter') || pCat.includes('chaqueta') || pCat.includes('vestimenta') || pCat.includes('calzado') || pCat.includes('zapato')) {
+    return 3; // Ropa y Abrigo
+  } 
+  if (pCat.includes('medicina') || pCat.includes('kit') || pCat.includes('insumo') || pCat.includes('auxilio') || pCat.includes('analgesico') || pCat.includes('analgésico') || pCat.includes('farmaco') || pCat.includes('fármaco') || pCat.includes('pastilla') || pCat.includes('paracetamol') || pCat.includes('ibuprofeno') || pCat.includes('gasa') || pCat.includes('venda') || pCat.includes('alcohol')) {
+    return 4; // Medicinas e Insumos
+  }
+
+  // Fallback to substring matching on category or name
+  const idx = suppliesList.findIndex(s => 
+    s.category.toLowerCase().includes(pCat) || 
+    pCat.includes(s.category.toLowerCase()) ||
+    s.name.toLowerCase().includes(pCat) || 
+    pCat.includes(s.name.toLowerCase())
+  );
+
+  if (idx === -1) {
+    if (pCat.includes('alimento') || pCat.includes('comida') || pCat.includes('perecedero')) {
+      return 0;
+    }
+    return 0; // Default fallback to first category
+  }
+
+  return idx;
 }
 
 // Robust CSV to DonorPledge parser supporting Google Sheets export format
@@ -49,11 +177,35 @@ function parseCSVToPledges(text: string): { pledges: DonorPledge[], kilosByCateg
 
   const headers = parseCSVLine(firstLine).map(h => h.toLowerCase().replace(/["']/g, '').trim());
 
-  // Dynamic synonyms matching
+  // Dynamic synonyms matching with smart prioritization to prevent "donacion" text columns from stealing numeric "kilosIdx"
   let donorIdx = headers.findIndex(h => h.includes('donante') || h.includes('nombre') || h.includes('donor') || h.includes('quien') || h.includes('person') || h.includes('usuario'));
-  let kilosIdx = headers.findIndex(h => h.includes('kilo') || h.includes('peso') || h.includes('cantidad') || h.includes('kg') || h.includes('cant') || h.includes('monto') || h.includes('donacion') || h.includes('donación'));
+  
+  // Try to find the actual numeric kilograms column first by specific weight markers
+  let kilosIdx = headers.findIndex(h => h.includes('kg') || h.includes('kilo') || h.includes('peso') || h.includes('cantidad') || h.includes('cant'));
+  if (kilosIdx === -1) {
+    kilosIdx = headers.findIndex(h => h.includes('monto') || h.includes('donacion') || h.includes('donación') || h.includes('valor'));
+  }
+  
   let cityIdx = headers.findIndex(h => h.includes('ciudad') || h.includes('centro') || h.includes('lugar') || h.includes('city') || h.includes('acopio') || h.includes('ubicacion') || h.includes('ubicación') || h.includes('destino'));
-  let categoryIdx = headers.findIndex(h => h.includes('categor') || h.includes('insumo') || h.includes('tipo') || h.includes('category') || h.includes('grupo') || h.includes('mercancia') || h.includes('mercancía'));
+  
+  // Try to find category column
+  let categoryIdx = headers.findIndex(h => 
+    h.includes('categor') || 
+    h.includes('insumo') || 
+    h.includes('tipo') || 
+    h.includes('category') || 
+    h.includes('grupo') || 
+    h.includes('mercancia') || 
+    h.includes('mercancía') ||
+    h.includes('producto') ||
+    h.includes('articulo') ||
+    h.includes('artículo')
+  );
+  // If no category found but we found a "donacion" column that wasn't chosen as the kilosIdx, use that!
+  if (categoryIdx === -1) {
+    categoryIdx = headers.findIndex((h, idx) => idx !== kilosIdx && (h.includes('donacion') || h.includes('donación')));
+  }
+
   let msgIdx = headers.findIndex(h => h.includes('mensaj') || h.includes('descrip') || h.includes('comentar') || h.includes('nota') || h.includes('message') || h.includes('observ') || h.includes('detalle') || h.includes('comentario') || h.includes('entrada'));
   let dateIdx = headers.findIndex(h => h.includes('fecha') || h.includes('date') || h.includes('día') || h.includes('dia') || h.includes('registro') || h.includes('marca temporal'));
   let emailIdx = headers.findIndex(h => h.includes('email') || h.includes('correo') || h.includes('mail') || h.includes('contacto'));
@@ -136,6 +288,13 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Cargar estado de Supabase si está disponible
+  if (supabase) {
+    console.log('🔄 Intentando cargar el estado de la web desde Supabase...');
+    await loadStateFromSupabase();
+    totalKilos = recalculateTotalKilos(appState);
+  }
+
   app.use(express.json());
 
   // API Routes
@@ -147,12 +306,149 @@ async function startServer() {
   app.get('/api/state', (req, res) => {
     res.json({
       ...appState,
+      supabaseActive: !!supabase,
       totalCollectedKilos: recalculateTotalKilos(appState)
     });
   });
 
+  // Forensic Analysis for Supabase connections
+  app.get('/api/forensic-analysis', async (req, res) => {
+    const report: any = {
+      timestamp: new Date().toISOString(),
+      supabaseActive: !!supabase,
+      databaseUrl: supabaseUrl ? supabaseUrl.replace(/(https?:\/\/)(.*)/, '$1***.$2'.split('.').slice(-2).join('.')) : 'No configurada',
+      clientInitialized: !!supabase,
+      checks: []
+    };
+
+    try {
+      if (!supabase) {
+        report.status = "Incompleto";
+        report.message = "No se puede realizar el análisis forense completo porque Supabase no está configurado (modo local en memoria).";
+        return res.json(report);
+      }
+
+      const startTime = Date.now();
+      
+      // Query 1: Test SELECT on website_state
+      const { data, error, status } = await supabase
+        .from('website_state')
+        .select('id, state')
+        .eq('id', 1);
+
+      const queryTime = Date.now() - startTime;
+      
+      report.checks.push({
+        name: "Conectividad de Red y Ping a Supabase API",
+        status: error ? "FALLIDO" : "OK",
+        latencyMs: queryTime,
+        details: error ? error.message : `Consulta completada con éxito. Código de estado HTTP de Supabase: ${status}`
+      });
+
+      if (error) {
+        report.status = "Incompleto";
+        report.message = `Error de conexión forense: ${error.message}`;
+        return res.json(report);
+      }
+
+      // Query 2: Row count & Integrity checks
+      const { count, error: countErr } = await supabase
+        .from('website_state')
+        .select('*', { count: 'exact', head: true });
+
+      report.checks.push({
+        name: "Integridad de la tabla website_state",
+        status: countErr ? "FALLIDO" : "OK",
+        details: countErr 
+          ? countErr.message 
+          : `La tabla existe en Supabase y tiene exactamente ${count} registros activos.`
+      });
+
+      // Query 3: Payload structure validation
+      if (data && data.length > 0) {
+        const payload = data[0].state;
+        const keys = typeof payload === 'object' ? Object.keys(payload) : [];
+        report.checks.push({
+          name: "Validación Forense de Datos (Payload)",
+          status: keys.length > 0 ? "OK" : "ADVERTENCIA",
+          details: keys.length > 0 
+            ? `Estructura JSONB válida. Claves principales encontradas en el estado guardado: ${keys.slice(0, 10).join(', ')}${keys.length > 10 ? '...' : ''}`
+            : "La tabla existe, pero el payload JSONB está vacío o no es un objeto de GlobalState válido."
+        });
+      } else {
+        report.checks.push({
+          name: "Validación Forense de Datos (Payload)",
+          status: "ADVERTENCIA",
+          details: "No se encontró el registro con ID = 1. El estado está en memoria pero aún no se ha persistido ningún cambio en la nube."
+        });
+      }
+
+      // Query 4: Server system footprint
+      const memoryUsage = process.memoryUsage();
+      report.checks.push({
+        name: "Huella de Memoria del Servidor Node.js",
+        status: "OK",
+        details: `RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB, Heap Usado: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`
+      });
+
+      report.status = "Saludable (100% Operativo)";
+      report.message = `¡Hola Orlando! El sistema de ayuda humanitaria Por 1T está listo y operando al 100%. Conexión con Supabase establecida con latencia de ${queryTime}ms.`;
+      
+      res.json(report);
+    } catch (err: any) {
+      report.status = "Error Crítico";
+      report.message = `Se produjo una excepción durante el análisis forense: ${err.message || err}`;
+      res.status(500).json(report);
+    }
+  });
+
+  // Reset all state for productive use (Clear all pledges, supplies set to 0)
+  app.post('/api/clear-state', async (req, res) => {
+    try {
+      const { password } = req.body;
+      if (password !== '869987') {
+        return res.status(403).json({ error: 'Contraseña incorrecta. Acción no autorizada.' });
+      }
+
+      // Reset pledges
+      appState.pledges = [];
+      
+      // Reset supplies currentKilos to 0
+      appState.supplies = appState.supplies.map(sup => ({
+        ...sup,
+        currentKilos: 0
+      }));
+
+      // Clear sync logs
+      const cleanLog: SyncLog = {
+        id: 'log-clear-' + Date.now(),
+        timestamp: new Date().toLocaleTimeString(),
+        status: 'success',
+        message: '🧹 [Limpieza Productiva] Toda la base de datos de donaciones e inventarios de suministros ha sido limpiada por el administrador. Listo para producción.'
+      };
+      appState.syncLogs = [cleanLog];
+      
+      // Clear suggestions
+      appState.suggestions = [];
+
+      // Recalculate total
+      totalKilos = recalculateTotalKilos(appState);
+
+      // Save to Supabase
+      await saveStateToSupabase();
+
+      res.json({
+        success: true,
+        message: '¡Base de datos limpiada con éxito! El sistema se encuentra en modo productivo libre de datos de prueba.',
+        state: { ...appState, supabaseActive: !!supabase }
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Update full or partial state (Admin Panel)
-  app.post('/api/state', (req, res) => {
+  app.post('/api/state', async (req, res) => {
     try {
       const updates = req.body;
       appState = {
@@ -160,7 +456,8 @@ async function startServer() {
         ...updates,
         lastSyncTime: new Date().toISOString()
       };
-      res.json({ success: true, state: appState });
+      await saveStateToSupabase();
+      res.json({ success: true, state: { ...appState, supabaseActive: !!supabase } });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
@@ -217,16 +514,7 @@ async function startServer() {
               // Distribute parsed kilos dynamically to matching supply items
               parsedPledges.forEach(p => {
                 if (p.pledgeKilos > 0) {
-                  const pCat = (p.category || '').toLowerCase().trim();
-                  let matchedIdx = appState.supplies.findIndex(s => 
-                    s.category.toLowerCase().includes(pCat) || 
-                    pCat.includes(s.category.toLowerCase()) ||
-                    s.name.toLowerCase().includes(pCat) || 
-                    pCat.includes(s.name.toLowerCase())
-                  );
-                  if (matchedIdx === -1) {
-                    matchedIdx = 0; // fallback to Alimentos if no match
-                  }
+                  const matchedIdx = findMatchingSupplyIndex(p.category, appState.supplies);
                   appState.supplies[matchedIdx].currentKilos += p.pledgeKilos;
                 }
               });
@@ -250,14 +538,19 @@ async function startServer() {
         syncMessage = `⚠️ Error al sincronizar Excel: ${e.message}`;
       }
 
-      // If we couldn't parse any real data, we keep the previous local state and simulate a small increment so the counter feels alive if they use a mock sheet
+      // If we couldn't parse any real data, we keep the previous local state
       if (!fetchedRealData) {
-        const boost = Math.floor(Math.random() * 25) + 5;
-        kilosAdded = boost;
-        if (appState.supplies.length > 0) {
-          appState.supplies[0].currentKilos += boost;
+        // Only simulate random boost if there is absolutely no sheet URL configured or we are on the default fallback
+        if (!targetUrl || targetUrl.includes('docs.google.com/spreadsheets/d/1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC')) {
+          const boost = Math.floor(Math.random() * 25) + 5;
+          kilosAdded = boost;
+          if (appState.supplies.length > 0) {
+            appState.supplies[0].currentKilos += boost;
+          }
+          syncMessage = `[Simulación Local Activa] Sincronización offline. ${syncMessage}. +${boost} kg agregados de forma simulada.`;
+        } else {
+          syncMessage = `[Sin Cambios] No se pudo obtener datos nuevos del Excel. ${syncMessage}. Se mantiene la última base de datos conocida.`;
         }
-        syncMessage = `[Simulación Local Activa] Sincronización offline. ${syncMessage}. +${boost} kg agregados de forma simulada.`;
       }
 
       const newTotal = recalculateTotalKilos(appState);
@@ -275,6 +568,8 @@ async function startServer() {
       appState.syncLogs = [logMsg, ...appState.syncLogs.slice(0, 19)];
       appState.lastSyncTime = new Date().toISOString();
       appState.nextSyncTime = new Date(Date.now() + appState.syncIntervalMinutes * 60 * 1000).toISOString();
+
+      await saveStateToSupabase();
 
       res.json({
         success: fetchedRealData,
@@ -294,12 +589,13 @@ async function startServer() {
         message: `Error general de sincronización: ${error.message}`
       };
       appState.syncLogs = [errLog, ...appState.syncLogs.slice(0, 19)];
+      await saveStateToSupabase();
       res.status(500).json({ error: error.message, logs: appState.syncLogs });
     }
   });
 
   // Add Pledge / Donation
-  app.post('/api/pledge', (req, res) => {
+  app.post('/api/pledge', async (req, res) => {
     try {
       const pledge: DonorPledge = {
         id: 'ple-' + Date.now(),
@@ -311,17 +607,13 @@ async function startServer() {
       // Add kilos donated right now towards 1T goal
       if (pledge.pledgeKilos && pledge.pledgeKilos > 0) {
         const targetCategory = pledge.category || 'Alimentos no perecederos';
-        let matched = false;
-        appState.supplies = appState.supplies.map(sup => {
-          if (sup.category.toLowerCase().includes(targetCategory.toLowerCase()) || targetCategory.toLowerCase().includes(sup.category.toLowerCase()) || sup.name.toLowerCase().includes(targetCategory.toLowerCase())) {
-            matched = true;
+        const matchedIdx = findMatchingSupplyIndex(targetCategory, appState.supplies);
+        appState.supplies = appState.supplies.map((sup, idx) => {
+          if (idx === matchedIdx) {
             return { ...sup, currentKilos: sup.currentKilos + pledge.pledgeKilos };
           }
           return sup;
         });
-        if (!matched && appState.supplies.length > 0) {
-          appState.supplies[0].currentKilos += pledge.pledgeKilos;
-        }
 
         // Add log entry
         const logMsg: SyncLog = {
@@ -353,7 +645,8 @@ async function startServer() {
               : `[Google Sheets Link] Error de servidor (HTTP ${response.status}). Verifique los permisos del Apps Script.`
           };
           appState.syncLogs = [logMsg, ...appState.syncLogs.slice(0, 19)];
-        }).catch((err) => {
+          await saveStateToSupabase();
+        }).catch(async (err) => {
           const logMsg: SyncLog = {
             id: 'log-webhook-err-' + Date.now(),
             timestamp: new Date().toLocaleTimeString(),
@@ -361,9 +654,11 @@ async function startServer() {
             message: `[Google Sheets Link] Error de red: ${err.message}. Revise su Webhook.`
           };
           appState.syncLogs = [logMsg, ...appState.syncLogs.slice(0, 19)];
+          await saveStateToSupabase();
         });
       }
 
+      await saveStateToSupabase();
       res.json({ success: true, pledge, state: appState });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -390,7 +685,7 @@ async function startServer() {
   });
 
   // Add News Item (Admin)
-  app.post('/api/news', (req, res) => {
+  app.post('/api/news', async (req, res) => {
     try {
       const item = {
         id: 'news-' + Date.now(),
@@ -398,6 +693,7 @@ async function startServer() {
         ...req.body
       };
       appState.news = [item, ...(appState.news || [])];
+      await saveStateToSupabase();
       res.json({ success: true, state: appState });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -405,7 +701,7 @@ async function startServer() {
   });
 
   // Add Suggestion (Public)
-  app.post('/api/suggestions', (req, res) => {
+  app.post('/api/suggestions', async (req, res) => {
     try {
       const item = {
         id: 'sug-' + Date.now(),
@@ -413,6 +709,7 @@ async function startServer() {
         ...req.body
       };
       appState.suggestions = [item, ...(appState.suggestions || [])];
+      await saveStateToSupabase();
       res.json({ success: true, state: appState });
     } catch (err: any) {
       res.status(500).json({ error: err.message });

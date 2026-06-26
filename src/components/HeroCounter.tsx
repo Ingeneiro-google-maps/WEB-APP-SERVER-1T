@@ -18,7 +18,7 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
   onTriggerSync,
   syncing
 }) => {
-  const totalKg = state.supplies.reduce((acc, item) => acc + item.currentKilos, 0);
+  const totalKg = (state.pledges || []).reduce((acc, p) => acc + (p.pledgeKilos || 0), 0);
   const targetKg = state.globalTargetTons * 1000;
   const progressRatio = Math.min(100, Math.max(0, (totalKg / targetKg) * 100));
   const tonsCollected = (totalKg / 1000).toFixed(2);

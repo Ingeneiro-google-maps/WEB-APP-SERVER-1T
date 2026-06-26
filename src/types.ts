@@ -89,6 +89,7 @@ export interface GlobalState {
   news: NewsItem[];
   suggestions: SuggestionItem[];
   hasNewDonationAlert?: boolean;
+  supabaseActive?: boolean;
   adminUsers?: AdminUser[];
   userChangeLogs?: UserChangeLog[];
   visibleBlocks?: {
@@ -99,6 +100,7 @@ export interface GlobalState {
     faqSection?: boolean;
     suggestionsSection?: boolean;
   };
+  donationPassword?: string;
 }
 
 export interface AdminUser {

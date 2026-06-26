@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { X, HeartHandshake, CheckCircle2, Package, Scale, FileText, User, MapPin } from 'lucide-react';
+import { X, HeartHandshake, CheckCircle2, Package, Scale, FileText, User, MapPin, Lock } from 'lucide-react';
 
 interface DonationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPledgeSubmitted: (pledgeData: any) => Promise<void>;
   centersCities: string[];
+  correctPassword?: string;
 }
 
 export const DonationModal: React.FC<DonationModalProps> = ({
   isOpen,
   onClose,
   onPledgeSubmitted,
-  centersCities
+  centersCities,
+  correctPassword = 'VENEZUELAVIVE2026'
 }) => {
   const [formData, setFormData] = useState({
     donorName: '',
@@ -23,6 +25,8 @@ export const DonationModal: React.FC<DonationModalProps> = ({
     pledgeKilos: 10,
     message: ''
   });
+  const [inputPassword, setInputPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -31,6 +35,13 @@ export const DonationModal: React.FC<DonationModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.donorName.trim() || formData.pledgeKilos <= 0) return;
+
+    // Validate donation password
+    if (inputPassword.trim() !== correctPassword) {
+      setPasswordError('La contraseña de registro es incorrecta.');
+      return;
+    }
+    setPasswordError('');
 
     setSubmitting(true);
     try {
@@ -55,6 +66,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
           pledgeKilos: 10,
           message: ''
         });
+        setInputPassword('');
         onClose();
       }, 2800);
     } catch (e) {
@@ -223,6 +235,31 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#008CBA] focus:bg-white"
                 />
               </div>
+            </div>
+
+            {/* Field 6: Contraseña de Registro de la Campaña */}
+            <div className="bg-amber-50/50 border border-amber-200 p-4 rounded-2xl">
+              <label className="block text-xs font-black uppercase text-amber-800 mb-1.5 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-amber-600" />
+                Contraseña de Seguridad de la Campaña *
+              </label>
+              <input
+                type="password"
+                required
+                placeholder="Introduzca la contraseña autorizada"
+                value={inputPassword}
+                onChange={(e) => {
+                  setInputPassword(e.target.value);
+                  setPasswordError('');
+                }}
+                className={`w-full px-4 py-3 rounded-xl bg-white border ${passwordError ? 'border-red-500 focus:border-red-500' : 'border-slate-300 focus:border-amber-500'} text-sm font-bold text-slate-900 focus:outline-none transition`}
+              />
+              {passwordError && (
+                <p className="text-xs text-red-600 font-bold mt-1.5">{passwordError}</p>
+              )}
+              <p className="text-[10px] text-slate-500 font-medium mt-1">
+                Para registrar donaciones, introduzca la clave establecida por el coordinador de campaña.
+              </p>
             </div>
 
             <button

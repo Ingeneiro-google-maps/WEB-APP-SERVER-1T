@@ -147,35 +147,46 @@ export const INITIAL_STATE: GlobalState = {
   pledges: [
     {
       id: 'ple-excel-1',
-      donorName: 'José',
-      email: 'jose@donante.es',
+      donorName: 'Almacén Central Madrid (Lote Consolidado)',
+      email: 'madrid@por1t.org',
       city: 'Madrid',
-      pledgeKilos: 1,
-      category: 'Baterías',
-      description: 'Pilas AA y baterías externas portátiles precintadas',
-      message: 'Entrega en centro de acopio Cuatro Caminos, Madrid.',
+      pledgeKilos: 525,
+      category: 'Alimentos no perecederos',
+      description: 'Harina de maíz, arroz, pasta, lentejas y granos enlatados',
+      message: 'Primer gran lote clasificado en Madrid para envío humanitario.',
       date: new Date().toLocaleDateString()
     },
     {
       id: 'ple-excel-2',
-      donorName: 'hhh',
-      email: 'hhh@solidario.com',
+      donorName: 'Campaña Solidaria Barcelona (Lote Consolidado)',
+      email: 'barcelona@por1t.org',
       city: 'Barcelona',
-      pledgeKilos: 8,
-      category: 'Alimentos no perecederos',
-      description: 'Arroz, pasta, lentejas y conservas en lata',
-      message: 'Donación directa para las familias en Mérida.',
+      pledgeKilos: 210,
+      category: 'Agua Potable',
+      description: 'Agua embotellada y sales de rehidratación oral',
+      message: 'Donaciones consolidadas listas para el puerto.',
       date: new Date().toLocaleDateString()
     },
     {
       id: 'ple-excel-3',
-      donorName: 'Voluntario Diáspora',
-      email: 'contacto@redes.org',
+      donorName: 'Voluntariado Diáspora Valencia (Lote Consolidado)',
+      email: 'valencia@por1t.org',
       city: 'Valencia',
-      pledgeKilos: 9,
-      category: 'Ropa',
-      description: 'Ropa térmica y abrigos infantiles clasificados',
-      message: 'Enviado con transportista colaborador.',
+      pledgeKilos: 95,
+      category: 'Ropa y Abrigo',
+      description: 'Mantas térmicas, chaquetas y ropa de abrigo infantil',
+      message: 'Mercancía clasificada por tallas.',
+      date: new Date().toLocaleDateString()
+    },
+    {
+      id: 'ple-excel-4',
+      donorName: 'Asociación Médica por Venezuela',
+      email: 'medicos@por1t.org',
+      city: 'Madrid',
+      pledgeKilos: 45,
+      category: 'Medicinas e Insumos',
+      description: 'Kits de primeros auxilios, gasas, vendajes y analgésicos esenciales',
+      message: 'Insumos sanitarios de emergencia con fechas de caducidad superior a 1 año.',
       date: new Date().toLocaleDateString()
     }
   ],
@@ -294,5 +305,6 @@ export const INITIAL_STATE: GlobalState = {
     newsSection: true,
     faqSection: true,
     suggestionsSection: true
-  }
+  },
+  donationPassword: 'VENEZUELAVIVE2026'
 };

@@ -5,7 +5,7 @@ import {
   FileSpreadsheet, CheckCircle2, AlertOctagon, ArrowUpRight, 
   Lock, Download, Building2, Newspaper, HelpCircle, Lightbulb, 
   Search, X, ExternalLink, Package, MapPin, Phone, Clock,
-  Users, History, User, UserPlus, ShieldCheck, Calendar
+  Users, History, User, UserPlus, ShieldCheck, Calendar, Terminal, Activity
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -23,7 +23,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -52,6 +52,80 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   // Search query for user changes log
   const [logSearchQuery, setLogSearchQuery] = useState('');
+
+  // "Borrar todo" Password modal/input
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [clearPassword, setClearPassword] = useState('');
+  const [clearError, setClearError] = useState<string | null>(null);
+  const [clearSuccess, setClearSuccess] = useState<string | null>(null);
+
+  // "Saluda al sistema" / Forensic states
+  const [forensicData, setForensicData] = useState<any>(null);
+  const [loadingForensic, setLoadingForensic] = useState(false);
+  const [forensicError, setForensicError] = useState<string | null>(null);
+  const [greetMessage, setGreetMessage] = useState<string | null>(null);
+
+  const handleClearAllDataSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setClearError(null);
+    setClearSuccess(null);
+
+    if (clearPassword !== '869987') {
+      setClearError('Contraseña incorrecta. El código de seguridad 869987 es requerido para realizar esta acción destructiva.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/clear-state', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: clearPassword })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setClearSuccess('🧹 ¡La base de datos se ha limpiado con éxito! Se han eliminado todas las donaciones de prueba y los inventarios se han inicializado en 0.');
+        if (data.state) {
+          onUpdateState(data.state);
+        }
+        setTimeout(() => {
+          setIsClearModalOpen(false);
+          setClearPassword('');
+          setClearSuccess(null);
+        }, 2500);
+      } else {
+        setClearError(data.error || 'Error al intentar limpiar los datos.');
+      }
+    } catch (err: any) {
+      setClearError(`Error de red: ${err.message || err}`);
+    }
+  };
+
+  const handleFetchForensic = async () => {
+    setLoadingForensic(true);
+    setForensicError(null);
+    setForensicData(null);
+    setGreetMessage(null);
+
+    try {
+      const res = await fetch('/api/forensic-analysis');
+      const data = await res.json();
+      if (res.ok) {
+        setForensicData(data);
+        if (data.message) {
+          setGreetMessage(data.message);
+        }
+      } else {
+        setForensicError(data.message || 'Error en la respuesta del análisis forense de Supabase.');
+      }
+    } catch (err: any) {
+      setForensicError(`Error de conexión con el servidor: ${err.message || err}`);
+    } finally {
+      setLoadingForensic(false);
+    }
+  };
 
   // Helper to trigger updates and save an audit log entry simultaneously
   const handleUpdateStateWithLog = (updates: Partial<GlobalState>, actionDescription: string) => {
@@ -116,6 +190,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [sheetUrl, setSheetUrl] = useState<string>(state.googleSheetUrl || '');
   const [sheetWebhookUrl, setSheetWebhookUrl] = useState<string>(state.googleSheetWebhookUrl || '');
   const [autoSync, setAutoSync] = useState<boolean>(state.autoSyncEnabled);
+  const [donationPass, setDonationPass] = useState<string>(state.donationPassword || 'VENEZUELAVIVE2026');
 
   // Estados de visibilidad de bloques de información de la web
   const [showSuppliesGrid, setShowSuppliesGrid] = useState<boolean>(state.visibleBlocks?.suppliesGrid !== false);
@@ -324,6 +399,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       googleSheetUrl: sheetUrl,
       googleSheetWebhookUrl: sheetWebhookUrl,
       autoSyncEnabled: autoSync,
+      donationPassword: donationPass,
       visibleBlocks: {
         suppliesGrid: showSuppliesGrid,
         centersGrid: showCentersGrid,
@@ -332,7 +408,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         faqSection: showFaqSection,
         suggestionsSection: showSuggestionsSection
       }
-    }, `Actualizó la configuración global y la visibilidad de bloques de la web (Meta: ${targetTons}T, Consulta automática: ${autoSync ? 'Habilitada' : 'Deshabilitada'})`);
+    }, `Actualizó la configuración global, contraseña de donaciones y visibilidad de bloques de la web (Meta: ${targetTons}T)`);
     showToast('⚙️ Configuración y sincronización guardadas en el servidor.');
   };
 
@@ -509,7 +585,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             }`}
           >
             <Building2 className="w-5 h-5" />
-            <span>🏢 Centros Acopio Comida ({state.centers.length})</span>
+            <span>🏢 AGREGAR Centro de Acopio ({state.centers.length})</span>
           </button>
 
           <button
@@ -600,6 +676,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <History className="w-5 h-5 text-yellow-300" />
             <span>📜 Histórico de Cambios Web ({state.userChangeLogs?.length || 0})</span>
           </button>
+
+          <button
+            onClick={() => {
+              setActiveTab('saludar_sistema');
+              handleFetchForensic();
+            }}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'saludar_sistema' 
+                ? 'bg-amber-600 text-white shadow-xl shadow-amber-500/20' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Terminal className="w-5 h-5 text-amber-400" />
+            <span>💻 Saluda al sistema</span>
+          </button>
         </div>
 
         {/* --- CONTENIDO PESTAÑA 1: BASE DE DATOS EXCEL (REGISTROS DONACIONES) --- */}
@@ -638,6 +729,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <span>Abrir Google Drive Excel</span>
                   </a>
                 )}
+
+                <button
+                  onClick={() => {
+                    setClearError(null);
+                    setClearSuccess(null);
+                    setClearPassword('');
+                    setIsClearModalOpen(true);
+                  }}
+                  className="px-6 py-4 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-lg shadow-rose-600/20 cursor-pointer"
+                >
+                  <Trash2 className="w-4 h-4 text-white animate-bounce" />
+                  <span>Borrar Todo (Prod)</span>
+                </button>
               </div>
             </div>
 
@@ -1175,7 +1279,48 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <div>
               <h3 className="text-2xl font-black uppercase text-white">⚙️ Configuración del Servidor y Base de Datos</h3>
               <p className="text-slate-400 text-sm mt-1">Sincronización horaria con hoja de cálculo externa de Google Drive Excel.</p>
+              
+              <div className="mt-4 p-3.5 bg-rose-950/40 border border-rose-500/40 rounded-2xl flex items-center gap-2.5 shadow-lg animate-pulse">
+                <span className="w-2.5 h-2.5 bg-rose-500 rounded-full shrink-0"></span>
+                <span className="text-xs font-black uppercase tracking-wider text-rose-400">
+                  ⚠️ "These data cannot be modified, only Orlando."
+                </span>
+              </div>
             </div>
+
+            {/* Supabase Global Persistence Status */}
+            {state.supabaseActive ? (
+              <div className="p-5 bg-emerald-950/40 border border-emerald-500/30 rounded-2xl flex items-start gap-4 shadow-lg">
+                <div className="p-3 bg-emerald-900/40 rounded-xl text-emerald-400 shrink-0">
+                  <Database className="w-6 h-6 animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+                    <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400">Base de Datos Supabase Conectada</h4>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    ¡La sincronización en la nube está activa! Todos los textos de la portada, la información general, las noticias, el inventario y las FAQs se almacenan y replican globalmente en tiempo real para todos los visitantes del mundo.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-5 bg-amber-950/30 border border-amber-500/30 rounded-2xl flex items-start gap-4 shadow-lg">
+                <div className="p-3 bg-amber-900/30 rounded-xl text-amber-500 shrink-0">
+                  <AlertOctagon className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-black uppercase tracking-wider text-amber-400">Base de Datos en Modo Local</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed mb-2">
+                    La aplicación funciona temporalmente en memoria del servidor. Para activar la persistencia global persistente en Supabase (y evitar que los datos se pierdan al reiniciar o varíen entre dispositivos), configure las variables de entorno en su servidor:
+                  </p>
+                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-[10px] text-slate-400 space-y-1">
+                    <div><b>SUPABASE_URL</b> = <span className="text-slate-300">https://your-project.supabase.co</span></div>
+                    <div><b>SUPABASE_KEY</b> = <span className="text-slate-300">su_clave_secreta_api</span></div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-6">
               <div>
@@ -1191,6 +1336,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   onChange={e => setTargetTons(parseFloat(e.target.value) || 1)}
                   className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-lg font-black text-white focus:border-[#008CBA] focus:outline-none"
                 />
+              </div>
+
+              <div>
+                <label className="text-xs font-black uppercase text-amber-500 block mb-2">
+                  🔐 Contraseña de Seguridad para Registro de Donaciones (Público)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej. VENEZUELAVIVE2026"
+                  value={donationPass}
+                  onChange={e => setDonationPass(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm font-bold text-white focus:border-[#008CBA] focus:outline-none"
+                />
+                <p className="text-[10px] text-slate-500 mt-1">
+                  💡 Esta contraseña es la requerida para que los donantes y voluntarios registren donaciones de mercancía en el formulario de la web.
+                </p>
               </div>
 
               <div>
@@ -1358,7 +1519,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               {/* Guía didáctica para configurar Apps Script */}
               <div className="mt-8 pt-6 border-t border-slate-800 space-y-4">
                 <h4 className="text-sm font-black uppercase text-amber-500 flex items-center gap-2">
-                  📋 MANUAL DE INTEGRACIÓN EN 3 PASOS (ESCRITURA DIRECTA)
+                  📋 MANUAL DE INTEGRACIÓN EN 3 PASOS (Estos son los pasos que deben de seguir si necesita cualquier ingeniero en reconectar la base de datos. Les dejo esto aquí para que sepan. Atentamente, Orlando.)
                 </h4>
                 <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-xs text-slate-300 leading-relaxed space-y-3">
                   <p>
@@ -1856,6 +2017,194 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA 10: SALUDA AL SISTEMA & ANÁLISIS FORENSE --- */}
+        {activeTab === 'saludar_sistema' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="bg-gradient-to-r from-amber-900/60 via-slate-900 to-slate-900 p-8 rounded-3xl border border-amber-500/40 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div>
+                <span className="px-3 py-1 bg-amber-500 text-slate-950 text-xs font-black uppercase tracking-widest rounded-full">Consola de Diagnóstico</span>
+                <h2 className="text-2xl sm:text-3xl font-black uppercase text-white mt-3 flex items-center gap-2.5 font-sans">
+                  <Terminal className="w-8 h-8 text-amber-400 animate-pulse" />
+                  <span>💻 SALUDA AL SISTEMA Y ANÁLISIS FORENSE</span>
+                </h2>
+                <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+                  Realice diagnósticos del sistema, latencia de conexión, integridad de tablas y validación de esquemas en caliente de la base de datos de producción Supabase.
+                </p>
+              </div>
+
+              <button
+                onClick={handleFetchForensic}
+                disabled={loadingForensic}
+                className="px-8 py-4 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 text-slate-950 font-black uppercase tracking-wider rounded-2xl shadow-xl shadow-amber-500/20 flex items-center justify-center gap-3 transition cursor-pointer shrink-0 text-sm font-bold"
+              >
+                <RefreshCw className={`w-5 h-5 ${loadingForensic ? 'animate-spin' : ''}`} />
+                <span>{loadingForensic ? 'Analizando...' : 'Iniciar Análisis Forense'}</span>
+              </button>
+            </div>
+
+            {/* Saludo formal del sistema */}
+            {greetMessage && (
+              <div className="bg-slate-900 p-6 rounded-3xl border border-emerald-500/40 shadow-xl bg-gradient-to-r from-slate-950 to-slate-900">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-emerald-400 uppercase tracking-widest">Respuesta del Sistema</h4>
+                    <p className="text-white text-base font-bold mt-1.5 leading-relaxed italic">
+                      "{greetMessage}"
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {forensicError && (
+              <div className="bg-rose-950/40 p-6 rounded-3xl border border-rose-500/40 text-rose-200 text-sm font-medium flex items-center gap-3">
+                <AlertOctagon className="w-6 h-6 text-rose-500 shrink-0" />
+                <span>{forensicError}</span>
+              </div>
+            )}
+
+            {forensicData && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                {/* Panel lateral: Metadatos del Sistema */}
+                <div className="lg:col-span-4 bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-6">
+                  <h3 className="font-black text-xs uppercase tracking-widest text-slate-400">Información del Entorno</h3>
+                  
+                  <div className="space-y-4 font-mono text-xs text-slate-300">
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-500">CLIENTE SUPABASE</span>
+                      <span className={forensicData.clientInitialized ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {forensicData.clientInitialized ? 'INICIALIZADO' : 'NULO'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-500">ESTADO SUPABASE</span>
+                      <span className={forensicData.supabaseActive ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {forensicData.supabaseActive ? 'CONECTADO (CLOUD)' : 'DESCONECTADO'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-500">BASE DE DATOS URL</span>
+                      <span className="text-slate-100 font-bold select-all">{forensicData.databaseUrl}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-500">HORA DE AUDITORÍA</span>
+                      <span className="text-slate-100 font-bold">{new Date(forensicData.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800/80 text-[11px] text-slate-400 leading-relaxed font-mono">
+                    <span className="text-[#008CBA] font-bold uppercase block mb-1">Nota del Auditor Forense:</span>
+                    Este análisis valida la conectividad mediante un túnel HTTP a Supabase. Si las credenciales no son válidas, la consulta lanzará un error de autenticación con código de excepción API.
+                  </div>
+                </div>
+
+                {/* Checks List */}
+                <div className="lg:col-span-8 bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
+                  <h3 className="font-black text-xs uppercase tracking-widest text-slate-400">Pruebas de Integridad Ejecutadas</h3>
+                  
+                  <div className="space-y-3">
+                    {forensicData.checks?.map((check: any, idx: number) => (
+                      <div key={idx} className="bg-slate-950 p-4 rounded-2xl border border-slate-850 flex items-start gap-4">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                          check.status === 'OK' 
+                            ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' 
+                            : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
+                        }`}>
+                          {check.status === 'OK' ? <CheckCircle2 className="w-4 h-4" /> : <AlertOctagon className="w-4 h-4" />}
+                        </div>
+                        
+                        <div className="grow">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-bold text-sm text-white">{check.name}</span>
+                            {check.latencyMs !== undefined && (
+                              <span className="text-[10px] font-mono text-slate-400 font-bold">Latencia: {check.latencyMs} ms</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-400 mt-1 leading-relaxed font-mono">
+                            {check.details}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* --- MODAL PARA CONFIRMACIÓN DE BORRADO DE BASE DE DATOS (CONTRASENA 869987) --- */}
+        {isClearModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md animate-fade-in text-[#1A202C]">
+            <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 border border-slate-200 shadow-2xl relative">
+              <button
+                onClick={() => setIsClearModalOpen(false)}
+                className="absolute top-5 right-5 p-1.5 text-slate-400 hover:text-slate-800 rounded-lg cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="w-16 h-16 bg-rose-50 text-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-rose-100 shadow-sm">
+                <Trash2 className="w-8 h-8 animate-bounce" />
+              </div>
+
+              <h4 className="text-xl font-black uppercase tracking-tight text-center text-slate-900 mb-1">
+                ⚠️ CONFIRMACIÓN DE OPERACIÓN CRÍTICA
+              </h4>
+              <p className="text-xs text-rose-600 text-center font-bold uppercase tracking-wider mb-6">
+                ESTA ACCIÓN ELIMINARÁ TODA LA BASE DE DATOS E INVENTARIO
+              </p>
+
+              <form onSubmit={handleClearAllDataSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5">
+                    Contraseña de Seguridad Requerida
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={clearPassword}
+                    onChange={(e) => setClearPassword(e.target.value)}
+                    placeholder="Ingrese la contraseña para continuar..."
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 focus:outline-none transition font-medium"
+                  />
+                </div>
+
+                {clearError && (
+                  <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs font-bold text-rose-700 leading-relaxed">
+                    {clearError}
+                  </div>
+                )}
+
+                {clearSuccess && (
+                  <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs font-bold text-emerald-800 leading-relaxed">
+                    {clearSuccess}
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsClearModalOpen(false)}
+                    className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold uppercase tracking-wider rounded-2xl text-xs transition cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase tracking-wider rounded-2xl text-xs shadow-lg shadow-rose-600/20 transition cursor-pointer"
+                  >
+                    Confirmar Borrado
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
