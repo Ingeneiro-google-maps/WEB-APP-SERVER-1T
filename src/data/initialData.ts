@@ -310,5 +310,9 @@ export const INITIAL_STATE: GlobalState = {
   headerVideoEnabled: true,
   headerVideoYoutubeUrl: 'https://www.youtube.com/watch?v=kYv_I-g_M5w',
   introVideoEnabled: true,
-  introVideoYoutubeUrl: 'https://youtube.com/shorts/LT90TVjBYv0'
+  introVideoYoutubeUrl: 'https://youtube.com/shorts/LT90TVjBYv0',
+  introVideoBadgeText: 'Video de Presentación Oficial de la Campaña 🇻🇪',
+  introVideoTitle: '¿Estás Listo para Solidarizarte?',
+  introVideoSubtitle: 'Conoce más de nuestra iniciativa en marcha por 1 Tonelada.',
+  introVideoBtnText: 'Ingresar a la Web de la Campaña ➔'
 };

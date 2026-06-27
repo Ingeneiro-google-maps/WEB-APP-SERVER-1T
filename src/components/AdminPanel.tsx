@@ -238,6 +238,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Video de introducción automático (Pop-up)
   const [introVideoEnabledState, setIntroVideoEnabledState] = useState<boolean>(state.introVideoEnabled !== false);
   const [introVideoYoutubeUrlState, setIntroVideoYoutubeUrlState] = useState<string>(state.introVideoYoutubeUrl || 'https://www.youtube.com/watch?v=kYv_I-g_M5w');
+  const [introVideoBadgeTextState, setIntroVideoBadgeTextState] = useState<string>(state.introVideoBadgeText || 'Video de Presentación Oficial de la Campaña 🇻🇪');
+  const [introVideoTitleState, setIntroVideoTitleState] = useState<string>(state.introVideoTitle || '¿Estás Listo para Solidarizarte?');
+  const [introVideoSubtitleState, setIntroVideoSubtitleState] = useState<string>(state.introVideoSubtitle || 'Conoce más de nuestra iniciativa en marcha por 1 Tonelada.');
+  const [introVideoBtnTextState, setIntroVideoBtnTextState] = useState<string>(state.introVideoBtnText || 'Ingresar a la Web de la Campaña ➔');
 
   const sheetIdFromUrl = state.googleSheetUrl ? (state.googleSheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || '1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC') : '1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC';
   const appsScriptCode = `function doPost(e) {
@@ -2586,6 +2590,57 @@ ON CONFLICT (id) DO NOTHING;`}
                     />
                   </div>
 
+                  {/* Custom Pop-up Texts customization */}
+                  <div className="space-y-3 bg-slate-950/40 p-4 rounded-xl border border-slate-800/50">
+                    <span className="text-[10px] font-black uppercase text-[#008CBA] tracking-wider block border-b border-slate-800 pb-1">
+                      ✍️ Personalizar Textos del Pop-up
+                    </span>
+                    
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-slate-500 block mb-1">Distintivo Superior (Badge)</label>
+                      <input
+                        type="text"
+                        value={introVideoBadgeTextState}
+                        onChange={e => setIntroVideoBadgeTextState(e.target.value)}
+                        placeholder="ej. Video de Presentación Oficial de la Campaña 🇻🇪"
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-800/80 rounded-lg text-xs text-white focus:border-indigo-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-slate-500 block mb-1">Título de Invitación</label>
+                      <input
+                        type="text"
+                        value={introVideoTitleState}
+                        onChange={e => setIntroVideoTitleState(e.target.value)}
+                        placeholder="ej. ¿Estás Listo para Solidarizarte?"
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-800/80 rounded-lg text-xs text-white focus:border-indigo-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-slate-500 block mb-1">Subtítulo / Descripción corta</label>
+                      <textarea
+                        value={introVideoSubtitleState}
+                        onChange={e => setIntroVideoSubtitleState(e.target.value)}
+                        placeholder="ej. Conoce más de nuestra iniciativa en marcha por 1 Tonelada."
+                        rows={2}
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-800/80 rounded-lg text-xs text-white focus:border-indigo-500 focus:outline-none resize-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-slate-500 block mb-1">Texto del Botón de Entrada</label>
+                      <input
+                        type="text"
+                        value={introVideoBtnTextState}
+                        onChange={e => setIntroVideoBtnTextState(e.target.value)}
+                        placeholder="ej. Ingresar a la Web de la Campaña ➔"
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-800/80 rounded-lg text-xs text-white focus:border-indigo-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
                   {/* Video Live Preview */}
                   {introVideoYoutubeUrlState && getYoutubeId(introVideoYoutubeUrlState) && (
                     <div className="rounded-xl overflow-hidden border border-slate-800 aspect-video bg-black relative shadow-inner">
@@ -2682,9 +2737,13 @@ ON CONFLICT (id) DO NOTHING;`}
                     headerVideoEnabled: headerVideoEnabledState,
                     headerVideoYoutubeUrl: headerVideoYoutubeUrlState,
                     introVideoEnabled: introVideoEnabledState,
-                    introVideoYoutubeUrl: introVideoYoutubeUrlState
-                  }, `Actualizó configuraciones del video de introducción y video cinematográfico en cabecera`);
-                  showToast('✨ ¡Configuraciones de video guardadas con éxito!');
+                    introVideoYoutubeUrl: introVideoYoutubeUrlState,
+                    introVideoBadgeText: introVideoBadgeTextState,
+                    introVideoTitle: introVideoTitleState,
+                    introVideoSubtitle: introVideoSubtitleState,
+                    introVideoBtnText: introVideoBtnTextState
+                  }, `Actualizó configuraciones del video de introducción, video en cabecera y textos personalizados del pop-up`);
+                  showToast('✨ ¡Configuraciones de video y textos guardadas con éxito!');
                 }}
                 className="px-8 py-4 bg-violet-600 hover:bg-violet-500 text-white font-black uppercase text-xs sm:text-sm tracking-widest rounded-2xl shadow-xl shadow-violet-500/20 transition cursor-pointer flex items-center gap-2.5"
               >

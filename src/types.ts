@@ -107,6 +107,10 @@ export interface GlobalState {
   headerVideoYoutubeUrl?: string;
   introVideoEnabled?: boolean;
   introVideoYoutubeUrl?: string;
+  introVideoBadgeText?: string;
+  introVideoTitle?: string;
+  introVideoSubtitle?: string;
+  introVideoBtnText?: string;
 }
 
 export interface WebAccessLog {

@@ -278,6 +278,10 @@ export default function App() {
       <IntroVideoModal
         enabled={state.introVideoEnabled !== false}
         youtubeUrl={state.introVideoYoutubeUrl || ''}
+        badgeText={state.introVideoBadgeText}
+        title={state.introVideoTitle}
+        subtitle={state.introVideoSubtitle}
+        btnText={state.introVideoBtnText}
         onClose={() => {}}
       />
     </div>
