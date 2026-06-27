@@ -258,7 +258,7 @@ export default function App() {
         )}
       </main>
 
-      <Footer onUnlockAdmin={() => setIsAdminView(true)} />
+      <Footer onUnlockAdmin={() => setIsAdminView(true)} codeVersion={state.codeVersion} />
 
       {/* Modals */}
       <DonationModal

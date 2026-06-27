@@ -13,6 +13,7 @@ dotenv.config();
 // In-memory persistent state across requests
 let appState: GlobalState = JSON.parse(JSON.stringify(INITIAL_STATE));
 let supabaseTableMissing = false;
+let hasSuccessfullyLoadedFromSupabase = false;
 
 // Initialize Supabase Client if credentials are provided (checking standard, service, anon and framework prefixes)
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
@@ -28,6 +29,18 @@ if (supabase) {
 // Helper para guardar el estado en Supabase
 async function saveStateToSupabase() {
   if (!supabase) return;
+
+  // Si no se ha cargado con éxito todavía desde Supabase, bloqueamos el guardado para evitar
+  // sobreescribir la base de datos de la nube con datos viejos/por defecto del archivo local.
+  if (!hasSuccessfullyLoadedFromSupabase) {
+    console.warn('⚠️ [Supabase] Bloqueado guardado asíncrono para prevenir pérdida de datos. Intentando cargar datos de la nube primero...');
+    await loadStateFromSupabase();
+    if (!hasSuccessfullyLoadedFromSupabase) {
+      console.error('❌ [Supabase] Cancelado guardado de estado. No se pudo verificar la versión de la nube.');
+      return;
+    }
+  }
+
   try {
     const { error } = await supabase
       .from('website_state')
@@ -187,11 +200,12 @@ async function loadStateFromSupabase() {
         const { error: insertError } = await supabase
           .from('website_state')
           .insert({ id: 1, state: appState });
-          if (insertError) {
-            console.error('❌ Error al crear el registro inicial en Supabase:', insertError);
-          } else {
-            console.log('✅ Registro inicial creado con éxito en Supabase.');
-          }
+        if (insertError) {
+          console.error('❌ Error al crear el registro inicial en Supabase:', insertError);
+        } else {
+          console.log('✅ Registro inicial creado con éxito en Supabase.');
+          hasSuccessfullyLoadedFromSupabase = true;
+        }
       } else if (error.message && error.message.includes('relation "public.website_state" does not exist')) {
         supabaseTableMissing = true;
         console.warn('⚠️ La tabla "website_state" no existe en Supabase.');
@@ -213,6 +227,7 @@ async function loadStateFromSupabase() {
       supabaseTableMissing = false;
       if (typeof data.state === 'object' && (data.state as any).campaignTitle) {
         const dbState = data.state as GlobalState;
+        hasSuccessfullyLoadedFromSupabase = true;
 
         // Si la versión del código coincide con la versión guardada en la base de datos,
         // no mezclamos para evitar restaurar elementos que el administrador eliminó en la web.
@@ -231,7 +246,11 @@ async function loadStateFromSupabase() {
           // Sincronizamos la base de datos de vuelta si hay cambios o si la versión se actualizó
           if (previousSerialized !== currentSerialized || dbState.codeVersion !== INITIAL_STATE.codeVersion) {
             console.log('🔄 Sincronizando nueva versión de datos en Supabase...');
+            // temporalmente puenteamos el guardado forzando el booleano
+            const orig = hasSuccessfullyLoadedFromSupabase;
+            hasSuccessfullyLoadedFromSupabase = true;
             await saveStateToSupabase();
+            hasSuccessfullyLoadedFromSupabase = orig;
           }
           console.log('✅ [Supabase] El estado de la web ha sido mezclado con éxito para aplicar la nueva versión de código.');
         }
@@ -443,11 +462,18 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Middleware crucial para mantener sincronizado Supabase en entornos Serverless (como Vercel)
+// Middleware crucial para mantener sincronizado Supabase en entornos Serverless o contenedores efímeros
 const ensureLatestState = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (supabase) {
     try {
-      await loadStateFromSupabase();
+      // Optimización crítica: Solo forzamos carga sincrónica desde Supabase si:
+      // 1. Aún no se ha realizado ninguna carga con éxito (por ejemplo, al arrancar el contenedor).
+      // 2. Es una petición explícita de lectura/guardado de estado (/state) o sincronización de Excel (/sync-excel).
+      // Para cualquier otra petición menor (como logs de acceso, etc.), usamos el estado en memoria para máxima velocidad.
+      const isCriticalPath = req.path === '/state' || req.path === '/sync-excel' || req.originalUrl.includes('/state') || req.originalUrl.includes('/sync-excel');
+      if (!hasSuccessfullyLoadedFromSupabase || isCriticalPath) {
+        await loadStateFromSupabase();
+      }
     } catch (err: any) {
       console.error('❌ Error cargando estado de Supabase en middleware:', err.message || err);
     }

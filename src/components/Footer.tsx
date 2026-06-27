@@ -3,9 +3,10 @@ import { Heart, Lock, KeyRound, AlertCircle, X, Instagram } from 'lucide-react';
 
 interface FooterProps {
   onUnlockAdmin?: () => void;
+  codeVersion?: string;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onUnlockAdmin }) => {
+export const Footer: React.FC<FooterProps> = ({ onUnlockAdmin, codeVersion = '1.0' }) => {
   const [isLockModalOpen, setIsLockModalOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
@@ -39,8 +40,9 @@ export const Footer: React.FC<FooterProps> = ({ onUnlockAdmin }) => {
               1T
             </div>
             <div className="flex flex-col">
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 flex-wrap">
                 <span>© 2026 Por 1T — Solidaridad ONG España con Venezuela 🇻🇪</span>
+                <span className="text-[10px] bg-slate-100 text-slate-500 font-mono px-1.5 py-0.5 rounded border border-slate-200 normal-case">Sincronización Excel v{codeVersion}</span>
               </p>
               <p className="text-[10px] font-bold text-[#008CBA] uppercase tracking-widest mt-0.5 flex items-center gap-1.5 flex-wrap">
                 <span>Desarrollo web realizado por el Ingeniero. Orlando Galdámez</span>

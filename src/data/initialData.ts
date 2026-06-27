@@ -1,7 +1,7 @@
 import { GlobalState } from '../types';
 
 export const INITIAL_STATE: GlobalState = {
-  "codeVersion": "1.2",
+  "codeVersion": "1.0",
   "campaignTitle": "Por 1T — Ayuda Humanitaria Emergencia Venezuela",
   "emergencySubtitle": "Respuesta Operativa de Emergencia por el Terremoto en Mérida, Trujillo y Táchira. Cada kilo suma para salvar vidas.",
   "headerAlertText": "Emergencia Nacional #VEN-2026: Terremoto en Los Andes (Mérida, Trujillo, Táchira)",
@@ -341,6 +341,14 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_85mkrh1x0",
+      "timestamp": "2026-06-27T08:13:53.926Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1695x909] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_nrdd5vlmp",
       "timestamp": "2026-06-27T08:05:45.431Z",
