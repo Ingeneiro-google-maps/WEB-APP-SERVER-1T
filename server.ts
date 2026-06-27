@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { INITIAL_STATE } from './src/data/initialData';
@@ -43,6 +44,27 @@ async function saveStateToSupabase() {
   } catch (err: any) {
     console.error('❌ Excepción al guardar estado en Supabase:', err.message || err);
   }
+}
+
+// Helper para guardar el estado en el archivo físico local para evitar pérdidas al subir a GitHub o reiniciar
+function persistStateToDisk() {
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'data', 'initialData.ts');
+    const content = `import { GlobalState } from '../types';
+
+export const INITIAL_STATE: GlobalState = ${JSON.stringify(appState, null, 2)};
+`;
+    fs.writeFileSync(filePath, content, 'utf-8');
+    console.log('💾 [Local FileSystem] ¡src/data/initialData.ts actualizado con el estado actual!');
+  } catch (err: any) {
+    console.warn('⚠️ No se pudo escribir en el archivo local (normal en producción de solo lectura):', err.message || err);
+  }
+}
+
+// Helper unificado para guardar estado en Supabase y disco físico
+async function saveAndPersistState() {
+  await saveStateToSupabase();
+  persistStateToDisk();
 }
 
 // Helper para cargar el estado desde Supabase
@@ -391,8 +413,8 @@ if (supabase) {
         appState.webAccessLogs = appState.webAccessLogs.slice(0, 250);
       }
 
-      // Save to Supabase DB if active
-      await saveStateToSupabase();
+      // Save to Supabase DB and local file system
+      await saveAndPersistState();
 
       res.json({ success: true, log: newAccessLog, state: { ...appState, supabaseActive: !!supabase, supabaseTableMissing: supabaseTableMissing } });
     } catch (err: any) {
@@ -524,8 +546,8 @@ if (supabase) {
       // Recalculate total
       totalKilos = recalculateTotalKilos(appState);
 
-      // Save to Supabase
-      await saveStateToSupabase();
+      // Save to Supabase and local file system
+      await saveAndPersistState();
 
       res.json({
         success: true,
@@ -546,7 +568,7 @@ if (supabase) {
         ...updates,
         lastSyncTime: new Date().toISOString()
       };
-      await saveStateToSupabase();
+      await saveAndPersistState();
       res.json({ success: true, state: { ...appState, supabaseActive: !!supabase, supabaseTableMissing: supabaseTableMissing } });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -659,7 +681,7 @@ if (supabase) {
       appState.lastSyncTime = new Date().toISOString();
       appState.nextSyncTime = new Date(Date.now() + appState.syncIntervalMinutes * 60 * 1000).toISOString();
 
-      await saveStateToSupabase();
+      await saveAndPersistState();
 
       res.json({
         success: fetchedRealData,
@@ -681,7 +703,7 @@ if (supabase) {
         message: `Error general de sincronización: ${error.message}`
       };
       appState.syncLogs = [errLog, ...appState.syncLogs.slice(0, 19)];
-      await saveStateToSupabase();
+      await saveAndPersistState();
       res.status(500).json({ error: error.message, logs: appState.syncLogs });
     }
   });
@@ -737,7 +759,7 @@ if (supabase) {
               : `[Google Sheets Link] Error de servidor (HTTP ${response.status}). Verifique los permisos del Apps Script.`
           };
           appState.syncLogs = [logMsg, ...appState.syncLogs.slice(0, 19)];
-          await saveStateToSupabase();
+          await saveAndPersistState();
         }).catch(async (err) => {
           const logMsg: SyncLog = {
             id: 'log-webhook-err-' + Date.now(),
@@ -746,11 +768,11 @@ if (supabase) {
             message: `[Google Sheets Link] Error de red: ${err.message}. Revise su Webhook.`
           };
           appState.syncLogs = [logMsg, ...appState.syncLogs.slice(0, 19)];
-          await saveStateToSupabase();
+          await saveAndPersistState();
         });
       }
 
-      await saveStateToSupabase();
+      await saveAndPersistState();
       res.json({ success: true, pledge, state: appState });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -785,7 +807,7 @@ if (supabase) {
         ...req.body
       };
       appState.news = [item, ...(appState.news || [])];
-      await saveStateToSupabase();
+      await saveAndPersistState();
       res.json({ success: true, state: appState });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -801,7 +823,7 @@ if (supabase) {
         ...req.body
       };
       appState.suggestions = [item, ...(appState.suggestions || [])];
-      await saveStateToSupabase();
+      await saveAndPersistState();
       res.json({ success: true, state: appState });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
