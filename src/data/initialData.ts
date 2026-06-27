@@ -306,5 +306,9 @@ export const INITIAL_STATE: GlobalState = {
     faqSection: true,
     suggestionsSection: true
   },
-  donationPassword: 'VENEZUELAVIVE2026'
+  donationPassword: 'VENEZUELAVIVE2026',
+  headerVideoEnabled: true,
+  headerVideoYoutubeUrl: 'https://www.youtube.com/watch?v=kYv_I-g_M5w',
+  introVideoEnabled: true,
+  introVideoYoutubeUrl: 'https://www.youtube.com/watch?v=kYv_I-g_M5w'
 };

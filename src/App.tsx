@@ -12,6 +12,7 @@ import { AdminPanel } from './components/AdminPanel';
 import { DonationModal } from './components/DonationModal';
 import { AiAssistantModal } from './components/AiAssistantModal';
 import { Footer } from './components/Footer';
+import { IntroVideoModal } from './components/IntroVideoModal';
 
 export default function App() {
   const [state, setState] = useState<GlobalState>(INITIAL_STATE);
@@ -272,6 +273,12 @@ export default function App() {
         isOpen={isAiOpen}
         onClose={() => setIsAiOpen(false)}
         campaignTitle={state.campaignTitle}
+      />
+
+      <IntroVideoModal
+        enabled={state.introVideoEnabled !== false}
+        youtubeUrl={state.introVideoYoutubeUrl || ''}
+        onClose={() => {}}
       />
     </div>
   );

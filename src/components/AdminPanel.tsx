@@ -5,8 +5,20 @@ import {
   FileSpreadsheet, CheckCircle2, AlertOctagon, ArrowUpRight, 
   Lock, Download, Building2, Newspaper, HelpCircle, Lightbulb, 
   Search, X, ExternalLink, Package, MapPin, Phone, Clock,
-  Users, History, User, UserPlus, ShieldCheck, Calendar, Terminal, Activity
+  Users, History, User, UserPlus, ShieldCheck, Calendar, Terminal, Activity,
+  Scale, Video, Play, Check, Sparkles
 } from 'lucide-react';
+
+function getYoutubeId(url: string): string {
+  if (!url) return '';
+  const cleanUrl = url.trim();
+  if (cleanUrl.length === 11 && !cleanUrl.includes('/') && !cleanUrl.includes('?')) {
+    return cleanUrl;
+  }
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = cleanUrl.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : '';
+}
 
 interface AdminPanelProps {
   state: GlobalState;
@@ -23,7 +35,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -211,6 +223,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [heroTitleRow1State, setHeroTitleRow1State] = useState<string>(state.heroTitleRow1 || '');
   const [heroTitleRow2State, setHeroTitleRow2State] = useState<string>(state.heroTitleRow2 || '');
   const [heroTitleRow3State, setHeroTitleRow3State] = useState<string>(state.heroTitleRow3 || '');
+
+  // Video de fondo del encabezado
+  const [headerVideoEnabledState, setHeaderVideoEnabledState] = useState<boolean>(state.headerVideoEnabled !== false);
+  const [headerVideoYoutubeUrlState, setHeaderVideoYoutubeUrlState] = useState<string>(state.headerVideoYoutubeUrl || 'https://www.youtube.com/watch?v=kYv_I-g_M5w');
+
+  // Video de introducción automático (Pop-up)
+  const [introVideoEnabledState, setIntroVideoEnabledState] = useState<boolean>(state.introVideoEnabled !== false);
+  const [introVideoYoutubeUrlState, setIntroVideoYoutubeUrlState] = useState<string>(state.introVideoYoutubeUrl || 'https://www.youtube.com/watch?v=kYv_I-g_M5w');
 
   const sheetIdFromUrl = state.googleSheetUrl ? (state.googleSheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || '1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC') : '1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC';
   const appsScriptCode = `function doPost(e) {
@@ -424,8 +444,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       heroBadgeText: heroBadgeTextState,
       heroTitleRow1: heroTitleRow1State,
       heroTitleRow2: heroTitleRow2State,
-      heroTitleRow3: heroTitleRow3State
-    }, `Personalizó y actualizó los títulos y avisos de la portada web principal`);
+      heroTitleRow3: heroTitleRow3State,
+      headerVideoEnabled: headerVideoEnabledState,
+      headerVideoYoutubeUrl: headerVideoYoutubeUrlState
+    }, `Personalizó y actualizó los títulos, avisos de la portada web y configuración de video de fondo`);
     showToast('✨ ¡Portada web personalizada y actualizada con éxito!');
   };
 
@@ -690,6 +712,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           >
             <Activity className="w-5 h-5 text-indigo-400 animate-pulse" />
             <span>🌐 Historial de Acceso a la Web ({state.webAccessLogs?.length || 0})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('contador_vivo')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'contador_vivo' 
+                ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-500/20' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Scale className="w-5 h-5 text-emerald-400 animate-bounce" />
+            <span>📊 Contador en vivo ({state.globalTargetTons}T)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('videos')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'videos' 
+                ? 'bg-violet-600 text-white shadow-xl shadow-violet-500/20' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Video className="w-5 h-5 text-violet-400" />
+            <span>🎥 Categoría de Videos</span>
           </button>
 
           <button
@@ -1783,6 +1829,63 @@ ON CONFLICT (id) DO NOTHING;`}
                   </div>
                 </div>
 
+                {/* Grupo 4: Video de Fondo de YouTube */}
+                <div className="pt-4 border-t border-slate-800/80">
+                  <h3 className="text-base font-black uppercase text-indigo-400 mb-4 border-b border-slate-800 pb-2">
+                    🎥 4. Video de Fondo del Encabezado (Espectacular)
+                  </h3>
+                  <div className="space-y-5">
+                    {/* Toggle Button for Video Activation */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-950/60 p-5 rounded-2xl border border-slate-800/60">
+                      <div>
+                        <span className="text-xs font-black uppercase text-white block">Activar Video de Fondo</span>
+                        <span className="text-[11px] text-slate-400 leading-relaxed block mt-0.5">
+                          Si se desactiva, se mostrará el diseño estándar con fondo de color suave.
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setHeaderVideoEnabledState(false)}
+                          className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition cursor-pointer ${
+                            !headerVideoEnabledState 
+                              ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' 
+                              : 'bg-slate-900 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          Apagado
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setHeaderVideoEnabledState(true)}
+                          className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition cursor-pointer ${
+                            headerVideoEnabledState 
+                              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' 
+                              : 'bg-slate-900 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          Encendido
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* YouTube Video URL Input */}
+                    <div>
+                      <label className="text-xs font-black uppercase text-slate-400 block mb-1">Enlace / Link del Video de YouTube</label>
+                      <input
+                        type="text"
+                        value={headerVideoYoutubeUrlState}
+                        onChange={e => setHeaderVideoYoutubeUrlState(e.target.value)}
+                        placeholder="ej. https://www.youtube.com/watch?v=kYv_I-g_M5w"
+                        className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:border-indigo-500 focus:outline-none placeholder-slate-600"
+                      />
+                      <p className="text-[10px] text-slate-500 leading-relaxed mt-1.5 font-medium">
+                        💡 Admite cualquier enlace de YouTube estándar (watch?v=), corto (youtu.be/), de inserción (embed/) o directamente el código ID de 11 caracteres. El sistema reproducirá de forma automática, sin sonido (mute), en bucle infinito y con soporte nativo para visualización móvil.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Botón de Guardar */}
                 <button
                   onClick={handleSavePortada}
@@ -2288,6 +2391,299 @@ ON CONFLICT (id) DO NOTHING;`}
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: CONTADOR EN VIVO --- */}
+        {activeTab === 'contador_vivo' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-emerald-900/60 via-slate-900 to-slate-900 p-8 rounded-3xl border border-emerald-500/40 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 font-sans">
+              <div>
+                <span className="px-3 py-1 bg-emerald-600 text-white text-xs font-black uppercase tracking-widest rounded-full">Progresión de la Campaña</span>
+                <h2 className="text-2xl sm:text-3xl font-black uppercase text-white mt-3 flex items-center gap-2.5">
+                  <Scale className="w-8 h-8 text-emerald-400 animate-pulse" />
+                  <span>📊 CONTADOR EN VIVO Y CONTROL DE METAS</span>
+                </h2>
+                <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+                  Establece el objetivo de peso (Toneladas) activo para la campaña en tiempo real. Cuando se cumpla el hito de una tonelada, puedes habilitar y expandir el ranking a dos toneladas, tres toneladas, o más, motivando a los donantes con nuevas metas progresivas.
+                </p>
+              </div>
+            </div>
+
+            {/* Live Progress Info Card */}
+            <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <h3 className="text-lg font-black uppercase text-white">Estado de Recolección en Tiempo Real</h3>
+                <p className="text-slate-400 text-xs mt-1">Cálculo en base a las donaciones registradas en el sistema.</p>
+                
+                <div className="flex items-baseline gap-2 mt-4">
+                  <span className="text-4xl font-black text-emerald-400">
+                    {((state.pledges || []).reduce((acc, p) => acc + (p.pledgeKilos || 0), 0) / 1000).toFixed(2)}
+                  </span>
+                  <span className="text-xl font-bold text-slate-400">Toneladas recolectadas</span>
+                  <span className="text-slate-500 text-xs ml-2">
+                    ({(state.pledges || []).reduce((acc, p) => acc + (p.pledgeKilos || 0), 0).toLocaleString()} kg)
+                  </span>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-slate-950 rounded-2xl border border-slate-800 text-center shrink-0">
+                <span className="text-slate-500 text-[10px] font-black uppercase tracking-wider block">Meta Actual Seleccionada</span>
+                <span className="text-3xl font-black text-sky-400 mt-1 block">{state.globalTargetTons} Toneladas</span>
+                <span className="text-xs text-slate-400">({state.globalTargetTons * 1000} kg)</span>
+              </div>
+            </div>
+
+            {/* Ranking Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[1, 2, 3, 4, 5, 6, 7].map((tons) => {
+                const targetWeightKg = tons * 1000;
+                const currentWeightKg = (state.pledges || []).reduce((acc, p) => acc + (p.pledgeKilos || 0), 0);
+                const isCurrentActive = state.globalTargetTons === tons;
+                const isCompleted = currentWeightKg >= targetWeightKg;
+                
+                let subtitle = "Meta de Lanzamiento";
+                if (tons === 2) subtitle = "Meta de Expansión";
+                if (tons === 3) subtitle = "Meta Intermedia";
+                if (tons === 4) subtitle = "Gran Convocatoria";
+                if (tons === 5) subtitle = "Hito Humanitario";
+                if (tons === 6) subtitle = "Solidaridad Máxima";
+                if (tons === 7) subtitle = "Éxito Absoluto";
+
+                return (
+                  <button
+                    key={tons}
+                    onClick={() => {
+                      handleUpdateStateWithLog(
+                        { globalTargetTons: tons },
+                        `Modificó la meta global en vivo de la campaña a: ${tons} Toneladas (${targetWeightKg} kg)`
+                      );
+                      showToast(`✨ Meta global actualizada a ${tons} Toneladas`);
+                    }}
+                    className={`text-left p-6 rounded-2xl border transition-all cursor-pointer relative group flex flex-col justify-between h-48 ${
+                      isCurrentActive
+                        ? 'bg-gradient-to-br from-emerald-950/80 to-slate-900 border-emerald-500 shadow-xl shadow-emerald-950/20 ring-2 ring-emerald-500/30'
+                        : isCompleted
+                        ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+                        : 'bg-slate-900/30 border-slate-950 hover:border-slate-800'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                          isCurrentActive
+                            ? 'bg-emerald-600 text-white'
+                            : isCompleted
+                            ? 'bg-slate-800 text-emerald-400'
+                            : 'bg-slate-950 text-slate-500'
+                        }`}>
+                          {isCurrentActive ? 'Meta Activa' : isCompleted ? 'Completado' : 'Habilitar'}
+                        </span>
+                        
+                        {isCompleted && (
+                          <Check className="w-4 h-4 text-emerald-400" />
+                        )}
+                      </div>
+
+                      <h4 className="text-xl font-black text-white mt-4 uppercase tracking-wider">
+                        {tons} {tons === 1 ? 'Tonelada' : 'Toneladas'}
+                      </h4>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{subtitle}</p>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-850 flex items-center justify-between text-[11px] text-slate-500">
+                      <span>Equivale a: <b>{targetWeightKg.toLocaleString()} kg</b></span>
+                      <span className="text-emerald-400 group-hover:translate-x-1 transition duration-150">➔</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: CATEGORÍA DE VIDEOS --- */}
+        {activeTab === 'videos' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-violet-900/60 via-slate-900 to-slate-900 p-8 rounded-3xl border border-violet-500/40 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 font-sans">
+              <div>
+                <span className="px-3 py-1 bg-violet-600 text-white text-xs font-black uppercase tracking-widest rounded-full">Material Audiovisual</span>
+                <h2 className="text-2xl sm:text-3xl font-black uppercase text-white mt-3 flex items-center gap-2.5 font-sans">
+                  <Video className="w-8 h-8 text-violet-400" />
+                  <span>🎥 CATEGORÍA DE VIDEOS DE LA WEB</span>
+                </h2>
+                <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+                  Administra las experiencias visuales de la campaña. Configura el video de introducción que se reproduce automáticamente en un pop-up cuando la página carga por primera vez, o gestiona el video cinematográfico que se reproduce en bucle en el encabezado de la página de inicio.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+              {/* Box 1: Video de Introducción Autoplay */}
+              <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl flex flex-col justify-between space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base sm:text-lg font-black uppercase text-white flex items-center gap-2">
+                      <Play className="w-5 h-5 text-indigo-400" />
+                      <span>1. Video de Entrada (Autoplay Pop-up)</span>
+                    </h3>
+                    <span className="text-[10px] font-black uppercase bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">Al Cargar la Web</span>
+                  </div>
+                  
+                  <p className="text-slate-400 text-xs leading-relaxed">
+                    Este video cubre la pantalla con un elegante efecto de atenuación en negro y fondo difuminado al ingresar al portal web por primera vez. El usuario puede disfrutarlo o saltarlo rápidamente con un botón.
+                  </p>
+
+                  {/* Toggle Switch */}
+                  <div className="flex items-center justify-between bg-slate-950/60 p-4 rounded-xl border border-slate-800/60">
+                    <div>
+                      <span className="text-xs font-black uppercase text-white block">Estado del Pop-up</span>
+                      <span className="text-[10px] text-slate-500 block">Activar/Desactivar reproducción automática</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setIntroVideoEnabledState(false)}
+                        className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition cursor-pointer ${
+                          !introVideoEnabledState 
+                            ? 'bg-red-600 text-white shadow-md' 
+                            : 'bg-slate-900 text-slate-400'
+                        }`}
+                      >
+                        Desactivar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIntroVideoEnabledState(true)}
+                        className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition cursor-pointer ${
+                          introVideoEnabledState 
+                            ? 'bg-emerald-600 text-white shadow-md' 
+                            : 'bg-slate-900 text-slate-400'
+                        }`}
+                      >
+                        Activar
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* YouTube Link Input */}
+                  <div>
+                    <label className="text-xs font-black uppercase text-slate-400 block mb-1">Enlace de YouTube</label>
+                    <input
+                      type="text"
+                      value={introVideoYoutubeUrlState}
+                      onChange={e => setIntroVideoYoutubeUrlState(e.target.value)}
+                      placeholder="ej. https://www.youtube.com/watch?v=kYv_I-g_M5w"
+                      className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 focus:outline-none placeholder-slate-700"
+                    />
+                  </div>
+
+                  {/* Video Live Preview */}
+                  {introVideoYoutubeUrlState && getYoutubeId(introVideoYoutubeUrlState) && (
+                    <div className="rounded-xl overflow-hidden border border-slate-800 aspect-video bg-black relative shadow-inner">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${getYoutubeId(introVideoYoutubeUrlState)}?controls=0&mute=1`}
+                        className="w-full h-full"
+                        frameBorder="0"
+                        title="Vista Previa Intro"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Box 2: Video de Fondo en el Encabezado */}
+              <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl flex flex-col justify-between space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base sm:text-lg font-black uppercase text-white flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-indigo-400" />
+                      <span>2. Video de Fondo (Header Cinematográfico)</span>
+                    </h3>
+                    <span className="text-[10px] font-black uppercase bg-[#008CBA]/10 text-sky-400 border border-[#008CBA]/20 px-2 py-0.5 rounded">En Portada</span>
+                  </div>
+                  
+                  <p className="text-slate-400 text-xs leading-relaxed">
+                    Reemplaza el fondo de la sección principal (Hero) por un video cinematográfico de YouTube en bucle continuo, silenciado (mute) de forma nativa para mayor espectacularidad.
+                  </p>
+
+                  {/* Toggle Switch */}
+                  <div className="flex items-center justify-between bg-slate-950/60 p-4 rounded-xl border border-slate-800/60">
+                    <div>
+                      <span className="text-xs font-black uppercase text-white block">Estado de Video de Fondo</span>
+                      <span className="text-[10px] text-slate-500 block">Activar/Desactivar video en cabecera</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setHeaderVideoEnabledState(false)}
+                        className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition cursor-pointer ${
+                          !headerVideoEnabledState 
+                            ? 'bg-red-600 text-white shadow-md' 
+                            : 'bg-slate-900 text-slate-400'
+                        }`}
+                      >
+                        Desactivar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setHeaderVideoEnabledState(true)}
+                        className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition cursor-pointer ${
+                          headerVideoEnabledState 
+                            ? 'bg-emerald-600 text-white shadow-md' 
+                            : 'bg-slate-900 text-slate-400'
+                        }`}
+                      >
+                        Activar
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* YouTube Link Input */}
+                  <div>
+                    <label className="text-xs font-black uppercase text-slate-400 block mb-1">Enlace de YouTube</label>
+                    <input
+                      type="text"
+                      value={headerVideoYoutubeUrlState}
+                      onChange={e => setHeaderVideoYoutubeUrlState(e.target.value)}
+                      placeholder="ej. https://www.youtube.com/watch?v=kYv_I-g_M5w"
+                      className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 focus:outline-none placeholder-slate-700"
+                    />
+                  </div>
+
+                  {/* Video Live Preview */}
+                  {headerVideoYoutubeUrlState && getYoutubeId(headerVideoYoutubeUrlState) && (
+                    <div className="rounded-xl overflow-hidden border border-slate-800 aspect-video bg-black relative shadow-inner">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${getYoutubeId(headerVideoYoutubeUrlState)}?controls=0&mute=1`}
+                        className="w-full h-full"
+                        frameBorder="0"
+                        title="Vista Previa Fondo"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* General Save Button for Videos */}
+            <div className="flex justify-end pt-4">
+              <button
+                onClick={() => {
+                  handleUpdateStateWithLog({
+                    headerVideoEnabled: headerVideoEnabledState,
+                    headerVideoYoutubeUrl: headerVideoYoutubeUrlState,
+                    introVideoEnabled: introVideoEnabledState,
+                    introVideoYoutubeUrl: introVideoYoutubeUrlState
+                  }, `Actualizó configuraciones del video de introducción y video cinematográfico en cabecera`);
+                  showToast('✨ ¡Configuraciones de video guardadas con éxito!');
+                }}
+                className="px-8 py-4 bg-violet-600 hover:bg-violet-500 text-white font-black uppercase text-xs sm:text-sm tracking-widest rounded-2xl shadow-xl shadow-violet-500/20 transition cursor-pointer flex items-center gap-2.5"
+              >
+                <Save className="w-5 h-5" />
+                <span>Guardar Cambios de Video</span>
+              </button>
             </div>
           </div>
         )}

@@ -103,6 +103,10 @@ export interface GlobalState {
   };
   donationPassword?: string;
   webAccessLogs?: WebAccessLog[];
+  headerVideoEnabled?: boolean;
+  headerVideoYoutubeUrl?: string;
+  introVideoEnabled?: boolean;
+  introVideoYoutubeUrl?: string;
 }
 
 export interface WebAccessLog {
