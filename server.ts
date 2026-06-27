@@ -27,8 +27,12 @@ if (supabase) {
 }
 
 // Helper para guardar el estado en Supabase
-async function saveStateToSupabase() {
+async function saveStateToSupabase(forceDirectWrite = false) {
   if (!supabase) return;
+
+  if (forceDirectWrite) {
+    hasSuccessfullyLoadedFromSupabase = true;
+  }
 
   // Si no se ha cargado con éxito todavía desde Supabase, bloqueamos el guardado para evitar
   // sobreescribir la base de datos de la nube con datos viejos/por defecto del archivo local.
@@ -75,8 +79,8 @@ export const INITIAL_STATE: GlobalState = ${JSON.stringify(appState, null, 2)};
 }
 
 // Helper unificado para guardar estado en Supabase y disco físico
-async function saveAndPersistState() {
-  await saveStateToSupabase();
+async function saveAndPersistState(forceDirectWrite = false) {
+  await saveStateToSupabase(forceDirectWrite);
   persistStateToDisk();
 }
 
@@ -470,8 +474,16 @@ const ensureLatestState = async (req: express.Request, res: express.Response, ne
       // 1. Aún no se ha realizado ninguna carga con éxito (por ejemplo, al arrancar el contenedor).
       // 2. Es una petición explícita de lectura/guardado de estado (/state) o sincronización de Excel (/sync-excel).
       // Para cualquier otra petición menor (como logs de acceso, etc.), usamos el estado en memoria para máxima velocidad.
+      // EXCEPCIÓN: Si la actualización automática de la web está suspendida (autoUpdateActive === false),
+      // NO forzamos la carga sincrónica en peticiones de lectura del visitante para evitar restaurar estados antiguos,
+      // a menos que sea una petición de guardado (POST) o que no se haya inicializado el contenedor aún.
       const isCriticalPath = req.path === '/state' || req.path === '/sync-excel' || req.originalUrl.includes('/state') || req.originalUrl.includes('/sync-excel');
-      if (!hasSuccessfullyLoadedFromSupabase || isCriticalPath) {
+      const isPostRequest = req.method === 'POST';
+      const isAutoUpdateActive = appState.autoUpdateActive !== false;
+
+      const shouldLoad = !hasSuccessfullyLoadedFromSupabase || (isCriticalPath && (isAutoUpdateActive || isPostRequest));
+
+      if (shouldLoad) {
         await loadStateFromSupabase();
       }
     } catch (err: any) {
@@ -697,7 +709,7 @@ if (supabase) {
       totalKilos = recalculateTotalKilos(appState);
 
       // Save to Supabase and local file system
-      await saveAndPersistState();
+      await saveAndPersistState(true);
 
       res.json({
         success: true,
@@ -718,7 +730,7 @@ if (supabase) {
         ...updates,
         lastSyncTime: new Date().toISOString()
       };
-      await saveAndPersistState();
+      await saveAndPersistState(true);
       res.json({ success: true, state: { ...appState, supabaseActive: !!supabase, supabaseTableMissing: supabaseTableMissing } });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -957,7 +969,7 @@ if (supabase) {
         ...req.body
       };
       appState.news = [item, ...(appState.news || [])];
-      await saveAndPersistState();
+      await saveAndPersistState(true);
       res.json({ success: true, state: appState });
     } catch (err: any) {
       res.status(500).json({ error: err.message });

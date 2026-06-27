@@ -214,6 +214,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [sheetUrl, setSheetUrl] = useState<string>(state.googleSheetUrl || '');
   const [sheetWebhookUrl, setSheetWebhookUrl] = useState<string>(state.googleSheetWebhookUrl || '');
   const [autoSync, setAutoSync] = useState<boolean>(state.autoSyncEnabled);
+  const [autoUpdate, setAutoUpdate] = useState<boolean>(state.autoUpdateActive !== false);
   const [donationPass, setDonationPass] = useState<string>(state.donationPassword || 'VENEZUELAVIVE2026');
 
   // Estados de visibilidad de bloques de información de la web
@@ -448,6 +449,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       googleSheetUrl: sheetUrl,
       googleSheetWebhookUrl: sheetWebhookUrl,
       autoSyncEnabled: autoSync,
+      autoUpdateActive: autoUpdate,
       donationPassword: donationPass,
       visibleBlocks: {
         suppliesGrid: showSuppliesGrid,
@@ -1572,6 +1574,50 @@ ON CONFLICT (id) DO NOTHING;`}
                 <label htmlFor="autosync_chk" className="text-sm font-bold text-slate-200 cursor-pointer">
                   Activar consulta automática al Excel cada 10 minutos en segundo plano
                 </label>
+              </div>
+
+              {/* --- CONTROL DE ACTUALIZACIÓN WEB AUTOMÁTICA --- */}
+              <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-black uppercase text-[#008CBA] tracking-wider">
+                      🔄 Actualización Automática de la Web (Supabase)
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Suspende o activa la actualización automática de la web en tiempo real con la base de datos de la nube.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${autoUpdate ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
+                      {autoUpdate ? '● Activa' : '⛔ Suspendida'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                  <input
+                    type="checkbox"
+                    id="autoupdate_chk"
+                    checked={autoUpdate}
+                    onChange={e => setAutoUpdate(e.target.checked)}
+                    className="w-5 h-5 accent-[#008CBA] rounded cursor-pointer mt-0.5"
+                  />
+                  <div>
+                    <label htmlFor="autoupdate_chk" className="text-sm font-bold text-slate-200 cursor-pointer block">
+                      Activar Actualización de la Web Automática
+                    </label>
+                    <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                      {autoUpdate 
+                        ? "La web se mantendrá sincronizada continuamente con los cambios de la base de datos." 
+                        : "⛔ SE SUSPENDE la actualización automática para los visitantes. Esto previene que se carguen datos antiguos accidentalmente. La web conservará el estado local en memoria del servidor."
+                      }
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-slate-400 leading-normal">
+                  🚀 <b>Garantía de Sincronización Inmediata:</b> Independientemente de esta opción, cada vez que hagas un cambio en la consola de administración y lo guardes, los datos irán <b>directamente a la Base de Datos</b> para actualizar la web a nivel mundial de forma inmediata.
+                </p>
               </div>
 
               {/* --- DIAGNÓSTICO DE SINCRONIZACIÓN CON EXCEL --- */}

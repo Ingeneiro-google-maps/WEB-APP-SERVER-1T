@@ -68,6 +68,7 @@ export interface SuggestionItem {
 
 export interface GlobalState {
   codeVersion?: string;
+  autoUpdateActive?: boolean;
   campaignTitle: string;
   emergencySubtitle: string;
   headerAlertText?: string;

@@ -2,6 +2,7 @@ import { GlobalState } from '../types';
 
 export const INITIAL_STATE: GlobalState = {
   "codeVersion": "1.0",
+  "autoUpdateActive": true,
   "campaignTitle": "Por 1T — Ayuda Humanitaria Emergencia Venezuela",
   "emergencySubtitle": "Respuesta Operativa de Emergencia por el Terremoto en Mérida, Trujillo y Táchira. Cada kilo suma para salvar vidas.",
   "headerAlertText": "Emergencia Nacional #VEN-2026: Terremoto en Los Andes (Mérida, Trujillo, Táchira)",
@@ -10,8 +11,8 @@ export const INITIAL_STATE: GlobalState = {
   "heroTitleRow2": "POR 1 TONELADA",
   "heroTitleRow3": "DESDE ESPAÑA",
   "globalTargetTons": 1,
-  "lastSyncTime": "2026-06-27T08:03:08.745Z",
-  "nextSyncTime": "2026-06-27T08:13:08.745Z",
+  "lastSyncTime": "2026-06-27T08:23:53.749Z",
+  "nextSyncTime": "2026-06-27T08:33:53.749Z",
   "googleSheetUrl": "https://docs.google.com/spreadsheets/d/1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC/edit?gid=762536088#gid=762536088",
   "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbxfiM27NiOzQx9FWqn2AFG6IeaG_MyCcNKTjiA29YF8MZ9NObXDlSUG7bLqWl_rHiw/exec",
   "autoSyncEnabled": true,
@@ -189,6 +190,13 @@ export const INITIAL_STATE: GlobalState = {
   ],
   "syncLogs": [
     {
+      "id": "log-1782548633749",
+      "timestamp": "8:23:53 AM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
+      "kilosUpdated": 10
+    },
+    {
       "id": "log-1782547388745",
       "timestamp": "8:03:08 AM",
       "status": "success",
@@ -341,6 +349,14 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_7a2v7692v",
+      "timestamp": "2026-06-27T08:23:54.784Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1534x914] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_85mkrh1x0",
       "timestamp": "2026-06-27T08:13:53.926Z",

@@ -89,14 +89,14 @@ export default function App() {
 
   // Automatic Hourly Sync with Google Drive Excel
   useEffect(() => {
-    if (!state.autoSyncEnabled) return;
+    if (!state.autoSyncEnabled || state.autoUpdateActive === false) return;
 
     const interval = setInterval(() => {
       handleTriggerSync(false);
     }, state.syncIntervalMinutes * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [state.autoSyncEnabled, state.syncIntervalMinutes]);
+  }, [state.autoSyncEnabled, state.syncIntervalMinutes, state.autoUpdateActive]);
 
   const handleTriggerSync = async (manual = true) => {
     if (syncing) return;
