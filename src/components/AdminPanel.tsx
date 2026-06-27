@@ -3,7 +3,7 @@ import { GlobalState, SupplyItem, CollectionCenter, FAQItem, AdminUser, UserChan
 import { 
   Settings, RefreshCw, Plus, Trash2, Edit3, Save, Database, 
   FileSpreadsheet, CheckCircle2, AlertOctagon, ArrowUpRight, 
-  Lock, Download, Building2, Newspaper, HelpCircle, Lightbulb, 
+  Lock, Download, Upload, Building2, Newspaper, HelpCircle, Lightbulb,  
   Search, X, ExternalLink, Package, MapPin, Phone, Clock,
   Users, History, User, UserPlus, ShieldCheck, Calendar, Terminal, Activity,
   Scale, Video, Play, Check, Sparkles
@@ -528,6 +528,211 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
+  // --- EXPORTAR E IMPORTAR CENTROS DE ACOPIO (EXCEL/CSV) ---
+  const exportCentersToCSV = () => {
+    const headers = [
+      'ID',
+      'Ciudad',
+      'Almacén/Punto',
+      'Dirección Completa',
+      'Horario de Recepción',
+      'Teléfono y Contacto',
+      'Necesidades Críticas',
+      'País',
+      'Categorías Aceptadas',
+      'Enlace de Google Maps'
+    ];
+
+    const escapeCSV = (str: string) => {
+      if (str === null || str === undefined) return '';
+      let value = String(str);
+      if (value.includes('"') || value.includes(';') || value.includes('\n') || value.includes('\r')) {
+        value = '"' + value.replace(/"/g, '""') + '"';
+      }
+      return value;
+    };
+
+    const rows = (state.centers || []).map(center => [
+      center.id || '',
+      center.city || '',
+      center.name || '',
+      center.address || '',
+      center.hours || '',
+      center.contact || '',
+      center.urgentNeeds ? center.urgentNeeds.join(', ') : '',
+      center.country || 'España',
+      center.acceptedItems ? center.acceptedItems.join(', ') : 'Alimentos no perecederos',
+      center.mapsUrl || ''
+    ]);
+
+    const csvContent = [
+      headers.join(';'),
+      ...rows.map(row => row.map(escapeCSV).join(';'))
+    ].join('\r\n');
+
+    // Excel UTF-8 BOM: \uFEFF para que se muestren bien las tildes y eñes
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    
+    const now = new Date();
+    const dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    link.setAttribute('download', `respaldo_centros_acopio_${dateStr}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('📥 Respaldo de centros de acopio exportado con éxito.');
+  };
+
+  const parseCSV = (text: string): string[][] => {
+    const result: string[][] = [];
+    let row: string[] = [];
+    let cell = '';
+    let inQuotes = false;
+    
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    
+    for (let i = 0; i < normalized.length; i++) {
+      const char = normalized[i];
+      const nextChar = normalized[i + 1];
+      
+      if (inQuotes) {
+        if (char === '"') {
+          if (nextChar === '"') {
+            cell += '"';
+            i++;
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          cell += char;
+        }
+      } else {
+        if (char === '"') {
+          inQuotes = true;
+        } else if (char === ';') {
+          row.push(cell);
+          cell = '';
+        } else if (char === '\n') {
+          row.push(cell);
+          result.push(row);
+          row = [];
+          cell = '';
+        } else {
+          cell += char;
+        }
+      }
+    }
+    if (cell !== '' || row.length > 0) {
+      row.push(cell);
+    }
+    if (row.length > 0) {
+      result.push(row);
+    }
+    
+    return result;
+  };
+
+  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        if (!text) {
+          alert('El archivo está vacío o no es legible.');
+          return;
+        }
+
+        const rows = parseCSV(text);
+        if (rows.length < 2) {
+          alert('El archivo no contiene suficientes filas para importar.');
+          return;
+        }
+
+        const headers = rows[0].map(h => h.trim().toLowerCase());
+        const cityIdx = headers.indexOf('ciudad');
+        const nameIdx = headers.indexOf('almacén/punto') !== -1 ? headers.indexOf('almacén/punto') : headers.indexOf('almacen/punto');
+        const addressIdx = headers.indexOf('dirección completa') !== -1 ? headers.indexOf('dirección completa') : headers.indexOf('direccion completa');
+        const hoursIdx = headers.indexOf('horario de recepción') !== -1 ? headers.indexOf('horario de recepción') : headers.indexOf('horario de recepcion');
+        const contactIdx = headers.indexOf('teléfono y contacto') !== -1 ? headers.indexOf('teléfono y contacto') : headers.indexOf('telefono y contacto');
+        const needsIdx = headers.indexOf('necesidades críticas') !== -1 ? headers.indexOf('necesidades críticas') : headers.indexOf('necesidades criticas');
+        const idIdx = headers.indexOf('id');
+        const countryIdx = headers.indexOf('país') !== -1 ? headers.indexOf('país') : headers.indexOf('pais');
+        const categoriesIdx = headers.indexOf('categorías aceptadas') !== -1 ? headers.indexOf('categorías aceptadas') : headers.indexOf('categorias aceptadas');
+        const mapsIdx = headers.indexOf('enlace de google maps') !== -1 ? headers.indexOf('enlace de google maps') : headers.indexOf('enlace de google maps');
+
+        if (cityIdx === -1 || nameIdx === -1 || addressIdx === -1) {
+          alert('Formato de archivo inválido. Asegúrese de que el archivo tenga las columnas: "Ciudad", "Almacén/Punto" y "Dirección Completa".');
+          return;
+        }
+
+        const importedCenters: CollectionCenter[] = [];
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (row.length < 3) continue;
+
+          const city = row[cityIdx]?.trim();
+          const name = row[nameIdx]?.trim();
+          const address = row[addressIdx]?.trim();
+
+          if (!city && !name && !address) continue;
+
+          if (!name || !address) {
+            console.warn(`Fila ${i + 1} omitida por falta de Nombre o Dirección.`);
+            continue;
+          }
+
+          const id = idIdx !== -1 && row[idIdx]?.trim() ? row[idIdx].trim() : 'cent-' + Date.now() + '-' + i;
+          const hours = hoursIdx !== -1 ? row[hoursIdx]?.trim() : '';
+          const contact = contactIdx !== -1 ? row[contactIdx]?.trim() : '';
+          const needsStr = needsIdx !== -1 ? row[needsIdx]?.trim() : '';
+          const country = countryIdx !== -1 ? row[countryIdx]?.trim() || 'España' : 'España';
+          const categoriesStr = categoriesIdx !== -1 ? row[categoriesIdx]?.trim() : '';
+          const mapsUrl = mapsIdx !== -1 ? row[mapsIdx]?.trim() || 'https://maps.google.com' : 'https://maps.google.com';
+
+          const urgentNeeds = needsStr ? needsStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+          const acceptedItems = categoriesStr ? categoriesStr.split(',').map(s => s.trim()).filter(Boolean) : ['Alimentos no perecederos'];
+
+          importedCenters.push({
+            id,
+            city: city || 'Madrid',
+            country,
+            name,
+            address,
+            contact,
+            hours,
+            acceptedItems,
+            urgentNeeds,
+            mapsUrl
+          });
+        }
+
+        if (importedCenters.length === 0) {
+          alert('No se encontraron centros de acopio válidos para importar en el archivo.');
+          return;
+        }
+
+        if (confirm(`Se han detectado ${importedCenters.length} centros de acopio en el archivo de respaldo.\n\n⚠️ ¡ATENCIÓN! Esto reemplazará todos los centros de acopio actuales en la web por los del archivo.\n\n¿Desea continuar con la restauración completa?`)) {
+          handleUpdateStateWithLog(
+            { centers: importedCenters },
+            `Reimportó un total de ${importedCenters.length} centros de acopio desde un archivo de respaldo de Excel/CSV`
+          );
+          showToast(`✅ Sincronización exitosa: ${importedCenters.length} centros restaurados.`);
+        }
+      } catch (err: any) {
+        alert('Error al leer o procesar el archivo de respaldo: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
   // Filtrado de Pledges (Excel BD)
   const filteredPledges = (state.pledges || []).filter(p => {
     if (!searchQuery) return true;
@@ -905,6 +1110,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         {/* --- CONTENIDO PESTAÑA 2: CENTROS DE ACOPIO PARA LLEVAR LA COMIDA --- */}
         {activeTab === 'centros' && (
           <div className="space-y-8">
+            {/* Copia de Seguridad y Respaldo de Centros */}
+            <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <div className="space-y-2">
+                <h3 className="text-lg font-black uppercase text-amber-500 flex items-center gap-2 tracking-wider">
+                  <Database className="w-6 h-6 text-amber-400 animate-pulse" />
+                  <span>Respaldo y Restauración de Centros de Acopio</span>
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed max-w-3xl">
+                  Descarga una copia de seguridad local de todos los centros de acopio actuales en formato Excel compatible (.csv). 
+                  Si ocurre algún fallo en el servidor o base de datos, puedes volver a subir el archivo para restaurar la lista completa con total integridad.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3.5 w-full lg:w-auto">
+                <button
+                  type="button"
+                  onClick={exportCentersToCSV}
+                  className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black uppercase text-xs tracking-wider rounded-xl shadow-lg hover:shadow-emerald-950/20 transition duration-200 cursor-pointer flex items-center justify-center gap-2 border border-emerald-500/20"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Exportar centros de acopio</span>
+                </button>
+
+                <label className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-black uppercase text-xs tracking-wider rounded-xl shadow-lg hover:shadow-amber-950/20 transition duration-200 cursor-pointer flex items-center justify-center gap-2 border border-amber-500/20">
+                  <Upload className="w-4 h-4" />
+                  <span>Reimportar Copia Excel</span>
+                  <input
+                    type="file"
+                    accept=".csv,.txt"
+                    onChange={handleImportCSV}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
             {/* Formulario Agregar Centro */}
             <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl">
               <h3 className="text-xl font-black uppercase text-[#008CBA] mb-6 flex items-center gap-2">
