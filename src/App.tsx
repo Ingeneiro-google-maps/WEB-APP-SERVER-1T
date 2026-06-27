@@ -13,6 +13,7 @@ import { DonationModal } from './components/DonationModal';
 import { AiAssistantModal } from './components/AiAssistantModal';
 import { Footer } from './components/Footer';
 import { IntroVideoModal } from './components/IntroVideoModal';
+import { MaintenanceScreen } from './components/MaintenanceScreen';
 
 export default function App() {
   const [state, setState] = useState<GlobalState>(INITIAL_STATE);
@@ -167,6 +168,16 @@ export default function App() {
   };
 
   const centersCities = Array.from(new Set(state.centers.map(c => c.city)));
+
+  if (state.maintenanceModeEnabled && !isAdminView) {
+    return (
+      <MaintenanceScreen
+        reason={state.maintenanceReason}
+        endTimestamp={state.maintenanceEndTimestamp}
+        onUnlockAdmin={() => setIsAdminView(true)}
+      />
+    );
+  }
 
   if (viewMode === 'all-centers') {
     return (

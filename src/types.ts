@@ -114,6 +114,19 @@ export interface GlobalState {
   introVideoTitle?: string;
   introVideoSubtitle?: string;
   introVideoBtnText?: string;
+  // Live counter custom status texts & visibility options
+  liveCounterStateRedLabel?: string;
+  liveCounterStateOrangeLabel?: string;
+  liveCounterStateGreenLabel?: string;
+  liveCounterShowStateBadge?: boolean;
+  liveCounterLegend0?: string;
+  liveCounterLegend30?: string;
+  liveCounterLegend70?: string;
+  liveCounterLegend100?: string;
+  liveCounterShowLegends?: boolean;
+  maintenanceModeEnabled?: boolean;
+  maintenanceReason?: string;
+  maintenanceEndTimestamp?: string; // ISO or timestamp
 }
 
 export interface WebAccessLog {

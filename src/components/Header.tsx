@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2 mx-auto sm:mx-0">
           <span className="text-base leading-none">🇻🇪</span>
           <AlertTriangle className="w-4 h-4 animate-bounce shrink-0 text-amber-300" />
-          <span>{state.headerAlertText || 'Emergencia Nacional #VEN-2026: Terremoto )'}</span>
+          <span>{state.headerAlertText || 'Emergencia Nacional #VEN-2026: Terremoto en Los Andes (Mérida, Trujillo, Táchira)'}</span>
         </div>
         <div className="hidden md:flex items-center gap-4 text-xs font-mono font-medium">
           <span className="bg-red-700 px-2 py-0.5 rounded flex items-center gap-1.5">

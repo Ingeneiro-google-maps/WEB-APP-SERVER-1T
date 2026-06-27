@@ -59,14 +59,14 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
 
   // Determine stage description & color logic: Red -> Yellow/Orange -> Green
   let stageTextClass = 'text-red-600 bg-red-50 border-red-200';
-  let stageName = 'ROJO — DÉFICIT CRÍTICO INICIAL';
+  let stageName = state.liveCounterStateRedLabel !== undefined ? state.liveCounterStateRedLabel : 'ROJO — DÉFICIT CRÍTICO INICIAL';
 
   if (progressRatio >= 75) {
     stageTextClass = 'text-emerald-700 bg-emerald-50 border-emerald-300';
-    stageName = 'VERDE — ¡META PRÓXIMA / ALCANZADA!';
+    stageName = state.liveCounterStateGreenLabel !== undefined ? state.liveCounterStateGreenLabel : 'VERDE — ¡META PRÓXIMA / ALCANZADA!';
   } else if (progressRatio >= 30) {
     stageTextClass = 'text-amber-700 bg-amber-50 border-amber-300';
-    stageName = 'NARANJA / AMARILLO — EN PROGRESO CONSTANTE';
+    stageName = state.liveCounterStateOrangeLabel !== undefined ? state.liveCounterStateOrangeLabel : 'NARANJA / AMARILLO — EN PROGRESO CONSTANTE';
   }
 
   const formattedSyncTime = state.lastSyncTime
@@ -189,12 +189,14 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
               </div>
 
               {/* Stage Badge */}
-              <div className="mb-4">
-                <div className={`px-3.5 py-1.5 rounded-lg border text-xs font-black tracking-wider uppercase inline-flex items-center gap-2 ${stageTextClass}`}>
-                  <span className="w-2 h-2 rounded-full bg-current animate-pulse"></span>
-                  <span>ESTADO: {stageName} ({progressRatio.toFixed(1)}%)</span>
+              {state.liveCounterShowStateBadge !== false && (
+                <div className="mb-4">
+                  <div className={`px-3.5 py-1.5 rounded-lg border text-xs font-black tracking-wider uppercase inline-flex items-center gap-2 ${stageTextClass}`}>
+                    <span className="w-2 h-2 rounded-full bg-current animate-pulse"></span>
+                    <span>ESTADO: {stageName || 'OCULTO'} ({progressRatio.toFixed(1)}%)</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* THE PROGRESS BAR (Red -> Orange/Yellow -> Green) */}
               <div className="relative h-14 sm:h-16 w-full bg-slate-200 rounded-2xl overflow-hidden shadow-inner flex border-4 border-white mb-3">
@@ -218,12 +220,14 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
               </div>
 
               {/* Progress Bar Legend */}
-              <div className="flex justify-between px-1 text-[11px] font-black uppercase tracking-tight">
-                <span className="text-red-600">0% Rojo</span>
-                <span className="text-orange-600">30% Naranja</span>
-                <span className="text-yellow-600">70% Amarillo</span>
-                <span className="text-emerald-600">100% Verde</span>
-              </div>
+              {state.liveCounterShowLegends !== false && (
+                <div className="flex justify-between px-1 text-[11px] font-black uppercase tracking-tight">
+                  <span className="text-red-600">{state.liveCounterLegend0 !== undefined ? state.liveCounterLegend0 : '0% Rojo'}</span>
+                  <span className="text-orange-600">{state.liveCounterLegend30 !== undefined ? state.liveCounterLegend30 : '30% Naranja'}</span>
+                  <span className="text-yellow-600">{state.liveCounterLegend70 !== undefined ? state.liveCounterLegend70 : '70% Amarillo'}</span>
+                  <span className="text-emerald-600">{state.liveCounterLegend100 !== undefined ? state.liveCounterLegend100 : '100% Verde'}</span>
+                </div>
+              )}
             </div>
 
             {/* Public Donation Registration CTA */}

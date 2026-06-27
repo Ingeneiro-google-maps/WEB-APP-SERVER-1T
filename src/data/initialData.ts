@@ -11,26 +11,18 @@ export const INITIAL_STATE: GlobalState = {
   "heroTitleRow2": "POR 1 TONELADA",
   "heroTitleRow3": "DESDE ESPAÑA",
   "globalTargetTons": 1,
-  "lastSyncTime": "2026-06-27T14:03:57.979Z",
-  "nextSyncTime": "2026-06-27T14:13:57.979Z",
+  "lastSyncTime": "2026-06-27T19:57:56.376Z",
+  "nextSyncTime": "2026-06-27T20:05:52.405Z",
   "googleSheetUrl": "https://docs.google.com/spreadsheets/d/1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC/edit?gid=762536088#gid=762536088",
   "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbxfiM27NiOzQx9FWqn2AFG6IeaG_MyCcNKTjiA29YF8MZ9NObXDlSUG7bLqWl_rHiw/exec",
   "autoSyncEnabled": true,
   "syncIntervalMinutes": 10,
-  "donationCategories": [
-    "Alimentos no perecederos",
-    "Ropa y Abrigo",
-    "Baterías y Pilas",
-    "Medicinas e Insumos Médicos",
-    "Agua Potable Embotellada",
-    "Kits Infantiles y Fórmulas"
-  ],
   "supplies": [
     {
       "id": "sup-1",
       "category": "Alimentos no perecederos",
       "name": "Harina de Maíz, Arroz y Pasta",
-      "currentKilos": 10,
+      "currentKilos": 48,
       "targetKilos": 500,
       "unit": "kg",
       "iconName": "Utensils"
@@ -57,7 +49,7 @@ export const INITIAL_STATE: GlobalState = {
       "id": "sup-4",
       "category": "Ropa y Abrigo",
       "name": "Mantas Térmicas y Ropa de Abrigo (Todas las tallas)",
-      "currentKilos": 0,
+      "currentKilos": 45,
       "targetKilos": 200,
       "unit": "kg",
       "iconName": "Shirt"
@@ -66,7 +58,7 @@ export const INITIAL_STATE: GlobalState = {
       "id": "sup-5",
       "category": "Medicinas e Insumos",
       "name": "Kits de Primeros Auxilios y Analgésicos",
-      "currentKilos": 0,
+      "currentKilos": 126,
       "targetKilos": 100,
       "unit": "kg",
       "iconName": "Cross"
@@ -186,153 +178,283 @@ export const INITIAL_STATE: GlobalState = {
   ],
   "pledges": [
     {
-      "id": "excel-1-10",
-      "donorName": "orlnado",
-      "email": "anonimo@donante.org",
-      "city": "Madrid",
+      "id": "excel-1-48",
+      "donorName": "Pollos y pepitos +58",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
       "category": "Alimentos no perecederos",
+      "pledgeKilos": 48,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-2-35",
+      "donorName": "Cotelga sl",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 35,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-3-7",
+      "donorName": "Johana carvajal",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 7,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-4-60",
+      "donorName": "Johana carvajal",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 60,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-5-20",
+      "donorName": "Cotelga sl",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 20,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-6-4",
+      "donorName": "Joana a carvajal",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 4,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-7-10",
+      "donorName": "Anonimo",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
       "pledgeKilos": 10,
       "message": "Entrega registrada",
-      "date": "6/26/2026"
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-8-4",
+      "donorName": "Anonimo",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 4,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-9-2",
+      "donorName": "Cotelga sl",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 2,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-10-3",
+      "donorName": "Anonimo",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 3,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-11-5",
+      "donorName": "Adonis soto",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-12-8",
+      "donorName": "Cotelga sl",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 8,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-13-8",
+      "donorName": "Corelga",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 8,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-14-5",
+      "donorName": "Anonimo",
+      "email": "holla@pollospepitos58.com",
+      "city": "Pollos y pepitos +58 (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
     }
   ],
   "syncLogs": [
     {
-      "id": "log-1782569037979",
-      "timestamp": "2:03:57 PM",
+      "id": "log-1782590152405",
+      "timestamp": "7:55:52 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 14 donaciones de la hoja de cálculo. Peso total acumulado: 219 kg.",
+      "kilosUpdated": 219
+    },
+    {
+      "id": "log-1782589559555",
+      "timestamp": "7:45:59 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 14 donaciones de la hoja de cálculo. Peso total acumulado: 219 kg.",
+      "kilosUpdated": 219
+    },
+    {
+      "id": "log-1782588960980",
+      "timestamp": "7:36:00 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 12 donaciones de la hoja de cálculo. Peso total acumulado: 206 kg.",
+      "kilosUpdated": 206
+    },
+    {
+      "id": "log-1782588360008",
+      "timestamp": "7:26:00 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 10 donaciones de la hoja de cálculo. Peso total acumulado: 193 kg.",
+      "kilosUpdated": 193
+    },
+    {
+      "id": "log-1782587759514",
+      "timestamp": "7:15:59 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 7 donaciones de la hoja de cálculo. Peso total acumulado: 184 kg.",
+      "kilosUpdated": 184
+    },
+    {
+      "id": "log-1782587159517",
+      "timestamp": "7:05:59 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 5 donaciones de la hoja de cálculo. Peso total acumulado: 170 kg.",
+      "kilosUpdated": 170
+    },
+    {
+      "id": "log-1782586559367",
+      "timestamp": "6:55:59 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 4 donaciones de la hoja de cálculo. Peso total acumulado: 100 kg.",
+      "kilosUpdated": 100
+    },
+    {
+      "id": "log-1782585959505",
+      "timestamp": "6:45:59 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 2 donaciones de la hoja de cálculo. Peso total acumulado: 58 kg.",
+      "kilosUpdated": 58
+    },
+    {
+      "id": "log-1782585359387",
+      "timestamp": "6:35:59 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 2 donaciones de la hoja de cálculo. Peso total acumulado: 58 kg.",
+      "kilosUpdated": 58
+    },
+    {
+      "id": "log-1782584759578",
+      "timestamp": "6:25:59 PM",
+      "status": "success",
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 2 donaciones de la hoja de cálculo. Peso total acumulado: 58 kg.",
+      "kilosUpdated": 58
+    },
+    {
+      "id": "log-1782584159734",
+      "timestamp": "6:15:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782564741488",
-      "timestamp": "12:52:21 PM",
+      "id": "log-1782583559367",
+      "timestamp": "6:05:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782564141598",
-      "timestamp": "12:42:21 PM",
+      "id": "log-1782582959477",
+      "timestamp": "5:55:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782563541525",
-      "timestamp": "12:32:21 PM",
+      "id": "log-1782582360174",
+      "timestamp": "5:46:00 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782562941932",
-      "timestamp": "12:22:21 PM",
+      "id": "log-1782581759311",
+      "timestamp": "5:35:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782562341371",
-      "timestamp": "12:12:21 PM",
+      "id": "log-1782581162805",
+      "timestamp": "5:26:02 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782561741534",
-      "timestamp": "12:02:21 PM",
+      "id": "log-1782580559328",
+      "timestamp": "5:15:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782561141542",
-      "timestamp": "11:52:21 AM",
+      "id": "log-1782579959343",
+      "timestamp": "5:05:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782560541453",
-      "timestamp": "11:42:21 AM",
+      "id": "log-1782579359214",
+      "timestamp": "4:55:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
     },
     {
-      "id": "log-1782559941734",
-      "timestamp": "11:32:21 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782559341542",
-      "timestamp": "11:22:21 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782558741510",
-      "timestamp": "11:12:21 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782558141329",
-      "timestamp": "11:02:21 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782557541408",
-      "timestamp": "10:52:21 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782556941849",
-      "timestamp": "10:42:21 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782556341486",
-      "timestamp": "10:32:21 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782555741615",
-      "timestamp": "10:22:21 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782555123663",
-      "timestamp": "10:12:03 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782554523483",
-      "timestamp": "10:02:03 AM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782553923458",
-      "timestamp": "9:52:03 AM",
+      "id": "log-1782578759422",
+      "timestamp": "4:45:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
@@ -403,6 +525,24 @@ export const INITIAL_STATE: GlobalState = {
   ],
   "userChangeLogs": [
     {
+      "id": "ulog-1782590276100-8m6i",
+      "userId": "usr-orlando",
+      "userName": "Ing. Orlando Galdámez",
+      "userEmail": "eng.orlandogaldamez@gmail.com",
+      "date": "27/06/2026",
+      "time": "21:57:56",
+      "action": "Actualizó la configuración de estados, leyendas y visibilidad del contador en vivo de Navarra"
+    },
+    {
+      "id": "ulog-1782570039652-6gjf",
+      "userId": "usr-orlando",
+      "userName": "Ing. Orlando Galdámez",
+      "userEmail": "eng.orlandogaldamez@gmail.com",
+      "date": "27/06/2026",
+      "time": "16:20:39",
+      "action": "Eliminó la categoría de donación \"Agua Potable Embotellada\""
+    },
+    {
       "id": "ulog-1",
       "userId": "usr-orlando",
       "userName": "Ing. Orlando Galdámez",
@@ -448,6 +588,86 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_bpt8e2nzk",
+      "timestamp": "2026-06-27T19:56:41.152Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1760x889] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_k3nmwgkre",
+      "timestamp": "2026-06-27T14:44:08.635Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1798x894] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_zzi70psyq",
+      "timestamp": "2026-06-27T14:42:06.459Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 375x667] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_hgvuoa1ox",
+      "timestamp": "2026-06-27T14:36:45.121Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1798x894] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_e1a1x5myc",
+      "timestamp": "2026-06-27T14:32:28.186Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 375x667] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_ps99wbjyd",
+      "timestamp": "2026-06-27T14:27:29.276Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1798x894] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_6zzw1qhmq",
+      "timestamp": "2026-06-27T14:27:24.097Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1798x894] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_1qehvbyfq",
+      "timestamp": "2026-06-27T14:24:05.343Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 375x667] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_jbqo92l4c",
+      "timestamp": "2026-06-27T14:23:47.255Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 375x667] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_kc5rqkjqt",
+      "timestamp": "2026-06-27T14:20:00.478Z",
+      "ip": "90.160.203.220",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1798x894] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_45dbf0has",
       "timestamp": "2026-06-27T14:05:07.563Z",
@@ -544,5 +764,24 @@ export const INITIAL_STATE: GlobalState = {
       "location": "Europe/Madrid",
       "page": "/"
     }
-  ]
+  ],
+  "donationCategories": [
+    "Alimentos no perecederos",
+    "Ropa y Abrigo",
+    "Baterías y Pilas",
+    "Medicinas e Insumos Médicos",
+    "Kits Infantiles y Fórmulas"
+  ],
+  "liveCounterStateRedLabel": "ROJO — DÉFICIT CRÍTICO INICIAL",
+  "liveCounterStateOrangeLabel": "NARANJA / AMARILLO — EN PROGRESO CONSTANTE",
+  "liveCounterStateGreenLabel": "VERDE — ¡META PRÓXIMA / ALCANZADA!",
+  "liveCounterShowStateBadge": true,
+  "liveCounterLegend0": "0% Rojo",
+  "liveCounterLegend30": "30% Naranja",
+  "liveCounterLegend70": "70% Amarillo",
+  "liveCounterLegend100": "100% Verde",
+  "liveCounterShowLegends": false,
+  "maintenanceModeEnabled": false,
+  "maintenanceReason": "Actualización y optimización de base de datos relacional de acopio",
+  "maintenanceEndTimestamp": ""
 };

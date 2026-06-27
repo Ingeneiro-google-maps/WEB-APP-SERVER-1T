@@ -42,7 +42,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'categorias_donacion' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'categorias_donacion' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -280,6 +280,46 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       .setMimeType(ContentService.MimeType.JSON);
   }
 }`;
+
+  const [isContadorTabUnlocked, setIsContadorTabUnlocked] = useState(false);
+  const [isConfigTabUnlocked, setIsConfigTabUnlocked] = useState(false);
+  const [contadorPasswordAttempt, setContadorPasswordAttempt] = useState('');
+  const [configPasswordAttempt, setConfigPasswordAttempt] = useState('');
+  const [contadorError, setContadorError] = useState('');
+  const [configError, setConfigError] = useState('');
+
+  // Customizable live counter values states
+  const [tempRedLabel, setTempRedLabel] = useState(state.liveCounterStateRedLabel || 'ROJO — DÉFICIT CRÍTICO INICIAL');
+  const [tempOrangeLabel, setTempOrangeLabel] = useState(state.liveCounterStateOrangeLabel || 'NARANJA / AMARILLO — EN PROGRESO CONSTANTE');
+  const [tempGreenLabel, setTempGreenLabel] = useState(state.liveCounterStateGreenLabel || 'VERDE — ¡META PRÓXIMA / ALCANZADA!');
+  const [tempShowStateBadge, setTempShowStateBadge] = useState(state.liveCounterShowStateBadge !== false);
+  const [tempLegend0, setTempLegend0] = useState(state.liveCounterLegend0 || '0% Rojo');
+  const [tempLegend30, setTempLegend30] = useState(state.liveCounterLegend30 || '30% Naranja');
+  const [tempLegend70, setTempLegend70] = useState(state.liveCounterLegend70 || '70% Amarillo');
+  const [tempLegend100, setTempLegend100] = useState(state.liveCounterLegend100 || '100% Verde');
+  const [tempShowLegends, setTempShowLegends] = useState(state.liveCounterShowLegends !== false);
+
+  const [tempMaintenanceModeEnabled, setTempMaintenanceModeEnabled] = useState(state.maintenanceModeEnabled || false);
+  const [tempMaintenanceReason, setTempMaintenanceReason] = useState(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
+  const [tempMaintenanceEndTimestamp, setTempMaintenanceEndTimestamp] = useState(state.maintenanceEndTimestamp || '');
+
+  React.useEffect(() => {
+    if (state) {
+      setTempRedLabel(state.liveCounterStateRedLabel !== undefined ? state.liveCounterStateRedLabel : 'ROJO — DÉFICIT CRÍTICO INICIAL');
+      setTempOrangeLabel(state.liveCounterStateOrangeLabel !== undefined ? state.liveCounterStateOrangeLabel : 'NARANJA / AMARILLO — EN PROGRESO CONSTANTE');
+      setTempGreenLabel(state.liveCounterStateGreenLabel !== undefined ? state.liveCounterStateGreenLabel : 'VERDE — ¡META PRÓXIMA / ALCANZADA!');
+      setTempShowStateBadge(state.liveCounterShowStateBadge !== false);
+      setTempLegend0(state.liveCounterLegend0 !== undefined ? state.liveCounterLegend0 : '0% Rojo');
+      setTempLegend30(state.liveCounterLegend30 !== undefined ? state.liveCounterLegend30 : '30% Naranja');
+      setTempLegend70(state.liveCounterLegend70 !== undefined ? state.liveCounterLegend70 : '70% Amarillo');
+      setTempLegend100(state.liveCounterLegend100 !== undefined ? state.liveCounterLegend100 : '100% Verde');
+      setTempShowLegends(state.liveCounterShowLegends !== false);
+      
+      setTempMaintenanceModeEnabled(state.maintenanceModeEnabled || false);
+      setTempMaintenanceReason(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
+      setTempMaintenanceEndTimestamp(state.maintenanceEndTimestamp || '');
+    }
+  }, [state]);
 
   const showToast = (txt: string) => {
     setMessage(txt);
@@ -987,6 +1027,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           >
             <Video className="w-5 h-5 text-violet-400" />
             <span>🎥 Categoría de Videos</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('mantenimiento')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'mantenimiento' 
+                ? 'bg-amber-500 text-slate-950 shadow-xl shadow-amber-500/20' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Settings className="w-5 h-5 text-amber-400" />
+            <span>🛠️ Modo Mantenimiento</span>
           </button>
 
           <button
@@ -1897,7 +1949,46 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
         {/* --- CONTENIDO PESTAÑA 6: CONFIGURACIÓN GENERAL GOOGLE SHEET / EXCEL --- */}
         {activeTab === 'config' && (
-          <div className="max-w-3xl mx-auto space-y-8 bg-slate-900 p-8 sm:p-12 rounded-3xl border border-slate-800 shadow-2xl">
+          !isConfigTabUnlocked ? (
+            <div className="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl text-center space-y-6 my-12 font-sans">
+              <div className="mx-auto w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-400 border border-slate-700 shadow-lg">
+                <Lock className="w-8 h-8 text-amber-500 animate-bounce" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-black uppercase text-white">⚙️ Acceso Restringido</h3>
+                <p className="text-xs text-slate-400">Configuración del Servidor y Base de Datos</p>
+                <p className="text-[11px] text-slate-500">Esta sección requiere autenticación por motivos de seguridad.</p>
+              </div>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (configPasswordAttempt === 'Isabella2015$') {
+                  setIsConfigTabUnlocked(true);
+                  setConfigError('');
+                } else {
+                  setConfigError('❌ Clave incorrecta. Inténtelo de nuevo.');
+                }
+              }} className="space-y-4 text-left">
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2">Clave del Servidor</label>
+                  <input
+                    type="password"
+                    placeholder="••••••••••••"
+                    value={configPasswordAttempt}
+                    onChange={(e) => setConfigPasswordAttempt(e.target.value)}
+                    className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 font-mono text-center tracking-widest text-center"
+                  />
+                </div>
+                {configError && <p className="text-rose-500 text-xs font-bold text-center">{configError}</p>}
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-slate-850 hover:bg-slate-800 active:scale-95 text-white rounded-xl text-xs font-black uppercase tracking-widest transition cursor-pointer border border-slate-700/50"
+                >
+                  Desbloquear Sección
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="max-w-3xl mx-auto space-y-8 bg-slate-900 p-8 sm:p-12 rounded-3xl border border-slate-800 shadow-2xl">
             <div>
               <h3 className="text-2xl font-black uppercase text-white">⚙️ Configuración del Servidor y Base de Datos</h3>
               <p className="text-slate-400 text-sm mt-1">Sincronización horaria con hoja de cálculo externa de Google Drive Excel.</p>
@@ -2318,6 +2409,7 @@ ON CONFLICT (id) DO NOTHING;`}
               </div>
             </div>
           </div>
+          )
         )}
 
         {/* --- CONTENIDO PESTAÑA 7: PERSONALIZACIÓN DE PORTADA (100% MODIFICABLE) --- */}
@@ -3002,7 +3094,46 @@ ON CONFLICT (id) DO NOTHING;`}
 
         {/* --- CONTENIDO PESTAÑA: CONTADOR EN VIVO --- */}
         {activeTab === 'contador_vivo' && (
-          <div className="space-y-6">
+          !isContadorTabUnlocked ? (
+            <div className="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl text-center space-y-6 my-12 font-sans">
+              <div className="mx-auto w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-emerald-400 border border-emerald-500/30 shadow-lg shadow-emerald-950/20">
+                <Lock className="w-8 h-8 text-emerald-450 animate-bounce" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-black uppercase text-white">🔐 Acceso Restringido</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Contador en Vivo y Metas de Navarra</p>
+                <p className="text-[11px] text-slate-500 font-medium">Esta sección requiere autenticación por motivos de seguridad.</p>
+              </div>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (contadorPasswordAttempt === 'Isabella2015$') {
+                  setIsContadorTabUnlocked(true);
+                  setContadorError('');
+                } else {
+                  setContadorError('❌ Clave incorrecta. Inténtelo de nuevo.');
+                }
+              }} className="space-y-4 text-left">
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2">Clave de Acceso</label>
+                  <input
+                    type="password"
+                    placeholder="••••••••••••"
+                    value={contadorPasswordAttempt}
+                    onChange={(e) => setContadorPasswordAttempt(e.target.value)}
+                    className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 font-mono text-center tracking-widest text-center"
+                  />
+                </div>
+                {contadorError && <p className="text-rose-500 text-xs font-bold text-center">{contadorError}</p>}
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black uppercase tracking-widest transition cursor-pointer"
+                >
+                  Confirmar Clave
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="space-y-6">
             <div className="bg-gradient-to-r from-emerald-900/60 via-slate-900 to-slate-900 p-8 rounded-3xl border border-emerald-500/40 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 font-sans">
               <div>
                 <span className="px-3 py-1 bg-emerald-600 text-white text-xs font-black uppercase tracking-widest rounded-full">Progresión de la Campaña</span>
@@ -3105,7 +3236,245 @@ ON CONFLICT (id) DO NOTHING;`}
                 );
               })}
             </div>
+
+            {/* Live Status Config Section */}
+            <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-xl space-y-6 font-sans">
+              <div>
+                <h3 className="text-xl font-black uppercase text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-emerald-400" />
+                  <span>🎨 CONFIGURACIÓN DE ESTADOS, LEYENDAS Y VISIBILIDAD (NAVARRA)</span>
+                </h3>
+                <p className="text-slate-400 text-xs mt-1">
+                  Modifica los textos de alerta correspondientes a cada fase del progreso, ajusta las etiquetas de la leyenda o desactívalas completamente de la portada.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4 border-t border-slate-800">
+                {/* 1. CONFIGURACIÓN DE ESTADOS */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400">🚨 Configuración de Alertas de Estado</h4>
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={tempShowStateBadge}
+                        onChange={(e) => setTempShowStateBadge(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-slate-850 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                      <span className="ml-2 text-xs font-black uppercase text-slate-400">MOSTRAR</span>
+                    </label>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Fase Roja (0% - 29.9%):</label>
+                        <button
+                          type="button"
+                          onClick={() => setTempRedLabel('')}
+                          className="text-[9px] text-rose-400 hover:underline uppercase font-bold"
+                        >
+                          Limpiar / Ocultar Texto
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={tempRedLabel}
+                        onChange={(e) => setTempRedLabel(e.target.value)}
+                        placeholder="Ej. ROJO — DÉFICIT CRÍTICO INICIAL"
+                        className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Fase Naranja/Amarilla (30% - 74.9%):</label>
+                        <button
+                          type="button"
+                          onClick={() => setTempOrangeLabel('')}
+                          className="text-[9px] text-rose-400 hover:underline uppercase font-bold"
+                        >
+                          Limpiar / Ocultar Texto
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={tempOrangeLabel}
+                        onChange={(e) => setTempOrangeLabel(e.target.value)}
+                        placeholder="Ej. NARANJA / AMARILLO — EN PROGRESO CONSTANTE"
+                        className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Fase Verde (75% o superior):</label>
+                        <button
+                          type="button"
+                          onClick={() => setTempGreenLabel('')}
+                          className="text-[9px] text-rose-400 hover:underline uppercase font-bold"
+                        >
+                          Limpiar / Ocultar Texto
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={tempGreenLabel}
+                        onChange={(e) => setTempGreenLabel(e.target.value)}
+                        placeholder="Ej. VERDE — ¡META PRÓXIMA / ALCANZADA!"
+                        className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. CONFIGURACIÓN DE LEYENDAS */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400">📊 Leyendas del Progreso (Rangos)</h4>
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={tempShowLegends}
+                        onChange={(e) => setTempShowLegends(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-slate-850 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                      <span className="ml-2 text-xs font-black uppercase text-slate-400">MOSTRAR</span>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Leyenda 0%:</label>
+                        <button
+                          type="button"
+                          onClick={() => setTempLegend0('')}
+                          className="text-[9px] text-rose-400 hover:underline font-bold"
+                        >
+                          Limpiar
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={tempLegend0}
+                        onChange={(e) => setTempLegend0(e.target.value)}
+                        placeholder="0% Rojo"
+                        className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Leyenda 30%:</label>
+                        <button
+                          type="button"
+                          onClick={() => setTempLegend30('')}
+                          className="text-[9px] text-rose-400 hover:underline font-bold"
+                        >
+                          Limpiar
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={tempLegend30}
+                        onChange={(e) => setTempLegend30(e.target.value)}
+                        placeholder="30% Naranja"
+                        className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Leyenda 70%:</label>
+                        <button
+                          type="button"
+                          onClick={() => setTempLegend70('')}
+                          className="text-[9px] text-rose-400 hover:underline font-bold"
+                        >
+                          Limpiar
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={tempLegend70}
+                        onChange={(e) => setTempLegend70(e.target.value)}
+                        placeholder="70% Amarillo"
+                        className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Leyenda 100%:</label>
+                        <button
+                          type="button"
+                          onClick={() => setTempLegend100('')}
+                          className="text-[9px] text-rose-400 hover:underline font-bold"
+                        >
+                          Limpiar
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={tempLegend100}
+                        onChange={(e) => setTempLegend100(e.target.value)}
+                        placeholder="100% Verde"
+                        className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Guardar cambios */}
+              <div className="pt-6 border-t border-slate-800 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTempRedLabel('ROJO — DÉFICIT CRÍTICO INICIAL');
+                    setTempOrangeLabel('NARANJA / AMARILLO — EN PROGRESO CONSTANTE');
+                    setTempGreenLabel('VERDE — ¡META PRÓXIMA / ALCANZADA!');
+                    setTempShowStateBadge(true);
+                    setTempLegend0('0% Rojo');
+                    setTempLegend30('30% Naranja');
+                    setTempLegend70('70% Amarillo');
+                    setTempLegend100('100% Verde');
+                    setTempShowLegends(true);
+                    showToast('🔄 Se han restablecido los valores por defecto locales (Haga clic en Guardar para aplicarlos)');
+                  }}
+                  className="px-4 py-2.5 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition cursor-pointer"
+                >
+                  Restablecer Predeterminados
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleUpdateStateWithLog({
+                      liveCounterStateRedLabel: tempRedLabel,
+                      liveCounterStateOrangeLabel: tempOrangeLabel,
+                      liveCounterStateGreenLabel: tempGreenLabel,
+                      liveCounterShowStateBadge: tempShowStateBadge,
+                      liveCounterLegend0: tempLegend0,
+                      liveCounterLegend30: tempLegend30,
+                      liveCounterLegend70: tempLegend70,
+                      liveCounterLegend100: tempLegend100,
+                      liveCounterShowLegends: tempShowLegends
+                    }, 'Actualizó la configuración de estados, leyendas y visibilidad del contador en vivo de Navarra');
+                    showToast('💾 ¡Configuración del contador en vivo guardada correctamente!');
+                  }}
+                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-950/40"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Guardar Cambios</span>
+                </button>
+              </div>
+            </div>
           </div>
+          )
         )}
 
         {/* --- CONTENIDO PESTAÑA: CATEGORÍA DE VIDEOS --- */}
@@ -3344,6 +3713,227 @@ ON CONFLICT (id) DO NOTHING;`}
                 <Save className="w-5 h-5" />
                 <span>Guardar Cambios de Video</span>
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: MODO MANTENIMIENTO --- */}
+        {activeTab === 'mantenimiento' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-amber-900/60 via-slate-900 to-slate-900 p-8 rounded-3xl border border-amber-500/40 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 font-sans">
+              <div>
+                <span className="px-3 py-1 bg-amber-500 text-slate-950 text-xs font-black uppercase tracking-widest rounded-full">Control de Infraestructura</span>
+                <h2 className="text-2xl sm:text-3xl font-black uppercase text-white mt-3 flex items-center gap-2.5 font-sans">
+                  <Settings className="w-8 h-8 text-amber-400" />
+                  <span>🛠️ GESTIÓN DEL MODO MANTENIMIENTO GLOBAL</span>
+                </h2>
+                <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+                  Active el bloqueo de mantenimiento para suspender temporalmente el acceso público a la plataforma mientras se realizan actualizaciones en el servidor. Los visitantes verán un contador regresivo de alta fidelidad y un motivo sumamente profesional.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Columna Izquierda: Activar & Motivo */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* 1. Toggle */}
+                <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black uppercase text-white flex items-center gap-2">
+                        <AlertOctagon className={`w-5 h-5 ${tempMaintenanceModeEnabled ? 'text-amber-400 animate-pulse' : 'text-slate-500'}`} />
+                        <span>1. Bloqueo de Mantenimiento</span>
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-1">Activar este interruptor desconectará la plataforma de forma inmediata para todos los usuarios normales.</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer select-none shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={tempMaintenanceModeEnabled}
+                        onChange={(e) => setTempMaintenanceModeEnabled(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-14 h-7 bg-slate-950 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-amber-500"></div>
+                    </label>
+                  </div>
+
+                  {tempMaintenanceModeEnabled ? (
+                    <div className="p-4 bg-amber-500/10 border border-amber-500/25 rounded-2xl flex items-start gap-3">
+                      <span className="text-xl">⚠️</span>
+                      <p className="text-xs text-amber-300 leading-relaxed font-semibold">
+                        <strong className="text-white block uppercase mb-1">MODO MANTENIMIENTO ACTIVO:</strong>
+                        Los usuarios normales que ingresen al portal web no podrán ver el contador ni realizar registros de donación. Serán redirigidos a la pantalla de espera hasta que desactive esta opción o expire el temporizador regresivo.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/25 rounded-2xl flex items-start gap-3">
+                      <span className="text-xl">✅</span>
+                      <p className="text-xs text-emerald-300 leading-relaxed font-semibold">
+                        <strong className="text-white block uppercase mb-1">SISTEMA EN LÍNEA:</strong>
+                        La web se encuentra totalmente accesible. Todos los acopios, mapas, noticias e inteligencia artificial están operando de forma óptima.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Motivo */}
+                <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+                  <h3 className="text-base sm:text-lg font-black uppercase text-white flex items-center gap-2">
+                    <Database className="w-5 h-5 text-amber-400" />
+                    <span>2. Motivo Técnico del Mantenimiento (Súper Profesionales)</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">Seleccione uno de los motivos de nivel de ingeniería para la desconexión o ingrese uno personalizado:</p>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    {[
+                      {
+                        label: '🗄️ Actualización de Base de Datos',
+                        desc: 'Actualización de base de datos relacional y migración de esquemas',
+                        text: 'Actualización de base de datos y migración de esquemas'
+                      },
+                      {
+                        label: '🖥️ Servidor Principal',
+                        desc: 'Mantenimiento preventivo de infraestructura y Servidor Principal',
+                        text: 'Mantenimiento del servidor principal'
+                      },
+                      {
+                        label: '🤖 Automatización',
+                        desc: 'Sincronización automatizada y optimización de procesos',
+                        text: 'Automatización de procesos'
+                      },
+                      {
+                        label: '📊 Procesamiento de Datos',
+                        desc: 'Actualizando procesos de procesamiento de datos masivos',
+                        text: 'Actualizando procesos de procesamiento de datos'
+                      }
+                    ].map((opt, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setTempMaintenanceReason(opt.text)}
+                        className={`p-4 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between h-28 ${
+                          tempMaintenanceReason === opt.text
+                            ? 'bg-slate-850 border-amber-500/50 shadow-md'
+                            : 'bg-slate-950 border-slate-850 hover:border-slate-700'
+                        }`}
+                      >
+                        <span className="text-xs font-black uppercase text-white block">{opt.label}</span>
+                        <span className="text-[10px] text-slate-400 leading-snug line-clamp-2 mt-1.5 font-medium">{opt.desc}</span>
+                        <span className="text-[9px] text-amber-400 font-bold tracking-wider mt-2 block text-right">
+                          {tempMaintenanceReason === opt.text ? '✓ SELECCIONADO' : 'SELECCIONAR'}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="pt-2">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Otro Motivo Personalizado Profesional:</label>
+                    <textarea
+                      rows={2}
+                      value={tempMaintenanceReason}
+                      onChange={(e) => setTempMaintenanceReason(e.target.value)}
+                      placeholder="Ingrese una descripción técnica detallada..."
+                      className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-amber-500 leading-relaxed"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Columna Derecha: Temporizador & Guardar */}
+              <div className="space-y-6">
+                <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl space-y-6 flex flex-col justify-between h-full">
+                  <div className="space-y-4">
+                    <h3 className="text-base sm:text-lg font-black uppercase text-white flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-amber-400 animate-pulse" />
+                      <span>3. Temporizador de Cuenta Regresiva</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Especifique la fecha y hora estimada de finalización. El contador en la web de inicio irá restando de forma dinámica segundo a segundo.
+                    </p>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Fecha y Hora de Finalización:</label>
+                      <input
+                        type="datetime-local"
+                        value={tempMaintenanceEndTimestamp}
+                        onChange={(e) => setTempMaintenanceEndTimestamp(e.target.value)}
+                        className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-amber-500 font-mono text-center tracking-wider"
+                      />
+                    </div>
+
+                    {/* Quick presets */}
+                    <div className="space-y-2">
+                      <span className="block text-[10px] font-black uppercase tracking-wider text-slate-400">Atajos Rápidos (Sumar Tiempo):</span>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { label: '+15 min', min: 15 },
+                          { label: '+30 min', min: 30 },
+                          { label: '+1 Hora', min: 60 },
+                          { label: '+2 Horas', min: 120 },
+                          { label: '+4 Horas', min: 240 },
+                          { label: '+12 Horas', min: 720 }
+                        ].map((p, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              const now = new Date();
+                              const future = new Date(now.getTime() + p.min * 60 * 1000);
+                              const year = future.getFullYear();
+                              const month = String(future.getMonth() + 1).padStart(2, '0');
+                              const day = String(future.getDate()).padStart(2, '0');
+                              const hours = String(future.getHours()).padStart(2, '0');
+                              const minutes = String(future.getMinutes()).padStart(2, '0');
+                              setTempMaintenanceEndTimestamp(`${year}-${month}-${day}T${hours}:${minutes}`);
+                              showToast(`⏰ Temporizador configurado para finalizar en ${p.label}`);
+                            }}
+                            className="bg-slate-950 hover:bg-slate-850 text-slate-300 hover:text-white border border-slate-850 hover:border-slate-750 text-[10px] font-bold py-2 rounded-lg cursor-pointer transition text-center"
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Real-time Countdown Live Preview */}
+                    <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-850 text-center space-y-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-500 block">Vista Previa Regresiva en Vivo</span>
+                      <CountdownPreview targetTimestamp={tempMaintenanceEndTimestamp} />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-800 space-y-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleUpdateStateWithLog({
+                          maintenanceModeEnabled: tempMaintenanceModeEnabled,
+                          maintenanceReason: tempMaintenanceReason,
+                          maintenanceEndTimestamp: tempMaintenanceEndTimestamp
+                        }, `Configuró modo mantenimiento: ${tempMaintenanceModeEnabled ? 'ACTIVADO' : 'DESACTIVADO'} | Motivo: "${tempMaintenanceReason}" | Finaliza: ${tempMaintenanceEndTimestamp || 'Indefinido'}`);
+                        showToast(`💾 ¡Estado de mantenimiento guardado con éxito!`);
+                      }}
+                      className="w-full py-4 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black uppercase tracking-widest text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20"
+                    >
+                      <Save className="w-5 h-5" />
+                      <span>Guardar Estado</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempMaintenanceModeEnabled(false);
+                        setTempMaintenanceReason('Actualización y optimización de base de datos relacional de acopio');
+                        setTempMaintenanceEndTimestamp('');
+                        showToast('🔄 Se han restablecido los valores por defecto locales (Recuerde hacer clic en Guardar)');
+                      }}
+                      className="w-full py-2.5 bg-slate-850 hover:bg-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition cursor-pointer"
+                    >
+                      Limpiar Configuración
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -3597,3 +4187,68 @@ ON CONFLICT (id) DO NOTHING;`}
     </div>
   );
 };
+
+// Componente para vista previa del temporizador en el panel administrativo
+function CountdownPreview({ targetTimestamp }: { targetTimestamp: string }) {
+  const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number; isExpired: boolean }>({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isExpired: true
+  });
+
+  React.useEffect(() => {
+    if (!targetTimestamp) {
+      setTimeLeft({ hours: 0, minutes: 0, seconds: 0, isExpired: true });
+      return;
+    }
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const target = new Date(targetTimestamp).getTime();
+      const diff = target - now;
+
+      if (isNaN(diff) || diff <= 0) {
+        setTimeLeft({ hours: 0, minutes: 0, seconds: 0, isExpired: true });
+      } else {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        setTimeLeft({ hours, minutes, seconds, isExpired: false });
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [targetTimestamp]);
+
+  if (!targetTimestamp) {
+    return <span className="text-[11px] text-slate-500 font-bold block py-1">⏳ SIN CONFIGURAR</span>;
+  }
+
+  if (timeLeft.isExpired) {
+    return <span className="text-xs text-rose-500 font-black uppercase tracking-wider block py-1 animate-pulse">⏱️ EXPIRADO / EN LÍNEA</span>;
+  }
+
+  return (
+    <div className="flex justify-center gap-3 text-white py-1">
+      <div className="flex flex-col items-center">
+        <span className="text-xl font-black font-mono leading-none text-white">{String(timeLeft.hours).padStart(2, '0')}</span>
+        <span className="text-[8px] font-black uppercase text-slate-500 mt-1">Horas</span>
+      </div>
+      <span className="text-xl font-black text-amber-500 animate-pulse">:</span>
+      <div className="flex flex-col items-center">
+        <span className="text-xl font-black font-mono leading-none text-white">{String(timeLeft.minutes).padStart(2, '0')}</span>
+        <span className="text-[8px] font-black uppercase text-slate-500 mt-1">Minutos</span>
+      </div>
+      <span className="text-xl font-black text-amber-500 animate-pulse">:</span>
+      <div className="flex flex-col items-center">
+        <span className="text-xl font-black font-mono leading-none text-amber-400">{String(timeLeft.seconds).padStart(2, '0')}</span>
+        <span className="text-[8px] font-black uppercase text-slate-500 mt-1">Segundos</span>
+      </div>
+    </div>
+  );
+}
+
