@@ -101,13 +101,11 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
         // Existe en base de datos pero no en el código local, lo conservamos (fue creado online)
         mergedCenters.push(dbCenter);
       } else {
-        // Existe en ambos. Si fue editado en la base de datos online, sus valores pueden ser ligeramente distintos,
-        // pero preferimos los cambios de código local si se acaba de hacer un deploy/push de código para evitar sobreescribir
-        // modificaciones de código de centros existentes. Sin embargo, para no machacar ediciones online válidas,
-        // combinamos las propiedades. En caso de conflicto de campos de texto específicos de centros, dejamos que el código local mande.
+        // Existe en ambos. Para evitar sobreescribir ediciones hechas online a través de la web,
+        // los valores dinámicos cargados de la base de datos (Supabase) prevalecen sobre el código local de INITIAL_STATE.
         mergedCenters[localCenterIdx] = {
-          ...dbCenter,
-          ...mergedCenters[localCenterIdx] // El código local prevalece para el centro existente
+          ...mergedCenters[localCenterIdx], // Conserva la estructura o nuevos campos del código local
+          ...dbCenter                       // Prevalecen los valores modificados o cargados desde la base de datos Supabase
         };
       }
     });
@@ -115,7 +113,7 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
   merged.centers = mergedCenters;
 
   // 4. Preguntas Frecuentes (FAQs):
-  // - Mezcla inteligente idéntica a centros de acopio
+  // - Mezcla inteligente idéntica a centros de acopio (la base de datos prevalece sobre el código viejo)
   const mergedFaqs = [...(local.faqs || [])];
   if (db.faqs) {
     db.faqs.forEach(dbFaq => {
@@ -124,8 +122,8 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
         mergedFaqs.push(dbFaq);
       } else {
         mergedFaqs[localFaqIdx] = {
-          ...dbFaq,
-          ...mergedFaqs[localFaqIdx]
+          ...mergedFaqs[localFaqIdx],       // Conserva la estructura local
+          ...dbFaq                          // Prevalecen los valores modificados online en Supabase
         };
       }
     });
