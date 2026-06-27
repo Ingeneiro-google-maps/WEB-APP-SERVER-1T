@@ -230,10 +230,11 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
             <div className="mt-8 pt-6 border-t border-slate-200">
               <button
                 onClick={onOpenDonation}
-                className="w-full py-4 px-6 bg-[#008CBA] hover:bg-[#007399] text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-blue-500/25 flex items-center justify-center gap-2.5 transition transform active:scale-98 cursor-pointer"
+                className="w-full py-4 px-4 sm:px-6 bg-[#008CBA] hover:bg-[#007399] text-white rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest shadow-xl shadow-blue-500/25 flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer"
               >
                 <HeartHandshake className="w-5 h-5 text-amber-300 shrink-0" />
-                <span>📦 Registrar Donación / Mercancía (Formulario Completo)</span>
+                <span className="hidden sm:inline">📦 Registrar Donación / Mercancía (Formulario)</span>
+                <span className="inline sm:hidden">📦 Registrar Donación / Mercancía</span>
               </button>
             </div>
           </div>
@@ -252,7 +253,7 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6">
               {state.supplies.map((item) => {
                 const pct = Math.min(100, Math.round((item.currentKilos / item.targetKilos) * 100));
                 let barColor = 'bg-red-500';
@@ -262,23 +263,23 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
                 return (
                   <div
                     key={item.id}
-                    className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-[#008CBA] transition flex flex-col justify-between"
+                    className="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-[#008CBA] transition flex flex-col justify-between"
                   >
                     <div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-[#008CBA] block mb-1.5">
+                      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[#008CBA] block mb-1.5 truncate" title={item.category}>
                         {item.category}
                       </span>
-                      <h3 className="font-bold text-sm text-[#1A202C] leading-snug mb-3">
+                      <h3 className="font-bold text-xs sm:text-sm text-[#1A202C] leading-snug mb-3 line-clamp-2" title={item.name}>
                         {item.name}
                       </h3>
                     </div>
 
                     <div>
-                      <div className="flex items-baseline justify-between mb-2 font-mono">
-                        <span className="text-xl font-black text-[#1A202C]">
-                          {item.currentKilos.toLocaleString()} <span className="text-xs font-bold text-slate-400">{item.unit}</span>
+                      <div className="flex flex-wrap items-baseline justify-between mb-2 font-mono gap-1">
+                        <span className="text-sm sm:text-xl font-black text-[#1A202C]">
+                          {item.currentKilos.toLocaleString()} <span className="text-[10px] sm:text-xs font-bold text-slate-400">{item.unit}</span>
                         </span>
-                        <span className="text-xs font-bold text-slate-400">
+                        <span className="text-[9px] sm:text-xs font-bold text-slate-400">
                           Meta: {item.targetKilos}
                         </span>
                       </div>

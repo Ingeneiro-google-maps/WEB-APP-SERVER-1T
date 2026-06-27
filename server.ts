@@ -147,6 +147,20 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
   }
   merged.faqs = mergedFaqs;
 
+  // 4b. Categorías de Donación dinámicas:
+  if (db.donationCategories && Array.isArray(db.donationCategories)) {
+    merged.donationCategories = db.donationCategories;
+  } else {
+    merged.donationCategories = local.donationCategories || [
+      "Alimentos no perecederos",
+      "Ropa y Abrigo",
+      "Baterías y Pilas",
+      "Medicinas e Insumos Médicos",
+      "Agua Potable Embotellada",
+      "Kits Infantiles y Fórmulas"
+    ];
+  }
+
   // 5. Configuración y textos escalares a nivel raíz:
   // Si un texto o valor existe en la base de datos y no es idéntico al default de código local anterior,
   // preservamos el de la base de datos ("los textos que ya han sido modificados online permanecen").

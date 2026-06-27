@@ -1,6 +1,6 @@
 {
   "name": "Por 1T",
   "description": "Plataforma humanitaria dinámica de acopio de alimentos y suministros para la emergencia del terremoto en Venezuela, con progreso en tiempo real, centros de acopio y panel administrativo.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

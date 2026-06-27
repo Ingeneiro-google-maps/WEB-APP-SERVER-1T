@@ -42,7 +42,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'categorias_donacion' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -216,6 +216,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [autoSync, setAutoSync] = useState<boolean>(state.autoSyncEnabled);
   const [autoUpdate, setAutoUpdate] = useState<boolean>(state.autoUpdateActive !== false);
   const [donationPass, setDonationPass] = useState<string>(state.donationPassword || 'VENEZUELAVIVE2026');
+
+  // Categorías de donación dinámicas
+  const [newCategoryName, setNewCategoryName] = useState<string>('');
+  const [editingCategoryIndex, setEditingCategoryIndex] = useState<number | null>(null);
+  const [editingCategoryName, setEditingCategoryName] = useState<string>('');
+  const [deletingCategoryIndex, setDeletingCategoryIndex] = useState<number | null>(null);
 
   // Estados de visibilidad de bloques de información de la web
   const [showSuppliesGrid, setShowSuppliesGrid] = useState<boolean>(state.visibleBlocks?.suppliesGrid !== false);
@@ -847,6 +853,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('categorias_donacion')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'categorias_donacion' 
+                ? 'bg-rose-700 text-white shadow-xl shadow-rose-500/30' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Package className="w-5 h-5 text-amber-400 animate-pulse" />
+            <span>🏷️ Modificar Categorías ({ (state.donationCategories || []).length })</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('noticias')}
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
               activeTab === 'noticias' 
@@ -1397,6 +1415,239 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: MODIFICAR CATEGORÍAS (DINÁMICAS) --- */}
+        {activeTab === 'categorias_donacion' && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Cabecera explicativa */}
+            <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-black uppercase text-rose-400 flex items-center gap-2.5">
+                    <Package className="w-6 h-6 text-rose-500 animate-pulse" />
+                    <span>Gestor de Categorías de Donación</span>
+                  </h3>
+                  <p className="text-slate-400 text-xs sm:text-sm mt-1">
+                    Agregue, edite o elimine las categorías que los donantes ven al registrar un aporte en el formulario de la web.
+                  </p>
+                </div>
+                <div className="px-3.5 py-1.5 bg-rose-950/40 border border-rose-500/40 rounded-xl text-[11px] font-bold text-rose-400 uppercase tracking-wider self-start sm:self-auto">
+                  ⚡ Cambios en Tiempo Real
+                </div>
+              </div>
+            </div>
+
+            {/* Dos columnas: Añadir nueva y Listado existente */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Formulario de Agregar */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+                  <h4 className="text-sm font-black uppercase text-slate-200 tracking-wider flex items-center gap-2">
+                    <Plus className="w-4 h-4 text-[#008CBA]" />
+                    Crear Nueva Categoría
+                  </h4>
+                  
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-2 uppercase">Nombre de la Categoría *</label>
+                    <input
+                      type="text"
+                      placeholder="Ej. Artículos de Higiene, Linternas..."
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm font-bold text-white focus:outline-none focus:border-rose-500 transition placeholder:text-slate-600"
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+                      💡 El nombre debe ser descriptivo. Se agregará inmediatamente como una opción seleccionable por los donantes.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      const trimmed = newCategoryName.trim();
+                      if (!trimmed) {
+                        setMessage("⚠️ El nombre de la categoría no puede estar vacío.");
+                        setTimeout(() => setMessage(null), 3000);
+                        return;
+                      }
+                      const currentCategories = state.donationCategories || [
+                        "Alimentos no perecederos",
+                        "Ropa y Abrigo",
+                        "Baterías y Pilas",
+                        "Medicinas e Insumos Médicos",
+                        "Agua Potable Embotellada",
+                        "Kits Infantiles y Fórmulas"
+                      ];
+                      if (currentCategories.some(c => c.toLowerCase() === trimmed.toLowerCase())) {
+                        setMessage("⚠️ Esta categoría ya existe en el sistema.");
+                        setTimeout(() => setMessage(null), 3000);
+                        return;
+                      }
+
+                      const updated = [...currentCategories, trimmed];
+                      handleUpdateStateWithLog({ donationCategories: updated }, `Agregó la categoría de donación "${trimmed}"`);
+                      setNewCategoryName('');
+                      setMessage("✅ Categoría agregada con éxito.");
+                      setTimeout(() => setMessage(null), 3000);
+                    }}
+                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg transition duration-200 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Agregar Categoría</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Listado de Categorías */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-black uppercase text-slate-200 tracking-wider">
+                      Categorías Registradas ({ (state.donationCategories || []).length })
+                    </h4>
+                    <span className="text-[10px] text-slate-400 font-medium font-mono">Fila editable</span>
+                  </div>
+
+                  <div className="divide-y divide-slate-800 border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/40">
+                    { (state.donationCategories || [
+                      "Alimentos no perecederos",
+                      "Ropa y Abrigo",
+                      "Baterías y Pilas",
+                      "Medicinas e Insumos Médicos",
+                      "Agua Potable Embotellada",
+                      "Kits Infantiles y Fórmulas"
+                    ]).map((category, index) => {
+                      const isEditing = editingCategoryIndex === index;
+                      const isConfirmingDelete = deletingCategoryIndex === index;
+
+                      return (
+                        <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 bg-slate-950/20 hover:bg-slate-950/60 transition">
+                          <div className="flex-1">
+                            {isEditing ? (
+                              <div className="flex items-center gap-2 w-full">
+                                <input
+                                  type="text"
+                                  value={editingCategoryName}
+                                  onChange={(e) => setEditingCategoryName(e.target.value)}
+                                  className="flex-1 px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+                                />
+                                <button
+                                  onClick={() => {
+                                    const trimmed = editingCategoryName.trim();
+                                    if (!trimmed) {
+                                      setMessage("⚠️ El nombre no puede estar vacío.");
+                                      setTimeout(() => setMessage(null), 3000);
+                                      return;
+                                    }
+                                    const currentCategories = [...(state.donationCategories || [
+                                      "Alimentos no perecederos",
+                                      "Ropa y Abrigo",
+                                      "Baterías y Pilas",
+                                      "Medicinas e Insumos Médicos",
+                                      "Agua Potable Embotellada",
+                                      "Kits Infantiles y Fórmulas"
+                                    ])];
+                                    const oldVal = currentCategories[index];
+                                    currentCategories[index] = trimmed;
+
+                                    handleUpdateStateWithLog({ donationCategories: currentCategories }, `Editó la categoría "${oldVal}" a "${trimmed}"`);
+                                    setEditingCategoryIndex(null);
+                                    setEditingCategoryName('');
+                                    setMessage("✅ Categoría actualizada con éxito.");
+                                    setTimeout(() => setMessage(null), 3000);
+                                  }}
+                                  className="p-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition cursor-pointer"
+                                  title="Guardar"
+                                >
+                                  <Check className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setEditingCategoryIndex(null);
+                                    setEditingCategoryName('');
+                                  }}
+                                  className="p-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition cursor-pointer"
+                                  title="Cancelar"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-xs sm:text-sm font-black text-slate-100 flex items-center gap-2">
+                                <span className="text-rose-400 font-mono">#{index + 1}</span>
+                                {category}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Acciones */}
+                          {!isEditing && (
+                            <div className="flex items-center gap-2 self-end sm:self-auto">
+                              {isConfirmingDelete ? (
+                                <div className="flex items-center gap-1.5 bg-rose-950/60 p-1 rounded-lg border border-rose-500/30">
+                                  <span className="text-[10px] text-rose-400 font-black uppercase px-1.5">¿Seguro?</span>
+                                  <button
+                                    onClick={() => {
+                                      const currentCategories = (state.donationCategories || [
+                                        "Alimentos no perecederos",
+                                        "Ropa y Abrigo",
+                                        "Baterías y Pilas",
+                                        "Medicinas e Insumos Médicos",
+                                        "Agua Potable Embotellada",
+                                        "Kits Infantiles y Fórmulas"
+                                      ]).filter((_, i) => i !== index);
+
+                                      handleUpdateStateWithLog({ donationCategories: currentCategories }, `Eliminó la categoría de donación "${category}"`);
+                                      setDeletingCategoryIndex(null);
+                                      setMessage("✅ Categoría eliminada.");
+                                      setTimeout(() => setMessage(null), 3000);
+                                    }}
+                                    className="px-2 py-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold rounded uppercase transition cursor-pointer"
+                                  >
+                                    Sí
+                                  </button>
+                                  <button
+                                    onClick={() => setDeletingCategoryIndex(null)}
+                                    className="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white text-[10px] font-bold rounded uppercase transition cursor-pointer"
+                                  >
+                                    No
+                                  </button>
+                                </div>
+                              ) : (
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      setEditingCategoryIndex(index);
+                                      setEditingCategoryName(category);
+                                      setDeletingCategoryIndex(null);
+                                    }}
+                                    className="p-2 bg-blue-600/30 hover:bg-blue-600 text-blue-400 hover:text-white rounded-xl transition cursor-pointer"
+                                    title="Editar categoría"
+                                  >
+                                    <Edit3 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setDeletingCategoryIndex(index);
+                                      setEditingCategoryIndex(null);
+                                    }}
+                                    className="p-2 bg-rose-600/30 hover:bg-rose-600 text-rose-400 hover:text-white rounded-xl transition cursor-pointer"
+                                    title="Eliminar categoría"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

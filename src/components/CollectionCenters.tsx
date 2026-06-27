@@ -11,6 +11,31 @@ export const CollectionCenters: React.FC<CollectionCentersProps> = ({ centers, s
   const [filterCountry, setFilterCountry] = useState<string>('España');
   const [filterCity, setFilterCity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [loadingDirectionsId, setLoadingDirectionsId] = useState<string | null>(null);
+
+  const handleGetDirections = (center: CollectionCenter) => {
+    const fallbackUrl = `https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(center.address + ', ' + center.city + ', España')}`;
+    
+    if (navigator.geolocation) {
+      setLoadingDirectionsId(center.id);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLoadingDirectionsId(null);
+          const { latitude, longitude } = position.coords;
+          const url = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${encodeURIComponent(center.address + ', ' + center.city + ', España')}`;
+          window.open(url, '_blank');
+        },
+        (error) => {
+          setLoadingDirectionsId(null);
+          // Fallback gracefully
+          window.open(fallbackUrl, '_blank');
+        },
+        { enableHighAccuracy: true, timeout: 3500, maximumAge: 60000 }
+      );
+    } else {
+      window.open(fallbackUrl, '_blank');
+    }
+  };
 
   const countries = Array.from(new Set<string>(centers.map(c => c.country || 'España')));
   
@@ -162,15 +187,22 @@ export const CollectionCenters: React.FC<CollectionCentersProps> = ({ centers, s
               </div>
 
               {/* Maps Action CTA */}
-              <a
-                href={center.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-3 bg-white group-hover:bg-[#008CBA] text-[#1A202C] group-hover:text-white border border-slate-200 group-hover:border-transparent rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition shadow-2xs"
+              <button
+                onClick={() => handleGetDirections(center)}
+                className="w-full py-3 bg-white group-hover:bg-[#008CBA] text-[#1A202C] group-hover:text-white border border-slate-200 group-hover:border-transparent rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition shadow-2xs cursor-pointer active:scale-95"
               >
-                <span>Cómo Llegar (Google Maps)</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+                {loadingDirectionsId === center.id ? (
+                  <>
+                    <span className="animate-pulse text-amber-500 shrink-0">📍 Obteniendo GPS...</span>
+                    <span className="text-[10px] animate-pulse">Calculando ruta...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Cómo Llegar (Google Maps)</span>
+                    <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                  </>
+                )}
+              </button>
             </div>
           ))}
         </div>
@@ -178,7 +210,7 @@ export const CollectionCenters: React.FC<CollectionCentersProps> = ({ centers, s
         {!showAll && filteredCenters.length > 6 && (
           <div className="mt-12 text-center flex justify-center">
             <button
-              onClick={() => window.open('?view=centros', '_blank')}
+              onClick={() => window.location.href = '?view=centros'}
               className="inline-flex items-center gap-2 px-8 py-4 bg-[#008CBA] hover:bg-[#007096] text-white text-sm font-black tracking-widest uppercase rounded-2xl transition shadow-md hover:shadow-xl cursor-pointer transform hover:-translate-y-0.5"
             >
               <span>Ver más centros de acopio ({filteredCenters.length - 6} más)</span>

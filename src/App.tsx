@@ -267,6 +267,7 @@ export default function App() {
         onPledgeSubmitted={handlePledgeSubmitted}
         centersCities={centersCities}
         centers={state.centers || []}
+        donationCategories={state.donationCategories || []}
         correctPassword={state.donationPassword || 'VENEZUELAVIVE2026'}
       />
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DonorPledge } from '../types';
 import { Search, Play, Pause, ChevronUp, RefreshCw, Trophy, Heart, MapPin, Calendar, Tag, AlertCircle } from 'lucide-react';
+import { getCategoryEmoji } from '../utils';
 
 interface DonationListProps {
   pledges: DonorPledge[];
@@ -297,9 +298,9 @@ export const DonationList: React.FC<DonationListProps> = ({
                         {/* Categoría de insumos */}
                         {pledge.category && (
                           <div className="mb-3">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-black uppercase tracking-wider rounded-lg">
-                              <Tag className="w-2.5 h-2.5 text-slate-500" />
-                              {pledge.category}
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-black uppercase tracking-wider rounded-lg shadow-2xs">
+                              <span className="text-xs shrink-0">{getCategoryEmoji(pledge.category)}</span>
+                              <span>{pledge.category}</span>
                             </span>
                           </div>
                         )}

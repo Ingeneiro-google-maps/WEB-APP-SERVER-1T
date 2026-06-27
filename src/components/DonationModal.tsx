@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, HeartHandshake, CheckCircle2, Package, Scale, FileText, User, MapPin, Lock } from 'lucide-react';
 import { CollectionCenter } from '../types';
+import { getCategoryEmoji } from '../utils';
 
 interface DonationModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface DonationModalProps {
   onPledgeSubmitted: (pledgeData: any) => Promise<void>;
   centersCities: string[];
   centers?: CollectionCenter[];
+  donationCategories?: string[];
   correctPassword?: string;
 }
 
@@ -17,13 +19,14 @@ export const DonationModal: React.FC<DonationModalProps> = ({
   onPledgeSubmitted,
   centersCities,
   centers = [],
+  donationCategories = [],
   correctPassword = 'VENEZUELAVIVE2026'
 }) => {
   const [formData, setFormData] = useState({
     donorName: '',
     email: '',
     city: '',
-    category: 'Alimentos no perecederos',
+    category: donationCategories[0] || 'Alimentos no perecederos',
     description: '',
     pledgeKilos: 10,
     message: ''
@@ -35,24 +38,28 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      const defaultCategory = donationCategories[0] || 'Alimentos no perecederos';
       if (centers && centers.length > 0) {
         setFormData(prev => ({
           ...prev,
-          city: `${centers[0].name} (${centers[0].city})`
+          city: `${centers[0].name} (${centers[0].city})`,
+          category: defaultCategory
         }));
       } else if (centersCities && centersCities.length > 0) {
         setFormData(prev => ({
           ...prev,
-          city: centersCities[0]
+          city: centersCities[0],
+          category: defaultCategory
         }));
       } else {
         setFormData(prev => ({
           ...prev,
-          city: 'Madrid'
+          city: 'Madrid',
+          category: defaultCategory
         }));
       }
     }
-  }, [isOpen, centers, centersCities]);
+  }, [isOpen, centers, centersCities, donationCategories]);
 
   if (!isOpen) return null;
 
@@ -85,7 +92,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
           donorName: '',
           email: '',
           city: centers && centers.length > 0 ? `${centers[0].name} (${centers[0].city})` : (centersCities[0] || 'Madrid'),
-          category: 'Alimentos no perecederos',
+          category: donationCategories[0] || 'Alimentos no perecederos',
           description: '',
           pledgeKilos: 10,
           message: ''
@@ -184,12 +191,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-300 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-[#008CBA] cursor-pointer"
                 >
-                  <option value="Alimentos no perecederos">🍚 Alimentos no perecederos</option>
-                  <option value="Ropa">👕 Ropa y Abrigo</option>
-                  <option value="Baterías">🔋 Baterías y Pilas</option>
-                  <option value="Medicinas">💊 Medicinas e Insumos Médicos</option>
-                  <option value="Agua Potable">💧 Agua Potable Embotesllada</option>
-                  <option value="Kits Infantiles">🍼 Kits Infantiles y Fórmulas</option>
+                  {donationCategories.map(cat => (
+                    <option key={cat} value={cat}>{getCategoryEmoji(cat)} {cat}</option>
+                  ))}
                 </select>
               </div>
 

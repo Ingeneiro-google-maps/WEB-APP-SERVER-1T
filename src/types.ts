@@ -93,6 +93,7 @@ export interface GlobalState {
   hasNewDonationAlert?: boolean;
   supabaseActive?: boolean;
   supabaseTableMissing?: boolean;
+  donationCategories?: string[];
   adminUsers?: AdminUser[];
   userChangeLogs?: UserChangeLog[];
   visibleBlocks?: {
