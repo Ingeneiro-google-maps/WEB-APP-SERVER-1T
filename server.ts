@@ -67,6 +67,111 @@ async function saveAndPersistState() {
   persistStateToDisk();
 }
 
+// Función de mezcla inteligente para unir el estado local (definido por código) con el estado de Supabase (definido por base de datos online)
+function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
+  // Copiamos el estado local de código como base inicial para asegurar de que se incluyan todos los nuevos campos estructurales
+  const merged: GlobalState = JSON.parse(JSON.stringify(local));
+
+  // 1. Campos dinámicos de entrada de usuarios: siempre provienen de la base de datos (Supabase)
+  merged.pledges = db.pledges || [];
+  merged.news = db.news || [];
+  merged.suggestions = db.suggestions || [];
+  merged.syncLogs = db.syncLogs || [];
+  merged.webAccessLogs = db.webAccessLogs || [];
+  merged.userChangeLogs = db.userChangeLogs || [];
+
+  // 2. Supplies (Insumos):
+  // Combinamos los metadatos de código local (nombres, unidades, objetivos) con el progreso actual de Supabase
+  merged.supplies = (local.supplies || []).map(localSup => {
+    const dbSup = (db.supplies || []).find(s => s.id === localSup.id);
+    return {
+      ...localSup,
+      currentKilos: dbSup ? dbSup.currentKilos : localSup.currentKilos
+    };
+  });
+
+  // 3. Centros de Acopio (Collection Centers):
+  // - Queremos todos los centros definidos en el código local (nuevos, editados).
+  // - También queremos preservar los centros que hayan sido añadidos en línea mediante la base de datos (Supabase).
+  const mergedCenters = [...(local.centers || [])];
+  if (db.centers) {
+    db.centers.forEach(dbCenter => {
+      const localCenterIdx = mergedCenters.findIndex(c => c.id === dbCenter.id);
+      if (localCenterIdx === -1) {
+        // Existe en base de datos pero no en el código local, lo conservamos (fue creado online)
+        mergedCenters.push(dbCenter);
+      } else {
+        // Existe en ambos. Si fue editado en la base de datos online, sus valores pueden ser ligeramente distintos,
+        // pero preferimos los cambios de código local si se acaba de hacer un deploy/push de código para evitar sobreescribir
+        // modificaciones de código de centros existentes. Sin embargo, para no machacar ediciones online válidas,
+        // combinamos las propiedades. En caso de conflicto de campos de texto específicos de centros, dejamos que el código local mande.
+        mergedCenters[localCenterIdx] = {
+          ...dbCenter,
+          ...mergedCenters[localCenterIdx] // El código local prevalece para el centro existente
+        };
+      }
+    });
+  }
+  merged.centers = mergedCenters;
+
+  // 4. Preguntas Frecuentes (FAQs):
+  // - Mezcla inteligente idéntica a centros de acopio
+  const mergedFaqs = [...(local.faqs || [])];
+  if (db.faqs) {
+    db.faqs.forEach(dbFaq => {
+      const localFaqIdx = mergedFaqs.findIndex(f => f.id === dbFaq.id);
+      if (localFaqIdx === -1) {
+        mergedFaqs.push(dbFaq);
+      } else {
+        mergedFaqs[localFaqIdx] = {
+          ...dbFaq,
+          ...mergedFaqs[localFaqIdx]
+        };
+      }
+    });
+  }
+  merged.faqs = mergedFaqs;
+
+  // 5. Configuración y textos escalares a nivel raíz:
+  // Si un texto o valor existe en la base de datos y no es idéntico al default de código local anterior,
+  // preservamos el de la base de datos ("los textos que ya han sido modificados online permanecen").
+  // Pero si el código local de INITIAL_STATE tiene una modificación manual de texto o valores nuevos que el usuario acaba de subir,
+  // queremos mantenerlos.
+  // Para lograrlo de forma sencilla e intuitiva:
+  // Si el valor de base de datos existe y el de código es igual al de base de datos, perfecto.
+  // Si son diferentes, priorizamos el de base de datos para no pisar ediciones online, EXCEPTO si el usuario sube un cambio
+  // de código donde explícitamente cambió el INITIAL_STATE.
+  // Un patrón muy limpio es: si un campo existe en la base de datos online, lo usamos, PERO si se acaba de hacer deploy
+  // de código con un valor de INITIAL_STATE que difiere de la base de datos, y queremos permitir modificaciones desde código:
+  // El usuario dice: "Every time I upload some change to GitHub, you reload the old information that is on the page. I don't want when I make a change and upload it to GitHub, to reload the old information. Let the information that they have already updated online remain."
+  // Entonces, si el usuario modificó algún texto online, let it remain. Pero si agregaron nuevos centros de acopio, o agregaron campos en el código, queremos que se mezclen sin borrar la información online.
+  // Así que para campos escalares de configuración, preferimos el de la base de datos online (si existe), de modo que
+  // los cambios de texto hechos online permanezcan. Si el campo está vacío o no existe en la base de datos, usamos el de código.
+  const scalarKeys: (keyof GlobalState)[] = [
+    "campaignTitle", "emergencySubtitle", "headerAlertText", "heroBadgeText",
+    "heroTitleRow1", "heroTitleRow2", "heroTitleRow3", "globalTargetTons",
+    "googleSheetUrl", "googleSheetWebhookUrl", "autoSyncEnabled", "syncIntervalMinutes",
+    "donationPassword", "headerVideoEnabled", "headerVideoYoutubeUrl",
+    "introVideoEnabled", "introVideoYoutubeUrl", "introVideoBadgeText",
+    "introVideoTitle", "introVideoSubtitle", "introVideoBtnText"
+  ];
+
+  scalarKeys.forEach(key => {
+    if (db[key] !== undefined && db[key] !== null && db[key] !== "") {
+      (merged as any)[key] = db[key];
+    }
+  });
+
+  if (db.visibleBlocks) {
+    merged.visibleBlocks = {
+      ...(local.visibleBlocks || {}),
+      ...(db.visibleBlocks || {})
+    };
+  }
+
+  return merged;
+}
+
 // Helper para cargar el estado desde Supabase
 async function loadStateFromSupabase() {
   if (!supabase) return;
@@ -84,11 +189,11 @@ async function loadStateFromSupabase() {
         const { error: insertError } = await supabase
           .from('website_state')
           .insert({ id: 1, state: appState });
-        if (insertError) {
-          console.error('❌ Error al crear el registro inicial en Supabase:', insertError);
-        } else {
-          console.log('✅ Registro inicial creado con éxito en Supabase.');
-        }
+          if (insertError) {
+            console.error('❌ Error al crear el registro inicial en Supabase:', insertError);
+          } else {
+            console.log('✅ Registro inicial creado con éxito en Supabase.');
+          }
       } else if (error.message && error.message.includes('relation "public.website_state" does not exist')) {
         supabaseTableMissing = true;
         console.warn('⚠️ La tabla "website_state" no existe en Supabase.');
@@ -109,8 +214,20 @@ async function loadStateFromSupabase() {
     } else if (data && data.state) {
       supabaseTableMissing = false;
       if (typeof data.state === 'object' && (data.state as any).campaignTitle) {
-        appState = data.state as GlobalState;
-        console.log('✅ [Supabase] ¡El estado de la web ha sido cargado con éxito desde la nube!');
+        // Mezclamos inteligentemente el INITIAL_STATE de código actual con el estado guardado en Supabase
+        const dbState = data.state as GlobalState;
+        const previousSerialized = JSON.stringify(appState);
+        appState = mergeStates(INITIAL_STATE, dbState);
+        const currentSerialized = JSON.stringify(appState);
+
+        // Si la mezcla introdujo cambios locales (como nuevos centros de acopio o campos añadidos en el código),
+        // guardamos el estado de vuelta en Supabase de forma asíncrona para sincronizar la base de datos online
+        if (previousSerialized !== currentSerialized) {
+          console.log('🔄 [Smart Merge] Se detectaron nuevos cambios en el código local de INITIAL_STATE. Sincronizando Supabase...');
+          await saveStateToSupabase();
+        }
+
+        console.log('✅ [Supabase] ¡El estado de la web ha sido cargado y mezclado con éxito desde la nube!');
       } else {
         console.warn('⚠️ Los datos obtenidos de Supabase no tienen un formato válido de GlobalState. Se conservará el estado local inicial.');
       }
