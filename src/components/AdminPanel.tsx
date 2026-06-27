@@ -187,6 +187,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     acceptedItems: ['Alimentos no perecederos', 'Medicinas', 'Mantas'],
     urgentNeeds: ['Leche infantil', 'Pastillas potabilizadoras']
   });
+  const [newUrgentNeedsStr, setNewUrgentNeedsStr] = useState<string>('Leche infantil, Pastillas potabilizadoras');
+  const [editUrgentNeedsStr, setEditUrgentNeedsStr] = useState<string>('');
 
   // Estados de edición para Noticias
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
@@ -281,6 +283,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleAddCenter = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCenter.name || !newCenter.address) return;
+    const urgentNeedsList = newUrgentNeedsStr
+      ? newUrgentNeedsStr.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
     const item: CollectionCenter = {
       id: 'cent-' + Date.now(),
       city: newCenter.city || 'Madrid',
@@ -290,7 +295,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       contact: newCenter.contact || '',
       hours: newCenter.hours || '',
       acceptedItems: newCenter.acceptedItems || ['Alimentos'],
-      urgentNeeds: newCenter.urgentNeeds || [],
+      urgentNeeds: urgentNeedsList,
       mapsUrl: newCenter.mapsUrl || 'https://maps.google.com'
     };
     handleUpdateStateWithLog(
@@ -298,23 +303,33 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       `Añadió un nuevo centro de acopio en ${item.city}: "${item.name}"`
     );
     setNewCenter({ city: 'Madrid', country: 'España', name: '', address: '', contact: '', hours: '10:00 AM - 8:00 PM', acceptedItems: ['Alimentos no perecederos'], urgentNeeds: [] });
+    setNewUrgentNeedsStr('');
     showToast(`✅ Centro "${item.name}" añadido correctamente.`);
   };
 
   const handleStartEditCenter = (center: CollectionCenter) => {
     setEditingCenterId(center.id);
     setEditCenterForm({ ...center });
+    setEditUrgentNeedsStr(center.urgentNeeds ? center.urgentNeeds.join(', ') : '');
   };
 
   const handleSaveEditCenter = () => {
     if (!editingCenterId) return;
-    const updated = state.centers.map(c => c.id === editingCenterId ? { ...c, ...editCenterForm } as CollectionCenter : c);
+    const urgentNeedsList = editUrgentNeedsStr
+      ? editUrgentNeedsStr.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
+    const updated = state.centers.map(c => 
+      c.id === editingCenterId 
+        ? { ...c, ...editCenterForm, urgentNeeds: urgentNeedsList } as CollectionCenter 
+        : c
+    );
     const targetName = editCenterForm.name || editingCenterId;
     handleUpdateStateWithLog(
       { centers: updated },
       `Modificó los datos del centro de acopio en ${editCenterForm.city || ''}: "${targetName}"`
     );
     setEditingCenterId(null);
+    setEditUrgentNeedsStr('');
     showToast('✅ Centro de acopio modificado con éxito.');
   };
 
@@ -954,10 +969,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   />
                 </div>
 
-                <div className="flex items-end">
+                <div className="md:col-span-3">
+                  <label className="text-xs font-black uppercase text-amber-400 block mb-1">🚨 Necesidades Críticas Específicas (Separadas por comas)</label>
+                  <input
+                    type="text"
+                    placeholder="ej. Leche infantil, Pastillas potabilizadoras"
+                    value={newUrgentNeedsStr}
+                    onChange={e => setNewUrgentNeedsStr(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-950 border border-amber-500/30 rounded-xl text-sm text-white focus:border-amber-400 focus:outline-none"
+                  />
+                  <span className="text-[10px] text-slate-500 block mt-1">
+                    Escribe las necesidades específicas separadas por comas (ej: Leche infantil, Pastillas potabilizadoras). Aparecerán en rojo y alertarán a los donantes.
+                  </span>
+                </div>
+
+                <div className="md:col-span-3 flex justify-end">
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-[#008CBA] hover:bg-blue-600 text-white font-black uppercase tracking-wider rounded-xl shadow-lg transition cursor-pointer"
+                    className="w-full sm:w-auto px-8 py-3.5 bg-[#008CBA] hover:bg-blue-600 text-white font-black uppercase tracking-wider rounded-xl shadow-lg transition cursor-pointer"
                   >
                     + Registrar Centro Acopio
                   </button>
@@ -1028,6 +1057,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         </div>
                       </div>
 
+                      <div>
+                        <label className="text-[10px] font-bold text-amber-400 uppercase flex items-center gap-1">
+                          🚨 Necesidades Críticas (Separadas por comas):
+                        </label>
+                        <input
+                          type="text"
+                          value={editUrgentNeedsStr}
+                          onChange={e => setEditUrgentNeedsStr(e.target.value)}
+                          placeholder="ej. Leche infantil, Pastillas potabilizadoras"
+                          className="w-full px-3 py-2 bg-slate-950 border border-amber-500/30 focus:border-amber-400 rounded text-xs text-white"
+                        />
+                      </div>
+
                       <button
                         onClick={handleSaveEditCenter}
                         className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-xs rounded-xl shadow cursor-pointer mt-4"
@@ -1086,6 +1128,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           )}
                         </div>
                       </div>
+
+                      {center.urgentNeeds && center.urgentNeeds.length > 0 && (
+                        <div className="mt-3 p-2.5 bg-red-950/40 border border-red-900/50 rounded-xl">
+                          <span className="text-[10px] font-black uppercase text-red-400 tracking-wider block mb-1">
+                            🚨 Necesidades Críticas Específicas:
+                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {center.urgentNeeds.map((need, idx) => (
+                              <span key={idx} className="px-2 py-0.5 bg-red-900/30 text-red-200 border border-red-900/50 rounded text-[10px] font-bold">
+                                {need}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <div className="mt-6 pt-4 border-t border-slate-800 flex flex-wrap gap-1.5">
                         {center.acceptedItems.map((it, i) => (

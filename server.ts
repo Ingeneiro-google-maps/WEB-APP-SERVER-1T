@@ -212,20 +212,29 @@ async function loadStateFromSupabase() {
     } else if (data && data.state) {
       supabaseTableMissing = false;
       if (typeof data.state === 'object' && (data.state as any).campaignTitle) {
-        // Mezclamos inteligentemente el INITIAL_STATE de código actual con el estado guardado en Supabase
         const dbState = data.state as GlobalState;
-        const previousSerialized = JSON.stringify(appState);
-        appState = mergeStates(INITIAL_STATE, dbState);
-        const currentSerialized = JSON.stringify(appState);
 
-        // Si la mezcla introdujo cambios locales (como nuevos centros de acopio o campos añadidos en el código),
-        // guardamos el estado de vuelta en Supabase de forma asíncrona para sincronizar la base de datos online
-        if (previousSerialized !== currentSerialized) {
-          console.log('🔄 [Smart Merge] Se detectaron nuevos cambios en el código local de INITIAL_STATE. Sincronizando Supabase...');
-          await saveStateToSupabase();
+        // Si la versión del código coincide con la versión guardada en la base de datos,
+        // no mezclamos para evitar restaurar elementos que el administrador eliminó en la web.
+        // La base de datos online de Supabase es la fuente de verdad absoluta.
+        if (dbState.codeVersion === INITIAL_STATE.codeVersion) {
+          appState = dbState;
+          console.log('✅ [Supabase] Estado cargado de forma íntegra y directa. Sin mezclas redundantes.');
+        } else {
+          // Si el código cambió o es una versión nueva, mezclamos inteligentemente para introducir nuevos centros/FAQs del código
+          console.log(`🔄 [Smart Merge] Nueva versión de código detectada (${INITIAL_STATE.codeVersion} vs db: ${dbState.codeVersion || 'ninguna'}). Mezclando...`);
+          const previousSerialized = JSON.stringify(appState);
+          appState = mergeStates(INITIAL_STATE, dbState);
+          appState.codeVersion = INITIAL_STATE.codeVersion; // Actualizamos la versión cargada
+          const currentSerialized = JSON.stringify(appState);
+
+          // Sincronizamos la base de datos de vuelta si hay cambios o si la versión se actualizó
+          if (previousSerialized !== currentSerialized || dbState.codeVersion !== INITIAL_STATE.codeVersion) {
+            console.log('🔄 Sincronizando nueva versión de datos en Supabase...');
+            await saveStateToSupabase();
+          }
+          console.log('✅ [Supabase] El estado de la web ha sido mezclado con éxito para aplicar la nueva versión de código.');
         }
-
-        console.log('✅ [Supabase] ¡El estado de la web ha sido cargado y mezclado con éxito desde la nube!');
       } else {
         console.warn('⚠️ Los datos obtenidos de Supabase no tienen un formato válido de GlobalState. Se conservará el estado local inicial.');
       }

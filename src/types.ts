@@ -67,6 +67,7 @@ export interface SuggestionItem {
 }
 
 export interface GlobalState {
+  codeVersion?: string;
   campaignTitle: string;
   emergencySubtitle: string;
   headerAlertText?: string;
