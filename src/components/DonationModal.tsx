@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, HeartHandshake, CheckCircle2, Package, Scale, FileText, User, MapPin, Lock } from 'lucide-react';
+import { CollectionCenter } from '../types';
 
 interface DonationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPledgeSubmitted: (pledgeData: any) => Promise<void>;
   centersCities: string[];
+  centers?: CollectionCenter[];
   correctPassword?: string;
 }
 
@@ -14,12 +16,13 @@ export const DonationModal: React.FC<DonationModalProps> = ({
   onClose,
   onPledgeSubmitted,
   centersCities,
+  centers = [],
   correctPassword = 'VENEZUELAVIVE2026'
 }) => {
   const [formData, setFormData] = useState({
     donorName: '',
     email: '',
-    city: centersCities[0] || 'Madrid',
+    city: '',
     category: 'Alimentos no perecederos',
     description: '',
     pledgeKilos: 10,
@@ -29,6 +32,27 @@ export const DonationModal: React.FC<DonationModalProps> = ({
   const [passwordError, setPasswordError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (centers && centers.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          city: `${centers[0].name} (${centers[0].city})`
+        }));
+      } else if (centersCities && centersCities.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          city: centersCities[0]
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          city: 'Madrid'
+        }));
+      }
+    }
+  }, [isOpen, centers, centersCities]);
 
   if (!isOpen) return null;
 
@@ -60,7 +84,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
         setFormData({
           donorName: '',
           email: '',
-          city: centersCities[0] || 'Madrid',
+          city: centers && centers.length > 0 ? `${centers[0].name} (${centers[0].city})` : (centersCities[0] || 'Madrid'),
           category: 'Alimentos no perecederos',
           description: '',
           pledgeKilos: 10,
@@ -205,36 +229,49 @@ export const DonationModal: React.FC<DonationModalProps> = ({
               />
             </div>
 
-            {/* Field 5: Centro de Acopio / Ciudad */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-700 mb-1.5 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#008CBA]" />
-                  Centro de Acopio *
-                </label>
-                <select
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#008CBA] cursor-pointer"
-                >
-                  {centersCities.map(c => (
+            {/* Field 5: Centro de Acopio de Entrega (Full width for long warehouse names) */}
+            <div>
+              <label className="block text-xs font-black uppercase text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#008CBA]" />
+                Centro de Acopio de Entrega *
+              </label>
+              <select
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-[#008CBA] cursor-pointer"
+              >
+                {centers && centers.length > 0 ? (
+                  centers.map(center => {
+                    const label = `${center.name} (${center.city})`;
+                    return (
+                      <option key={center.id} value={label}>
+                        📍 {label}
+                      </option>
+                    );
+                  })
+                ) : (
+                  centersCities.map(c => (
                     <option key={c} value={c}>📍 {c} (España)</option>
-                  ))}
-                </select>
-              </div>
+                  ))
+                )}
+              </select>
+              <p className="text-[10px] text-slate-500 font-medium mt-1 leading-normal">
+                💡 Seleccione el punto de acopio oficial donde depositó o enviará su ayuda. Todos los centros están operativos con scroll para fácil selección.
+              </p>
+            </div>
 
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">
-                  Email de Contacto (Opcional)
-                </label>
-                <input
-                  type="email"
-                  placeholder="donante@email.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#008CBA] focus:bg-white"
-                />
-              </div>
+            {/* Field 5b: Email de contacto */}
+            <div>
+              <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">
+                Email de Contacto (Opcional)
+              </label>
+              <input
+                type="email"
+                placeholder="donante@email.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 focus:outline-none focus:border-[#008CBA] focus:bg-white"
+              />
             </div>
 
             {/* Field 6: Contraseña de Registro de la Campaña */}

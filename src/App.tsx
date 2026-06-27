@@ -266,6 +266,7 @@ export default function App() {
         onClose={() => setIsDonationOpen(false)}
         onPledgeSubmitted={handlePledgeSubmitted}
         centersCities={centersCities}
+        centers={state.centers || []}
         correctPassword={state.donationPassword || 'VENEZUELAVIVE2026'}
       />
 
