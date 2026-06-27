@@ -310,5 +310,5 @@ export const INITIAL_STATE: GlobalState = {
   headerVideoEnabled: true,
   headerVideoYoutubeUrl: 'https://www.youtube.com/watch?v=kYv_I-g_M5w',
   introVideoEnabled: true,
-  introVideoYoutubeUrl: 'https://www.youtube.com/watch?v=kYv_I-g_M5w'
+  introVideoYoutubeUrl: 'https://youtube.com/shorts/LT90TVjBYv0'
 };

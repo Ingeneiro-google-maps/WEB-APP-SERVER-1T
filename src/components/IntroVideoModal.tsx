@@ -13,6 +13,13 @@ function getYoutubeId(url: string): string {
   if (cleanUrl.length === 11 && !cleanUrl.includes('/') && !cleanUrl.includes('?')) {
     return cleanUrl;
   }
+  if (cleanUrl.includes('/shorts/')) {
+    const parts = cleanUrl.split('/shorts/');
+    if (parts[1]) {
+      const id = parts[1].split(/[?#&]/)[0];
+      if (id.length === 11) return id;
+    }
+  }
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
   const match = cleanUrl.match(regExp);
   return (match && match[2].length === 11) ? match[2] : '';
