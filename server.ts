@@ -238,6 +238,14 @@ function sanitizeStateTexts(state: GlobalState): boolean {
       );
     if (state.emergencySubtitle !== original) changed = true;
   }
+  
+  // Forzar siempre el video del header solicitado por el usuario
+  const targetVideoUrl = "https://www.youtube.com/watch?v=vvMuOIXMzkI&t=167s";
+  if (state.headerVideoYoutubeUrl !== targetVideoUrl) {
+    state.headerVideoYoutubeUrl = targetVideoUrl;
+    changed = true;
+  }
+  
   return changed;
 }
 

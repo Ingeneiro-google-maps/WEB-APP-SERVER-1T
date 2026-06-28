@@ -1,7 +1,7 @@
 import { GlobalState } from '../types';
 
 export const INITIAL_STATE: GlobalState = {
-  "codeVersion": "1.6",
+  "codeVersion": "1.7",
   "autoUpdateActive": true,
   "campaignTitle": "Por 1T — Ayuda Humanitaria Emergencia Venezuela",
   "emergencySubtitle": "Respuesta Operativa de Emergencia por el Terremoto . Cada kilo suma para salvar vidas.",
@@ -11,9 +11,9 @@ export const INITIAL_STATE: GlobalState = {
   "heroTitleRow2": "POR 1 TONELADA",
   "heroTitleRow3": "DESDE ESPAÑA",
   "globalTargetTons": 1,
-  "celebrationType": "confetti",
+  "celebrationType": "fireworks",
   "progressBarStyle": "default",
-  "lastSyncTime": "2026-06-28T04:12:18.284Z",
+  "lastSyncTime": "2026-06-28T04:28:16.186Z",
   "nextSyncTime": "2026-06-28T04:22:18.284Z",
   "googleSheetUrl": "https://docs.google.com/spreadsheets/d/1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC/edit?gid=762536088#gid=762536088",
   "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbxfiM27NiOzQx9FWqn2AFG6IeaG_MyCcNKTjiA29YF8MZ9NObXDlSUG7bLqWl_rHiw/exec",
@@ -983,6 +983,15 @@ export const INITIAL_STATE: GlobalState = {
   ],
   "userChangeLogs": [
     {
+      "id": "ulog-1782620895862-jwt9",
+      "userId": "usr-orlando",
+      "userName": "Ing. Orlando Galdámez",
+      "userEmail": "eng.orlandogaldamez@gmail.com",
+      "date": "28/06/2026",
+      "time": "06:28:15",
+      "action": "Actualizó la configuración de estados, leyendas, animaciones y barras del contador en vivo de Navarra"
+    },
+    {
       "id": "ulog-1782590276100-8m6i",
       "userId": "usr-orlando",
       "userName": "Ing. Orlando Galdámez",
@@ -1038,7 +1047,7 @@ export const INITIAL_STATE: GlobalState = {
   },
   "donationPassword": "VENEZUELAVIVE2026",
   "headerVideoEnabled": true,
-  "headerVideoYoutubeUrl": "https://www.youtube.com/watch?v=kYv_I-g_M5w",
+  "headerVideoYoutubeUrl": "https://www.youtube.com/watch?v=vvMuOIXMzkI&t=167s",
   "introVideoEnabled": true,
   "introVideoYoutubeUrl": "https://youtube.com/shorts/LT90TVjBYv0",
   "introVideoBadgeText": "Video de Presentación Oficial de la Campaña 🇻🇪",
@@ -1046,6 +1055,14 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_2gsr9cjm4",
+      "timestamp": "2026-06-28T04:26:15.696Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1638x907] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_7lfv9wmlm",
       "timestamp": "2026-06-28T04:16:49.986Z",
