@@ -127,6 +127,8 @@ export interface GlobalState {
   maintenanceModeEnabled?: boolean;
   maintenanceReason?: string;
   maintenanceEndTimestamp?: string; // ISO or timestamp
+  celebrationType?: 'confetti' | 'balloons' | 'fireworks' | 'sparkles' | 'none';
+  progressBarStyle?: 'default' | 'striped-animated' | 'neon-glow' | 'gradient-wave' | 'retro-blocks';
 }
 
 export interface WebAccessLog {

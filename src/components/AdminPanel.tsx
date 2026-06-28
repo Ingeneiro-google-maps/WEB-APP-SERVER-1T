@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import confetti from 'canvas-confetti';
 import { GlobalState, SupplyItem, CollectionCenter, FAQItem, AdminUser, UserChangeLog } from '../types';
 import { 
   Settings, RefreshCw, Plus, Trash2, Edit3, Save, Database, 
@@ -298,6 +299,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [tempLegend70, setTempLegend70] = useState(state.liveCounterLegend70 || '70% Amarillo');
   const [tempLegend100, setTempLegend100] = useState(state.liveCounterLegend100 || '100% Verde');
   const [tempShowLegends, setTempShowLegends] = useState(state.liveCounterShowLegends !== false);
+  const [tempCelebrationType, setTempCelebrationType] = useState<'confetti' | 'balloons' | 'fireworks' | 'sparkles' | 'none'>(state.celebrationType || 'confetti');
+  const [tempProgressBarStyle, setTempProgressBarStyle] = useState<'default' | 'striped-animated' | 'neon-glow' | 'gradient-wave' | 'retro-blocks'>(state.progressBarStyle || 'default');
 
   const [tempMaintenanceModeEnabled, setTempMaintenanceModeEnabled] = useState(state.maintenanceModeEnabled || false);
   const [tempMaintenanceReason, setTempMaintenanceReason] = useState(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
@@ -314,6 +317,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setTempLegend70(state.liveCounterLegend70 !== undefined ? state.liveCounterLegend70 : '70% Amarillo');
       setTempLegend100(state.liveCounterLegend100 !== undefined ? state.liveCounterLegend100 : '100% Verde');
       setTempShowLegends(state.liveCounterShowLegends !== false);
+      setTempCelebrationType(state.celebrationType || 'confetti');
+      setTempProgressBarStyle(state.progressBarStyle || 'default');
       
       setTempMaintenanceModeEnabled(state.maintenanceModeEnabled || false);
       setTempMaintenanceReason(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
@@ -3173,7 +3178,7 @@ ON CONFLICT (id) DO NOTHING;`}
 
             {/* Ranking Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {[1, 2, 3, 4, 5, 6, 7].map((tons) => {
+              {[1, 2, 3, 4, 5, 6, 7, 10].map((tons) => {
                 const targetWeightKg = tons * 1000;
                 const currentWeightKg = (state.pledges || []).reduce((acc, p) => acc + (p.pledgeKilos || 0), 0);
                 const isCurrentActive = state.globalTargetTons === tons;
@@ -3186,6 +3191,7 @@ ON CONFLICT (id) DO NOTHING;`}
                 if (tons === 5) subtitle = "Hito Humanitario";
                 if (tons === 6) subtitle = "Solidaridad Máxima";
                 if (tons === 7) subtitle = "Éxito Absoluto";
+                if (tons === 10) subtitle = "Hito Histórico de Acopio";
 
                 return (
                   <button
@@ -3429,6 +3435,145 @@ ON CONFLICT (id) DO NOTHING;`}
                 </div>
               </div>
 
+              {/* Secciones Nuevas de Animaciones y Barras de Progreso */}
+              <style>{`
+                @keyframes progress-stripes {
+                  0% { background-position: 1rem 0; }
+                  100% { background-position: 0 0; }
+                }
+                @keyframes pulse-glow {
+                  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 2px rgba(34,211,238,0.4)); }
+                  50% { opacity: 1; filter: drop-shadow(0 0 10px rgba(34,211,238,0.9)); }
+                }
+                @keyframes wave-preview {
+                  0% { background-position: 0% 50%; }
+                  50% { background-position: 100% 50%; }
+                  100% { background-position: 0% 50%; }
+                }
+                .stripes-preview {
+                  background-image: linear-gradient(
+                    45deg,
+                    rgba(255, 255, 255, 0.25) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.25) 50%,
+                    rgba(255, 255, 255, 0.25) 75%,
+                    transparent 75%,
+                    transparent
+                  );
+                  background-size: 8px 8px;
+                  animation: progress-stripes 1s linear infinite;
+                }
+              `}</style>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6 border-t border-slate-800">
+                {/* 3. ANIMACIONES DE CELEBRACIÓN */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                    <span>✨ Animación por Llegada a Metas</span>
+                  </h4>
+                  <p className="text-slate-400 text-xs">
+                    Selecciona el tipo de animación de celebración que se activará automáticamente al alcanzar o superar el 100% de la meta.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      { id: 'confetti', label: '🎉 Confeti Estándar', desc: 'Lluvia clásica de confeti de colores' },
+                      { id: 'fireworks', label: '🎆 Fuegos Artificiales', desc: 'Explosiones continuas de colores' },
+                      { id: 'balloons', label: '🎈 Globos Flotantes', desc: 'Globos en 3D que ascienden por la pantalla' },
+                      { id: 'sparkles', label: '⭐ Destellos Estelares', desc: 'Brillos celestiales parpadeantes' },
+                      { id: 'none', label: '🚫 Sin Animación', desc: 'Desactiva efectos visuales' }
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          setTempCelebrationType(item.id as any);
+                          if (item.id !== 'none') {
+                            showToast(`Prueba de animación: ${item.label}`);
+                            if (item.id === 'confetti') {
+                              confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+                            } else if (item.id === 'fireworks') {
+                              confetti({ particleCount: 60, spread: 100, origin: { x: 0.2, y: 0.5 } });
+                              confetti({ particleCount: 60, spread: 100, origin: { x: 0.8, y: 0.5 } });
+                            }
+                          }
+                        }}
+                        className={`text-left p-3.5 rounded-xl border transition cursor-pointer flex flex-col justify-between ${
+                          tempCelebrationType === item.id
+                            ? 'bg-emerald-950/40 border-emerald-500 shadow-md ring-1 ring-emerald-500/25'
+                            : 'bg-slate-950 border-slate-850 hover:border-slate-750'
+                        }`}
+                      >
+                        <span className="text-xs font-black uppercase text-white">{item.label}</span>
+                        <span className="text-[10px] text-slate-400 mt-1">{item.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. ESTILOS DE BARRA DE PROGRESO */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                    <span>📊 Barra de Progreso Animada</span>
+                  </h4>
+                  <p className="text-slate-400 text-xs">
+                    Elige entre los diferentes estilos de barra de progreso interactivos para el contador en vivo de la portada.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      { id: 'default', label: '🌈 Arcoíris Navarra', desc: 'Degradado clásico dinámico de Rojo a Verde' },
+                      { id: 'striped-animated', label: '💈 Rayas Animadas', desc: 'Franjas oblicuas en movimiento continuo' },
+                      { id: 'neon-glow', label: '⚡ Brillo Neón', desc: 'Luz brillante y pulsación con aura de neón' },
+                      { id: 'gradient-wave', label: '🌊 Ola de Brillo', desc: 'Efecto de onda brillante metálica constante' },
+                      { id: 'retro-blocks', label: '🎮 Bloques Retro de 8-bits', desc: 'Estilo clásico segmentado de consola' }
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setTempProgressBarStyle(item.id as any)}
+                        className={`text-left p-3.5 rounded-xl border transition cursor-pointer flex flex-col justify-between ${
+                          tempProgressBarStyle === item.id
+                            ? 'bg-emerald-950/40 border-emerald-500 shadow-md ring-1 ring-emerald-500/25'
+                            : 'bg-slate-950 border-slate-850 hover:border-slate-750'
+                        }`}
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs font-black uppercase text-white">{item.label}</span>
+                          <span className="text-[10px] text-slate-400 mt-1 leading-snug">{item.desc}</span>
+                        </div>
+                        
+                        {/* Mini preview bar */}
+                        <div className="w-full h-3 bg-slate-900 rounded-lg mt-3 overflow-hidden relative border border-slate-800">
+                          {item.id === 'default' && (
+                            <div className="h-full bg-gradient-to-r from-red-500 via-yellow-400 to-emerald-500 w-[70%]" />
+                          )}
+                          {item.id === 'striped-animated' && (
+                            <div className="h-full bg-emerald-500 stripes-preview w-[70%]" />
+                          )}
+                          {item.id === 'neon-glow' && (
+                            <div className="h-full bg-cyan-400 w-[70%] animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]" style={{ animation: 'pulse-glow 2s infinite' }} />
+                          )}
+                          {item.id === 'gradient-wave' && (
+                            <div className="h-full bg-gradient-to-r from-blue-600 via-sky-400 to-blue-600 w-[70%] bg-[length:200%_auto] animate-[wave-preview_2s_linear_infinite]" style={{ animation: 'wave-preview 2s linear infinite' }} />
+                          )}
+                          {item.id === 'retro-blocks' && (
+                            <div className="h-full flex gap-0.5 w-[70%] bg-slate-950 p-0.5">
+                              <div className="h-full bg-amber-500 w-2.5 rounded-sm" />
+                              <div className="h-full bg-amber-500 w-2.5 rounded-sm" />
+                              <div className="h-full bg-amber-500 w-2.5 rounded-sm" />
+                              <div className="h-full bg-amber-500 w-2.5 rounded-sm" />
+                              <div className="h-full bg-amber-500 w-2.5 rounded-sm" />
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               {/* Guardar cambios */}
               <div className="pt-6 border-t border-slate-800 flex justify-end gap-3">
                 <button
@@ -3443,6 +3588,8 @@ ON CONFLICT (id) DO NOTHING;`}
                     setTempLegend70('70% Amarillo');
                     setTempLegend100('100% Verde');
                     setTempShowLegends(true);
+                    setTempCelebrationType('confetti');
+                    setTempProgressBarStyle('default');
                     showToast('🔄 Se han restablecido los valores por defecto locales (Haga clic en Guardar para aplicarlos)');
                   }}
                   className="px-4 py-2.5 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition cursor-pointer"
@@ -3462,8 +3609,10 @@ ON CONFLICT (id) DO NOTHING;`}
                       liveCounterLegend30: tempLegend30,
                       liveCounterLegend70: tempLegend70,
                       liveCounterLegend100: tempLegend100,
-                      liveCounterShowLegends: tempShowLegends
-                    }, 'Actualizó la configuración de estados, leyendas y visibilidad del contador en vivo de Navarra');
+                      liveCounterShowLegends: tempShowLegends,
+                      celebrationType: tempCelebrationType,
+                      progressBarStyle: tempProgressBarStyle
+                    }, 'Actualizó la configuración de estados, leyendas, animaciones y barras del contador en vivo de Navarra');
                     showToast('💾 ¡Configuración del contador en vivo guardada correctamente!');
                   }}
                   className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-950/40"

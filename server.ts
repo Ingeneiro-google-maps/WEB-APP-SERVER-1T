@@ -190,7 +190,8 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
     "googleSheetUrl", "googleSheetWebhookUrl", "autoSyncEnabled", "syncIntervalMinutes",
     "donationPassword", "headerVideoEnabled", "headerVideoYoutubeUrl",
     "introVideoEnabled", "introVideoYoutubeUrl", "introVideoBadgeText",
-    "introVideoTitle", "introVideoSubtitle", "introVideoBtnText"
+    "introVideoTitle", "introVideoSubtitle", "introVideoBtnText",
+    "celebrationType", "progressBarStyle"
   ];
 
   scalarKeys.forEach(key => {
@@ -207,6 +208,37 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
   }
 
   return merged;
+}
+
+function sanitizeStateTexts(state: GlobalState): boolean {
+  let changed = false;
+  if (state.headerAlertText) {
+    const original = state.headerAlertText;
+    state.headerAlertText = state.headerAlertText
+      .replace(
+        "Emergencia Nacional #VEN-2026: Terremoto en Los Andes (Mérida, Trujillo, Táchira)",
+        "Emergencia Nacional #VEN-2026: Terremoto"
+      )
+      .replace(
+        "Emergencia Nacional #VEN-2026: Terremoto en Los Andes",
+        "Emergencia Nacional #VEN-2026: Terremoto"
+      );
+    if (state.headerAlertText !== original) changed = true;
+  }
+  if (state.emergencySubtitle) {
+    const original = state.emergencySubtitle;
+    state.emergencySubtitle = state.emergencySubtitle
+      .replace(
+        "Respuesta Operativa de Emergencia por el Terremoto en Mérida, Trujillo y Táchira. Cada kilo suma para salvar vidas. Los datos de mercancía e inventario se sincronizan automáticamente cada 10 minutos desde el servidor.",
+        "Respuesta Operativa de Emergencia por el Terremoto . Cada kilo suma para salvar vidas. Los datos de mercancía e inventario se sincronizan automáticamente cada 10 minutos desde el servidor."
+      )
+      .replace(
+        "Respuesta Operativa de Emergencia por el Terremoto en Mérida, Trujillo y Táchira. Cada kilo suma para salvar vidas.",
+        "Respuesta Operativa de Emergencia por el Terremoto . Cada kilo suma para salvar vidas."
+      );
+    if (state.emergencySubtitle !== original) changed = true;
+  }
+  return changed;
 }
 
 // Helper para cargar el estado desde Supabase
@@ -268,12 +300,26 @@ async function loadStateFromSupabase() {
           }
           appState = dbState;
           console.log('✅ [Supabase] Estado cargado de forma íntegra y directa. Sin mezclas redundantes.');
+          
+          // Sanitizamos textos
+          const textChanges = sanitizeStateTexts(appState);
+          if (textChanges) {
+            console.log('🔄 Sincronizando textos sanitizados en Supabase...');
+            const orig = hasSuccessfullyLoadedFromSupabase;
+            hasSuccessfullyLoadedFromSupabase = true;
+            await saveStateToSupabase();
+            hasSuccessfullyLoadedFromSupabase = orig;
+          }
         } else {
           // Si el código cambió o es una versión nueva, mezclamos inteligentemente para introducir nuevos centros/FAQs del código
           console.log(`🔄 [Smart Merge] Nueva versión de código detectada (${INITIAL_STATE.codeVersion} vs db: ${dbState.codeVersion || 'ninguna'}). Mezclando...`);
           const previousSerialized = JSON.stringify(appState);
           appState = mergeStates(INITIAL_STATE, dbState);
           appState.codeVersion = INITIAL_STATE.codeVersion; // Actualizamos la versión cargada
+          
+          // Sanitizamos textos de la mezcla
+          sanitizeStateTexts(appState);
+          
           const currentSerialized = JSON.stringify(appState);
 
           // Sincronizamos la base de datos de vuelta si hay cambios o si la versión se actualizó

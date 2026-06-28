@@ -44,18 +44,66 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
   const videoId = getYoutubeId(state.headerVideoYoutubeUrl || '');
   const isVideoActive = !!(state.headerVideoEnabled && videoId);
 
-  // Confetti trigger when >= 100%
+  const [balloons, setBalloons] = React.useState<{ id: number; left: number; color: string; size: number; delay: number }[]>([]);
+  const [sparkles, setSparkles] = React.useState<{ id: number; left: number; top: number; size: number; delay: number }[]>([]);
+
+  // Celebration trigger when >= 100%
   useEffect(() => {
     if (progressRatio >= 100) {
+      const type = state.celebrationType || 'confetti';
+      if (type === 'none') return;
+
       try {
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-      } catch (e) {}
+        if (type === 'confetti') {
+          confetti({
+            particleCount: 150,
+            spread: 90,
+            origin: { y: 0.65 }
+          });
+        } else if (type === 'fireworks') {
+          const duration = 6 * 1000;
+          const animationEnd = Date.now() + duration;
+          const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+          const interval = setInterval(() => {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) {
+              return clearInterval(interval);
+            }
+            const particleCount = 50 * (timeLeft / duration);
+            confetti({ ...defaults, particleCount, origin: { x: Math.random() * 0.4 + 0.1, y: Math.random() - 0.2 } });
+            confetti({ ...defaults, particleCount, origin: { x: Math.random() * 0.4 + 0.5, y: Math.random() - 0.2 } });
+          }, 250);
+        } else if (type === 'balloons') {
+          const colors = [
+            'bg-rose-500', 'bg-sky-500', 'bg-amber-500', 'bg-emerald-500',
+            'bg-violet-500', 'bg-pink-500', 'bg-yellow-500', 'bg-teal-500', 'bg-cyan-500'
+          ];
+          const newBalloons = Array.from({ length: 35 }).map((_, i) => ({
+            id: i,
+            left: Math.random() * 90 + 5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: Math.random() * 25 + 35,
+            delay: Math.random() * 5
+          }));
+          setBalloons(newBalloons);
+          setTimeout(() => setBalloons([]), 11000);
+        } else if (type === 'sparkles') {
+          const newSparkles = Array.from({ length: 50 }).map((_, i) => ({
+            id: i,
+            left: Math.random() * 94 + 3,
+            top: Math.random() * 85 + 5,
+            size: Math.random() * 15 + 10,
+            delay: Math.random() * 5
+          }));
+          setSparkles(newSparkles);
+          setTimeout(() => setSparkles([]), 11000);
+        }
+      } catch (e) {
+        console.error('Error running celebration:', e);
+      }
     }
-  }, [progressRatio]);
+  }, [progressRatio, state.celebrationType]);
 
   // Determine stage description & color logic: Red -> Yellow/Orange -> Green
   let stageTextClass = 'text-red-600 bg-red-50 border-red-200';
@@ -198,26 +246,176 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
                 </div>
               )}
 
-              {/* THE PROGRESS BAR (Red -> Orange/Yellow -> Green) */}
-              <div className="relative h-14 sm:h-16 w-full bg-slate-200 rounded-2xl overflow-hidden shadow-inner flex border-4 border-white mb-3">
-                {/* Background 4-quarter visual cue */}
-                <div className="flex w-full h-full opacity-25">
-                  <div className="h-full bg-red-500 w-[25%]"></div>
-                  <div className="h-full bg-orange-500 w-[25%]"></div>
-                  <div className="h-full bg-yellow-400 w-[25%]"></div>
-                  <div className="h-full bg-emerald-500 w-[25%]"></div>
+              {/* STYLES & OVERLAYS FOR THE CELEBRATIONS */}
+              <style>{`
+                @keyframes progress-stripes {
+                  0% { background-position: 1.5rem 0; }
+                  100% { background-position: 0 0; }
+                }
+                @keyframes pulse-glow {
+                  0%, 100% { filter: drop-shadow(0 0 4px rgba(6,182,212,0.6)); opacity: 0.8; }
+                  50% { filter: drop-shadow(0 0 20px rgba(6,182,212,1)); opacity: 1; }
+                }
+                @keyframes wave-preview {
+                  0% { background-position: 0% 50%; }
+                  50% { background-position: 100% 50%; }
+                  100% { background-position: 0% 50%; }
+                }
+                @keyframes floatUp {
+                  0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+                  10% { opacity: 1; }
+                  90% { opacity: 1; }
+                  100% { transform: translateY(-20vh) rotate(15deg); opacity: 0; }
+                }
+                @keyframes sparkleTwinkle {
+                  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+                  20% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+                  40% { transform: scale(0.8) rotate(90deg); opacity: 0.8; }
+                  65% { transform: scale(1.3) rotate(135deg); opacity: 1; }
+                  100% { transform: scale(0) rotate(180deg); opacity: 0; }
+                }
+              `}</style>
+
+              {/* Balloons Celebration Overlay */}
+              {balloons.length > 0 && (
+                <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+                  {balloons.map((b) => (
+                    <div
+                      key={b.id}
+                      className={`fixed bottom-0 rounded-full ${b.color} shadow-lg pointer-events-none flex items-center justify-center`}
+                      style={{
+                        left: `${b.left}%`,
+                        width: `${b.size}px`,
+                        height: `${b.size * 1.25}px`,
+                        animation: `floatUp 7s ease-in-out forwards`,
+                        animationDelay: `${b.delay}s`,
+                      }}
+                    >
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 border-t-4 border-l-4 border-r-4 border-transparent border-t-inherit" />
+                      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[1px] h-10 bg-slate-400 opacity-60" />
+                      <div className="absolute top-2 left-3 w-2.5 h-2.5 bg-white/40 rounded-full" />
+                    </div>
+                  ))}
                 </div>
-                
-                {/* Active Dynamic Progress Bar */}
-                <div
-                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 via-orange-500 via-yellow-400 to-emerald-500 shadow-[0_0_20px_rgba(245,158,11,0.5)] flex items-center justify-end px-4 transition-all duration-1000 ease-out"
-                  style={{ width: `${Math.max(8, progressRatio)}%` }}
-                >
-                  <div className="h-4 w-4 bg-white rounded-full shadow-md animate-pulse flex items-center justify-center">
-                    <div className="h-2 w-2 bg-[#1A202C] rounded-full"></div>
+              )}
+
+              {/* Sparkles Celebration Overlay */}
+              {sparkles.length > 0 && (
+                <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+                  {sparkles.map((s) => (
+                    <svg
+                      key={s.id}
+                      className="fixed text-yellow-300 pointer-events-none fill-current drop-shadow-[0_0_8px_rgba(252,211,77,0.8)]"
+                      viewBox="0 0 24 24"
+                      style={{
+                        left: `${s.left}%`,
+                        top: `${s.top}%`,
+                        width: `${s.size}px`,
+                        height: `${s.size}px`,
+                        animation: `sparkleTwinkle 4s ease-in-out forwards`,
+                        animationDelay: `${s.delay}s`,
+                      }}
+                    >
+                      <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" />
+                    </svg>
+                  ))}
+                </div>
+              )}
+
+              {/* THE PROGRESS BAR (Customizable with state.progressBarStyle) */}
+              {(!state.progressBarStyle || state.progressBarStyle === 'default') && (
+                <div className="relative h-14 sm:h-16 w-full bg-slate-200 rounded-2xl overflow-hidden shadow-inner flex border-4 border-white mb-3">
+                  <div className="flex w-full h-full opacity-25">
+                    <div className="h-full bg-red-500 w-[25%]"></div>
+                    <div className="h-full bg-orange-500 w-[25%]"></div>
+                    <div className="h-full bg-yellow-400 w-[25%]"></div>
+                    <div className="h-full bg-emerald-500 w-[25%]"></div>
+                  </div>
+                  <div
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 via-orange-500 via-yellow-400 to-emerald-500 shadow-[0_0_20px_rgba(245,158,11,0.5)] flex items-center justify-end px-4 transition-all duration-1000 ease-out"
+                    style={{ width: `${Math.max(8, progressRatio)}%` }}
+                  >
+                    <div className="h-4 w-4 bg-white rounded-full shadow-md animate-pulse flex items-center justify-center">
+                      <div className="h-2 w-2 bg-[#1A202C] rounded-full"></div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {state.progressBarStyle === 'striped-animated' && (
+                <div className="relative h-14 sm:h-16 w-full bg-slate-200 rounded-2xl overflow-hidden shadow-inner flex border-4 border-white mb-3">
+                  <div
+                    className="absolute top-0 left-0 h-full bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${Math.max(8, progressRatio)}%`,
+                      backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)',
+                      backgroundSize: '1.5rem 1.5rem',
+                      animation: 'progress-stripes 1.2s linear infinite'
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span className="text-emerald-950 font-black text-xs sm:text-sm tracking-widest uppercase">
+                      🚀 PROGRESO SOLIDARIO: {progressRatio.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {state.progressBarStyle === 'neon-glow' && (
+                <div className="relative h-14 sm:h-16 w-full bg-slate-950 rounded-2xl overflow-hidden shadow-inner flex border-4 border-slate-900 mb-3">
+                  <div
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${Math.max(8, progressRatio)}%`,
+                      animation: 'pulse-glow 2s infinite'
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span className="text-cyan-400 font-mono font-black text-xs sm:text-sm tracking-wider uppercase animate-pulse">
+                      ⚡ FLUJO NEÓN ACTIVADO: {progressRatio.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {state.progressBarStyle === 'gradient-wave' && (
+                <div className="relative h-14 sm:h-16 w-full bg-slate-100 rounded-2xl overflow-hidden shadow-inner flex border-4 border-white mb-3">
+                  <div
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-pink-500 via-purple-500 via-indigo-500 via-teal-400 to-emerald-500 transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${Math.max(8, progressRatio)}%`,
+                      backgroundSize: '200% auto',
+                      animation: 'wave-preview 4s linear infinite'
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span className="text-white font-black text-xs sm:text-sm tracking-widest uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                      ✨ OLA METÁLICA WAVE: {progressRatio.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {state.progressBarStyle === 'retro-blocks' && (
+                <div className="relative h-14 sm:h-16 w-full bg-black rounded-2xl overflow-hidden flex border-4 border-zinc-850 p-1 mb-3">
+                  <div className="flex gap-1 w-full h-full">
+                    {Array.from({ length: 25 }).map((_, index) => {
+                      const threshold = (index / 25) * 100;
+                      const isActive = progressRatio >= threshold;
+                      return (
+                        <div
+                          key={index}
+                          className={`h-full flex-1 transition-all duration-300 ${
+                            isActive
+                              ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.85)] animate-pulse'
+                              : 'bg-zinc-950 border border-zinc-900'
+                          } rounded-sm`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Progress Bar Legend */}
               {state.liveCounterShowLegends !== false && (

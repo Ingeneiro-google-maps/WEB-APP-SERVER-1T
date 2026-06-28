@@ -1,18 +1,20 @@
 import { GlobalState } from '../types';
 
 export const INITIAL_STATE: GlobalState = {
-  "codeVersion": "1.5",
+  "codeVersion": "1.6",
   "autoUpdateActive": true,
   "campaignTitle": "Por 1T — Ayuda Humanitaria Emergencia Venezuela",
-  "emergencySubtitle": "Respuesta Operativa de Emergencia por el Terremoto en Mérida, Trujillo y Táchira. Cada kilo suma para salvar vidas.",
-  "headerAlertText": "Emergencia Nacional #VEN-2026: Terremoto en Los Andes (Mérida, Trujillo, Táchira)",
+  "emergencySubtitle": "Respuesta Operativa de Emergencia por el Terremoto . Cada kilo suma para salvar vidas.",
+  "headerAlertText": "Emergencia Nacional #VEN-2026: Terremoto",
   "heroBadgeText": "🇻🇪 Emergencia Humanitaria • Terremoto Venezuela",
   "heroTitleRow1": "AYUDA VITAL",
   "heroTitleRow2": "POR 1 TONELADA",
   "heroTitleRow3": "DESDE ESPAÑA",
   "globalTargetTons": 1,
-  "lastSyncTime": "2026-06-27T19:57:56.376Z",
-  "nextSyncTime": "2026-06-27T20:05:52.405Z",
+  "celebrationType": "confetti",
+  "progressBarStyle": "default",
+  "lastSyncTime": "2026-06-28T04:12:18.284Z",
+  "nextSyncTime": "2026-06-28T04:22:18.284Z",
   "googleSheetUrl": "https://docs.google.com/spreadsheets/d/1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC/edit?gid=762536088#gid=762536088",
   "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbxfiM27NiOzQx9FWqn2AFG6IeaG_MyCcNKTjiA29YF8MZ9NObXDlSUG7bLqWl_rHiw/exec",
   "autoSyncEnabled": true,
@@ -22,7 +24,7 @@ export const INITIAL_STATE: GlobalState = {
       "id": "sup-1",
       "category": "Alimentos no perecederos",
       "name": "Harina de Maíz, Arroz y Pasta",
-      "currentKilos": 48,
+      "currentKilos": 210,
       "targetKilos": 500,
       "unit": "kg",
       "iconName": "Utensils"
@@ -73,8 +75,17 @@ export const INITIAL_STATE: GlobalState = {
       "address": "laza Uxío Novoneyra, Bajo 2, 15960, Ribeira (A Coruña)",
       "contact": "711 51 18 50",
       "hours": "7:30–22:00",
-      "acceptedItems": ["Alimentos no perecederos", "Medicinas", "Mantas"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos",
+        "Medicinas",
+        "Mantas"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -85,8 +96,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Avda. do Malecón, 10, 15960, Ribeira (A Coruña)",
       "contact": "881 092 153",
       "hours": "Lunes cerrado. Martes a jueves 9:00–15:30 y 18:00–23:00. Viernes 9:30–15:30 y 18:00–00:00. Sábado 9:00–00:00. Domingo 9:00–16:00.",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -97,7 +115,9 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Rua Galicia 99",
       "contact": "",
       "hours": "Alimentos no perecederos, baterías, ropa, insumos médicos",
-      "acceptedItems": ["Alimentos no perecederos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
       "urgentNeeds": [],
       "mapsUrl": "https://maps.google.com"
     },
@@ -109,8 +129,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Avda. Rosalía de Castro, 37, 15960, Ribeira (A Coruña)",
       "contact": "881 121 172",
       "hours": "8:00–00:00 la mayoría de días",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -121,8 +148,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Rúa Ramón Menéndez Pidal, 16, 15007 A Coruña",
       "contact": "",
       "hours": "11:00- 3:30 am",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -133,8 +167,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Calle Juan Díaz Porlier, 9 (barrio Matogrande), 15009, A Coruña",
       "contact": "662 25 11 89",
       "hours": "10:00-21:00",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -145,8 +186,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Fuente Álamo, 22 Bajo, 15010, A Coruña",
       "contact": "633 900 116",
       "hours": "Lunes a domingo de 10:00 a 14:00 y de 16:00 a 21:00",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -157,8 +205,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Emilio González López, 53 Bajo, 15011, A Coruña",
       "contact": "624 189 825",
       "hours": "Lunes a viernes de 9:30 a 14:00 y de 16:30 a 19:00",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -169,8 +224,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Travesía de Rianxo, 7 Bajo, 15009, A Coruña",
       "contact": "",
       "hours": "No especificado",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -181,8 +243,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "C. Paraíso, 26, 15175 Carral, A Coruña",
       "contact": "641 88 71 39",
       "hours": "10:00 AM – 2:00 PM, 5:00 – 8:00 PM",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -193,8 +262,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Rúa Agro do Medio, 13 Bajo, 15895, O Milladoiro, Ames (A Coruña)",
       "contact": "610 476 840",
       "hours": "Lunes a jueves 9:00–23:00. Viernes a domingo y festivos 9:00–23:30.",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -205,8 +281,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Avda. Rosalía de Castro, 29, 15895, O Milladoiro, Ames (A Coruña)",
       "contact": "641 240 580",
       "hours": "Lunes 9:00–14:00 y 17:00–21:00. Martes cerrado. Miércoles a domingo 9:00–14:00 y 17:00–21:00.",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -217,8 +300,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Avenida Mariñas 7",
       "contact": "",
       "hours": "No especificado",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -229,8 +319,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Lugar antequeira, 15, 15911 Antequeira, A Coruña",
       "contact": "612 56 59 77",
       "hours": "12:00 PM - 3:00 AM",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -241,8 +338,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Avenida da Maía, 63, 15220 Bertamiráns, A Coruña",
       "contact": "695 58 65 10",
       "hours": "9:30 AM – 2:00 PM, 4:00 – 8:30 PM",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -253,8 +357,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Calle Teixugueiras, 23, 36212, Vigo",
       "contact": "",
       "hours": "Lunes a sábado de 9:00 a 22:00. Festivos algunos días de 10:00 a 22:00 (o 9:00–14:00).",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -265,8 +376,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Romero donallo 23, Bajo",
       "contact": "625 42 93 97",
       "hours": "Domingo 16:00- 20:00 Lunes a viernes 17:00-20:00",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -277,8 +395,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Rua Palmeira 22A",
       "contact": "",
       "hours": "Sábado 12:30- 17:00. Domingo 12:30-00:00. Lunes a viernes: 12:30- 17:00",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -289,8 +414,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Rúa Agra do Orzán, 32, Bajo, 15010, A Coruña",
       "contact": "",
       "hours": "10:00- 20:00 excepto domingo",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -301,8 +433,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Rúa Benito Vicetto, 1, 32004 Ourense",
       "contact": "698 13 77 30",
       "hours": "10:00 AM - 8:00 PM",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -313,8 +452,17 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Praza campo San Antonio, #37",
       "contact": "",
       "hours": "8:00 AM – 12:00 AM",
-      "acceptedItems": ["Alimentos no perecederos", "Medicinas", "Mantas"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos",
+        "Medicinas",
+        "Mantas"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -325,8 +473,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "C.c monte balado planta 3. Local 2",
       "contact": "",
       "hours": "10:00 AM – 1:00 AM Lunes cerrado",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -337,8 +492,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Piscina Municipal de Ordes \"O Muiño\", 15689 Ordes, A Coruña",
       "contact": "",
       "hours": "10:00 AM – 9:00 PM",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -349,8 +511,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Av. de Barcelona, 33, 15706 Santiago de Compostela, A Coruña",
       "contact": "",
       "hours": "Sábado: 10:00-16:00, 19:30-23:00 | Domingo: 11:00-16:00 | Lunes: 8:30-16:00, 19:30-23:00 | Martes y Miércoles: 8:30-17:00 | Jueves y Viernes: 8:30-16:00, 19:30-23:00",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -361,8 +530,17 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Avenida de Monforte 13 Bajo",
       "contact": "",
       "hours": "No especificado",
-      "acceptedItems": ["Alimentos no perecederos", "Medicinas", "Mantas"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos",
+        "Medicinas",
+        "Mantas"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -373,8 +551,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "Avenida Rosalía De Castro número 2 , Ribeira 15960",
       "contact": "",
       "hours": "De 10:00 a 14:00 y de 17:00 a 20:30",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     },
     {
@@ -385,8 +570,15 @@ export const INITIAL_STATE: GlobalState = {
       "address": "avenida romero Donallo 25",
       "contact": "",
       "hours": "De 9:00 a 20:00 (Horario continuo)",
-      "acceptedItems": ["Alimentos no perecederos"],
-      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "acceptedItems": [
+        "Alimentos no perecederos"
+      ],
+      "urgentNeeds": [
+        "Alimentos no perecederos",
+        "baterías",
+        "ropa",
+        "insumos médicos"
+      ],
       "mapsUrl": "https://maps.google.com"
     }
   ],
@@ -562,9 +754,36 @@ export const INITIAL_STATE: GlobalState = {
       "pledgeKilos": 5,
       "message": "Entrega registrada",
       "date": "6/27/2026"
+    },
+    {
+      "id": "excel-15-160",
+      "donorName": "Ruby Vargas. A Pequecha café bar",
+      "email": "apequecha10@gmail.com",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 160,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
+    },
+    {
+      "id": "excel-16-2",
+      "donorName": "Natalia",
+      "email": "anonimo@donante.org",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 2,
+      "message": "Entrega registrada",
+      "date": "6/27/2026"
     }
   ],
   "syncLogs": [
+    {
+      "id": "log-1782619938284",
+      "timestamp": "4:12:18 AM",
+      "status": "success",
+      "message": "[Sustracción Manual] [Excel BD Sincronizada] Se extrajeron con éxito 16 donaciones de la hoja de cálculo. Peso total acumulado: 381 kg.",
+      "kilosUpdated": 381
+    },
     {
       "id": "log-1782590152405",
       "timestamp": "7:55:52 PM",
@@ -694,13 +913,6 @@ export const INITIAL_STATE: GlobalState = {
     {
       "id": "log-1782579359214",
       "timestamp": "4:55:59 PM",
-      "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
-    },
-    {
-      "id": "log-1782578759422",
-      "timestamp": "4:45:59 PM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
       "kilosUpdated": 10
@@ -834,6 +1046,30 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_7lfv9wmlm",
+      "timestamp": "2026-06-28T04:16:49.986Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1638x907] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_wkj182phg",
+      "timestamp": "2026-06-28T04:11:38.326Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1638x907] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_fe8mvjjso",
+      "timestamp": "2026-06-28T04:11:26.033Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1638x907] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_6jkwm0tiz",
       "timestamp": "2026-06-28T04:05:53.823Z",
