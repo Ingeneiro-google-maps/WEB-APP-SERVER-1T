@@ -7,7 +7,7 @@ import {
   Lock, Download, Upload, Building2, Newspaper, HelpCircle, Lightbulb,  
   Search, X, ExternalLink, Package, MapPin, Phone, Clock,
   Users, History, User, UserPlus, ShieldCheck, Calendar, Terminal, Activity,
-  Scale, Video, Play, Check, Sparkles
+  Scale, Video, Play, Check, Sparkles, Scan
 } from 'lucide-react';
 
 function getYoutubeId(url: string): string {
@@ -43,7 +43,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'centros' | 'categorias_donacion' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'centros' | 'categorias_donacion' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -63,6 +63,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   });
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // IA Scanner States
+  const [scannerFile, setScannerFile] = useState<File | null>(null);
+  const [scannerPreview, setScannerPreview] = useState<string | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scannerResults, setScannerResults] = useState<any[]>([]);
 
   // States for adding a new user profile
   const [newUserName, setNewUserName] = useState('');
@@ -124,6 +130,77 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     } catch (err: any) {
       setClearError(`Error de red: ${err.message || err}`);
     }
+  };
+
+  const handleScannerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setScannerFile(file);
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setScannerPreview(ev.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      setScannerResults([]);
+      setMessage(null);
+    }
+  };
+
+  const processScannerFile = async () => {
+    if (!scannerPreview || !scannerFile) return;
+    setIsScanning(true);
+    setMessage(null);
+    
+    try {
+      const base64Data = scannerPreview.split(',')[1];
+      const mimeType = scannerFile.type;
+
+      const res = await fetch('/api/analyze-document', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mimeType, base64Data })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.pledges && data.pledges.length > 0) {
+          setScannerResults(data.pledges);
+          setMessage(`✅ ¡Análisis completado! Se encontraron ${data.pledges.length} registros.`);
+        } else {
+          setMessage(`⚠️ No se encontraron registros de donación en este documento.`);
+        }
+      } else {
+        setMessage(`❌ Error: ${data.error || 'Error al analizar el documento.'}`);
+      }
+    } catch (err: any) {
+      setMessage(`❌ Error de red: ${err.message}`);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const importScannerResults = async () => {
+    if (scannerResults.length === 0) return;
+    
+    const newPledges = [...(state.pledges || [])];
+    
+    for (const pledge of scannerResults) {
+      if (!pledge.id) {
+        pledge.id = `don-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      }
+      pledge.status = 'recibido'; // Assumed received if from external table
+      if (!pledge.date) pledge.date = new Date().toISOString();
+      newPledges.unshift(pledge);
+    }
+    
+    onUpdateState({ pledges: newPledges });
+    await onTriggerSync(true);
+    
+    setScannerResults([]);
+    setScannerFile(null);
+    setScannerPreview(null);
+    setMessage(`✅ ¡Importación exitosa! ${scannerResults.length} donaciones añadidas al sistema.`);
+    setActiveTab('excel_bd');
   };
 
   const handleFetchForensic = async () => {
@@ -886,6 +963,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('ia_scanner')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'ia_scanner' 
+                ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Scan className="w-5 h-5 text-cyan-300" />
+            <span>🤖 Escáner IBM de Tablas Integrado:</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('centros')}
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
               activeTab === 'centros' 
@@ -1179,6 +1268,194 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 </table>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: ESCÁNER IA --- */}
+        {activeTab === 'ia_scanner' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-br from-slate-900 to-slate-950 p-6 md:p-8 rounded-3xl border border-blue-500/30 shadow-2xl space-y-6">
+              <div className="flex flex-col md:flex-row items-center gap-4">
+                <div className="w-14 h-14 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center shrink-0">
+                  <Scan className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-wider">Módulo de Escáner IBM de Tablas Integrado:</h3>
+                  <p className="text-slate-400 text-sm mt-1">
+                    Sube una foto (JPG, PNG) o un documento PDF de una hoja de registro de donaciones impresa o digital. La Inteligencia Artificial extraerá automáticamente los datos en una tabla editable antes de importarlos al sistema.
+                  </p>
+                </div>
+              </div>
+
+              {/* Upload Zone */}
+              <div className="border-2 border-dashed border-slate-700 rounded-3xl p-8 flex flex-col items-center justify-center text-center bg-slate-900/50 hover:bg-slate-800/50 transition relative overflow-hidden group">
+                <input 
+                  type="file" 
+                  accept="image/jpeg, image/png, application/pdf" 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  onChange={handleScannerFileChange}
+                />
+                
+                {scannerPreview && scannerFile?.type.startsWith('image/') ? (
+                  <div className="relative w-full max-w-lg mx-auto rounded-xl overflow-hidden shadow-2xl mb-4 border border-slate-700 group-hover:border-blue-500 transition-colors">
+                    <img src={scannerPreview} alt="Preview" className="w-full object-contain max-h-64 bg-slate-950" />
+                    <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                      <span className="bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow-lg">Cambiar Documento</span>
+                    </div>
+                  </div>
+                ) : scannerFile ? (
+                  <div className="p-6 bg-blue-500/10 border border-blue-500/30 rounded-2xl mb-4 w-full max-w-sm flex flex-col items-center">
+                    <FileSpreadsheet className="w-12 h-12 text-blue-400 mb-3" />
+                    <span className="text-white font-bold text-lg truncate w-full px-4">{scannerFile.name}</span>
+                    <span className="text-slate-400 text-xs mt-1">({(scannerFile.size / 1024).toFixed(1)} KB)</span>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="w-12 h-12 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
+                    <h4 className="text-lg font-bold text-white">Haz clic o arrastra un archivo aquí</h4>
+                    <p className="text-slate-400 text-sm mt-2 max-w-md">
+                      Formatos soportados: PDF, JPG, PNG. Asegúrate de que las cabeceras (Donante, Kilos, Centro) sean legibles.
+                    </p>
+                  </>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              {scannerFile && (
+                <div className="flex justify-center">
+                  <button
+                    onClick={processScannerFile}
+                    disabled={isScanning}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-wider transition shadow-lg shadow-blue-600/20 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isScanning ? (
+                      <>
+                        <RefreshCw className="w-6 h-6 animate-spin" />
+                        Analizando documento...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-6 h-6" />
+                        Extraer Datos con Inteligencia Artificial
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Results Table */}
+            {scannerResults.length > 0 && (
+              <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl space-y-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                      Resultados de Extracción ({scannerResults.length})
+                    </h3>
+                    <p className="text-slate-400 text-xs mt-1">Puedes modificar los datos directamente en la tabla antes de importar.</p>
+                  </div>
+                  <button
+                    onClick={importScannerResults}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg shadow-emerald-600/20 flex items-center gap-2 shrink-0"
+                  >
+                    <Save className="w-4 h-4" />
+                    Importar al Sistema
+                  </button>
+                </div>
+                
+                <div className="overflow-x-auto rounded-xl border border-slate-700">
+                  <table className="w-full text-left text-sm text-slate-300">
+                    <thead className="bg-slate-800/80 text-white font-black uppercase text-xs tracking-wider">
+                      <tr>
+                        <th className="px-4 py-3">Donante</th>
+                        <th className="px-4 py-3">Kilos</th>
+                        <th className="px-4 py-3">Centro</th>
+                        <th className="px-4 py-3">Categoría</th>
+                        <th className="px-4 py-3 w-10"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800 bg-slate-900/50">
+                      {scannerResults.map((r, i) => (
+                        <tr key={i} className="hover:bg-slate-800/80 transition">
+                          <td className="px-4 py-2">
+                            <input 
+                              type="text" 
+                              value={r.donor || ''} 
+                              onChange={(e) => {
+                                const newResults = [...scannerResults];
+                                newResults[i].donor = e.target.value;
+                                setScannerResults(newResults);
+                              }}
+                              className="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 text-white text-sm"
+                              placeholder="Anónimo"
+                            />
+                          </td>
+                          <td className="px-4 py-2">
+                            <div className="flex items-center gap-1">
+                              <input 
+                                type="number" 
+                                value={r.kilos || ''} 
+                                onChange={(e) => {
+                                  const newResults = [...scannerResults];
+                                  newResults[i].kilos = Number(e.target.value);
+                                  setScannerResults(newResults);
+                                }}
+                                className="w-20 bg-slate-950 border border-slate-700 rounded-md px-2 py-1 text-amber-400 font-bold text-sm"
+                              />
+                              <span className="text-amber-400 font-bold text-xs">kg</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2">
+                            <input 
+                              type="text" 
+                              value={r.city || ''} 
+                              onChange={(e) => {
+                                const newResults = [...scannerResults];
+                                newResults[i].city = e.target.value;
+                                setScannerResults(newResults);
+                              }}
+                              className="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 text-white text-sm"
+                              placeholder="Centro"
+                            />
+                          </td>
+                          <td className="px-4 py-2">
+                            <select 
+                              value={r.category || 'Alimentos no perecederos'} 
+                              onChange={(e) => {
+                                const newResults = [...scannerResults];
+                                newResults[i].category = e.target.value;
+                                setScannerResults(newResults);
+                              }}
+                              className="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 text-white text-sm"
+                            >
+                              <option value="Alimentos no perecederos">Alimentos no perecederos</option>
+                              <option value="Ropa y Abrigo">Ropa y Abrigo</option>
+                              <option value="Baterías y Pilas">Baterías y Pilas</option>
+                              <option value="Medicinas e Insumos Médicos">Medicinas e Insumos Médicos</option>
+                              <option value="Kits Infantiles y Fórmulas">Kits Infantiles y Fórmulas</option>
+                              <option value="General">General</option>
+                            </select>
+                          </td>
+                          <td className="px-4 py-2 text-right">
+                            <button 
+                              onClick={() => {
+                                const newResults = scannerResults.filter((_, idx) => idx !== i);
+                                setScannerResults(newResults);
+                              }}
+                              className="text-red-400 hover:text-red-300 p-1 rounded-md hover:bg-slate-800"
+                              title="Eliminar fila"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

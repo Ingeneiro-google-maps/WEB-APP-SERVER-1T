@@ -547,7 +547,8 @@ let totalKilos = recalculateTotalKilos(appState);
 export const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Middleware crucial para mantener sincronizado Supabase en entornos Serverless o contenedores efímeros
 const ensureLatestState = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -1133,6 +1134,70 @@ Genera un reporte breve de 4 puntos con: 1) Estado general de la meta, 2) Cuello
       res.json({
         reply: `He recibido tu consulta. Para apoyarnos de inmediato con la emergencia en Venezuela, puedes entregar alimentos no perecederos, agua y medicinas en nuestros centros de acopio operativos. ¡Cada kilo salva vidas!`
       });
+    }
+  });
+
+  // Analyze document for donations
+  app.post('/api/analyze-document', async (req, res) => {
+    try {
+      const { mimeType, base64Data } = req.body;
+      const apiKey = process.env.GEMINI_API_KEY;
+
+      if (!apiKey) {
+        return res.status(500).json({ error: 'La clave GEMINI_API_KEY no está configurada.' });
+      }
+      if (!mimeType || !base64Data) {
+        return res.status(400).json({ error: 'Faltan datos del documento.' });
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                inlineData: {
+                  data: base64Data,
+                  mimeType
+                }
+              },
+              {
+                text: `Extrae los datos de esta tabla de donaciones y devuélvelos en formato CSV.
+Reglas:
+1. Extrae únicamente las filas de datos con información sobre donaciones o kilos.
+2. Si la tabla no contiene kilos o donaciones, devuelve un CSV vacío.
+3. El formato de salida debe ser estrictamente CSV con las siguientes cabeceras exactas en minúscula (usando comas como separador):
+donante,kilos,ciudad,categoria,fecha,mensaje,email
+4. Si falta algún dato de una columna, déjalo vacío (para ciudad extrae la ciudad o centro de acopio).
+5. Extrae la cantidad numérica para "kilos". Limpia los textos para dejar solo el número. Convierte comas a puntos si representan decimales. Si es peso total de una línea, calcúlalo.
+6. Asigna el producto o donación a una de las siguientes categorías exactas del sistema dependiendo de su labor o uso:
+   - "Alimentos no perecederos"
+   - "Ropa y Abrigo"
+   - "Baterías y Pilas"
+   - "Medicinas e Insumos Médicos"
+   - "Kits Infantiles y Fórmulas"
+7. El mensaje/descripción puede ser el nombre original del producto que se está donando (ej. "Atún Claro Montey").
+8. NO devuelvas bloques de código (markdown), simplemente texto CSV puro sin \`\`\`csv.
+9. Omite cualquier texto antes o después de los datos CSV.`
+              }
+            ]
+          }
+        ]
+      });
+
+      let csvText = response.text?.trim() || '';
+      if (csvText.startsWith('\`\`\`csv')) {
+        csvText = csvText.replace(/^\`\`\`csv\n/, '').replace(/\n\`\`\`$/, '');
+      }
+
+      const parsedData = parseCSVToPledges(csvText);
+
+      res.json({ success: true, pledges: parsedData.pledges });
+    } catch (err: any) {
+      console.error('Error in analyze-document:', err);
+      res.status(500).json({ error: err.message || 'Error al analizar documento' });
     }
   });
 
