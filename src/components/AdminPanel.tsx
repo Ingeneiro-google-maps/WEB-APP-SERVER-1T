@@ -3178,7 +3178,7 @@ ON CONFLICT (id) DO NOTHING;`}
 
             {/* Ranking Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {[1, 2, 3, 4, 5, 6, 7, 10].map((tons) => {
+              {[1, 2, 3, 4, 5, 6, 7, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((tons) => {
                 const targetWeightKg = tons * 1000;
                 const currentWeightKg = (state.pledges || []).reduce((acc, p) => acc + (p.pledgeKilos || 0), 0);
                 const isCurrentActive = state.globalTargetTons === tons;
@@ -3192,6 +3192,16 @@ ON CONFLICT (id) DO NOTHING;`}
                 if (tons === 6) subtitle = "Solidaridad Máxima";
                 if (tons === 7) subtitle = "Éxito Absoluto";
                 if (tons === 10) subtitle = "Hito Histórico de Acopio";
+                if (tons === 15) subtitle = "Impacto Social Increíble";
+                if (tons === 20) subtitle = "Hazaña Solidaria Navarra";
+                if (tons === 30) subtitle = "Esperanza Sin Fronteras";
+                if (tons === 40) subtitle = "Superación Histórica Suprema";
+                if (tons === 50) subtitle = "Hito de Oro Humanitario";
+                if (tons === 60) subtitle = "Compromiso Inquebrantable";
+                if (tons === 70) subtitle = "Unión Solidaria Continental";
+                if (tons === 80) subtitle = "Milagro de Amor Colectivo";
+                if (tons === 90) subtitle = "Fuerza Humana Suprema";
+                if (tons === 100) subtitle = "Centuria del Alma Navarra";
 
                 return (
                   <button
