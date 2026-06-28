@@ -28,7 +28,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
     city: '',
     category: donationCategories[0] || 'Alimentos no perecederos',
     description: '',
-    pledgeKilos: 10,
+    pledgeKilos: '10',
     message: ''
   });
   const [inputPassword, setInputPassword] = useState('');
@@ -65,7 +65,10 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.donorName.trim() || formData.pledgeKilos <= 0) return;
+    const rawKilos = String(formData.pledgeKilos).replace(',', '.');
+    const parsedKilos = parseFloat(rawKilos);
+
+    if (!formData.donorName.trim() || isNaN(parsedKilos) || parsedKilos <= 0) return;
 
     // Validate donation password
     if (inputPassword.trim() !== correctPassword) {
@@ -82,7 +85,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
         city: formData.city,
         category: formData.category,
         description: formData.description,
-        pledgeKilos: Number(formData.pledgeKilos),
+        pledgeKilos: parsedKilos,
         message: formData.description || formData.message || `Entrega registrada en ${formData.city}`
       });
       setSuccess(true);
@@ -94,7 +97,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
           city: centers && centers.length > 0 ? `${centers[0].name} (${centers[0].city})` : (centersCities[0] || 'Madrid'),
           category: donationCategories[0] || 'Alimentos no perecederos',
           description: '',
-          pledgeKilos: 10,
+          pledgeKilos: '10',
           message: ''
         });
         setInputPassword('');
@@ -204,13 +207,18 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                 </label>
                 <div className="flex items-center gap-2">
                   <input
-                    type="number"
-                    min="0.5"
-                    step="0.5"
-                    max="1000"
+                    type="text"
+                    inputMode="decimal"
                     required
+                    placeholder="10"
                     value={formData.pledgeKilos}
-                    onChange={(e) => setFormData({ ...formData, pledgeKilos: Number(e.target.value) })}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      // Permitir números con coma o punto, o vacío
+                      if (val === '' || /^[0-9]*[.,]?[0-9]*$/.test(val)) {
+                        setFormData({ ...formData, pledgeKilos: val });
+                      }
+                    }}
                     className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-lg font-black font-mono text-slate-900 focus:outline-none focus:border-[#008CBA]"
                   />
                   <span className="font-bold text-sm text-slate-600 font-mono">kg</span>
