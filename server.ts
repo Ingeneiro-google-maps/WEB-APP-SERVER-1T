@@ -110,9 +110,17 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
   // 3. Centros de Acopio (Collection Centers):
   // - Queremos todos los centros definidos en el código local (nuevos, editados).
   // - También queremos preservar los centros que hayan sido añadidos en línea mediante la base de datos (Supabase).
-  const mergedCenters = [...(local.centers || [])];
+  // - Filtramos de forma explícita cualquier centro de Los Andes (Mérida, Trujillo, Táchira) para cumplir con el requerimiento del usuario.
+  const isAndesCenter = (c: any) => {
+    const text = `${c.city || ''} ${c.name || ''} ${c.address || ''}`.toLowerCase();
+    return text.includes('mérida') || text.includes('merida') || text.includes('trujillo') || text.includes('táchira') || text.includes('tachira');
+  };
+
+  const localCenters = (local.centers || []).filter(c => !isAndesCenter(c));
+  const mergedCenters = [...localCenters];
   if (db.centers) {
     db.centers.forEach(dbCenter => {
+      if (isAndesCenter(dbCenter)) return; // Excluir centros de Los Andes
       const localCenterIdx = mergedCenters.findIndex(c => c.id === dbCenter.id);
       if (localCenterIdx === -1) {
         // Existe en base de datos pero no en el código local, lo conservamos (fue creado online)
@@ -251,6 +259,13 @@ async function loadStateFromSupabase() {
         // no mezclamos para evitar restaurar elementos que el administrador eliminó en la web.
         // La base de datos online de Supabase es la fuente de verdad absoluta.
         if (dbState.codeVersion === INITIAL_STATE.codeVersion) {
+          // Filtramos cualquier centro de Los Andes (Mérida, Trujillo, Táchira) para asegurar la persistencia limpia de la orden del usuario
+          if (dbState.centers) {
+            dbState.centers = dbState.centers.filter(c => {
+              const text = `${c.city || ''} ${c.name || ''} ${c.address || ''}`.toLowerCase();
+              return !(text.includes('mérida') || text.includes('merida') || text.includes('trujillo') || text.includes('táchira') || text.includes('tachira'));
+            });
+          }
           appState = dbState;
           console.log('✅ [Supabase] Estado cargado de forma íntegra y directa. Sin mezclas redundantes.');
         } else {

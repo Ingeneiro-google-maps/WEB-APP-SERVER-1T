@@ -1,7 +1,7 @@
 import { GlobalState } from '../types';
 
 export const INITIAL_STATE: GlobalState = {
-  "codeVersion": "1.0",
+  "codeVersion": "1.5",
   "autoUpdateActive": true,
   "campaignTitle": "Por 1T — Ayuda Humanitaria Emergencia Venezuela",
   "emergencySubtitle": "Respuesta Operativa de Emergencia por el Terremoto en Mérida, Trujillo y Táchira. Cada kilo suma para salvar vidas.",
@@ -66,82 +66,328 @@ export const INITIAL_STATE: GlobalState = {
   ],
   "centers": [
     {
-      "id": "cent-madrid",
-      "city": "Madrid",
+      "id": "cent-1782565319291",
+      "city": "Ribeira",
       "country": "España",
-      "name": "Almacén Humanitario Central Madrid — Cuatro Caminos",
-      "address": "Calle Bravo Murillo 122, Tetuán, Madrid 28020",
-      "contact": "+34 910-239182 / madrid@por1t.org",
-      "hours": "Lunes a Sábado: 10:00 AM - 8:30 PM (Recepción continua para envío aéreo)",
-      "acceptedItems": [
-        "Alimentos no perecederos",
-        "Fórmulas infantiles",
-        "Medicinas en caja original",
-        "Mantas térmicas"
-      ],
-      "urgentNeeds": [
-        "Antibióticos de amplio espectro",
-        "Leche infantil en polvo",
-        "Pastillas potabilizadoras"
-      ],
-      "mapsUrl": "https://maps.google.com/?q=Calle+Bravo+Murillo+122+Madrid"
+      "name": "O Delas (Cafetería)",
+      "address": "laza Uxío Novoneyra, Bajo 2, 15960, Ribeira (A Coruña)",
+      "contact": "711 51 18 50",
+      "hours": "7:30–22:00",
+      "acceptedItems": ["Alimentos no perecederos", "Medicinas", "Mantas"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
     },
     {
-      "id": "cent-barcelona",
-      "city": "Barcelona",
+      "id": "cent-1782565378800",
+      "city": "Ribeira",
       "country": "España",
-      "name": "Almacén Solidario Barcelona — Sants",
-      "address": "Carrer de Sants 340, Sants-Montjuïc, Barcelona 08028",
-      "contact": "+34 930-182931 / barcelona@por1t.org",
-      "hours": "Lunes a Sábado: 10:00 AM - 8:30 PM",
-      "acceptedItems": [
-        "Alimentos no perecederos",
-        "Fórmulas infantiles",
-        "Medicinas en caja original"
-      ],
-      "urgentNeeds": [
-        "Leche en polvo",
-        "Conservas en lata",
-        "Gasas y vendajes"
-      ],
-      "mapsUrl": "https://maps.google.com/?q=Carrer+de+Sants+340+Barcelona"
+      "name": "Café Bar A Pequecha",
+      "address": "Avda. do Malecón, 10, 15960, Ribeira (A Coruña)",
+      "contact": "881 092 153",
+      "hours": "Lunes cerrado. Martes a jueves 9:00–15:30 y 18:00–23:00. Viernes 9:30–15:30 y 18:00–00:00. Sábado 9:00–00:00. Domingo 9:00–16:00.",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
     },
     {
-      "id": "cent-valencia",
-      "city": "Valencia",
+      "id": "cent-1782565426082",
+      "city": "Ribeira",
       "country": "España",
-      "name": "Punto Humanitario Valencia — Ruzafa",
-      "address": "Carrer de Cuba 48, Eixample, Valencia 46006",
-      "contact": "+34 960-492102 / valencia@por1t.org",
-      "hours": "Martes a Domingo: 11:00 AM - 7:00 PM",
-      "acceptedItems": [
-        "Arroz, pasta y legumbres secas",
-        "Pañales y artículos de higiene"
-      ],
-      "urgentNeeds": [
-        "Artículos de higiene femenina",
-        "Jabón desinfectante",
-        "Comida lista para consumir"
-      ],
-      "mapsUrl": "https://maps.google.com/?q=Carrer+de+Cuba+48+Valencia"
+      "name": "Cafetería Flor de Toxo",
+      "address": "Rua Galicia 99",
+      "contact": "",
+      "hours": "Alimentos no perecederos, baterías, ropa, insumos médicos",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": [],
+      "mapsUrl": "https://maps.google.com"
     },
     {
-      "id": "cent-tenerife",
-      "city": "Santa Cruz de Tenerife",
+      "id": "cent-1782565572397",
+      "city": "Ribeira",
       "country": "España",
-      "name": "Centro Solidario Canarias — Sede Principal",
-      "address": "Calle Castillo 45, Santa Cruz de Tenerife 38002",
-      "contact": "+34 922-182910 / canarias@por1t.org",
-      "hours": "Lunes a Viernes: 9:00 AM - 7:00 PM",
-      "acceptedItems": [
-        "Alimentos secos precintados",
-        "Kits de primeros auxilios"
-      ],
-      "urgentNeeds": [
-        "Alimentos infantiles no perecederos",
-        "Analgésicos"
-      ],
-      "mapsUrl": "https://maps.google.com/?q=Calle+Castillo+45+Santa+Cruz+de+Tenerife"
+      "name": "A Cabaña Brasería",
+      "address": "Avda. Rosalía de Castro, 37, 15960, Ribeira (A Coruña)",
+      "contact": "881 121 172",
+      "hours": "8:00–00:00 la mayoría de días",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782565661090",
+      "city": "A Coruña",
+      "country": "España",
+      "name": "Bar Venus (Café Bar Venus)",
+      "address": "Rúa Ramón Menéndez Pidal, 16, 15007 A Coruña",
+      "contact": "",
+      "hours": "11:00- 3:30 am",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782565735698",
+      "city": "A Coruña",
+      "country": "España",
+      "name": "Flor de Azúcar (panadería-pastelería)",
+      "address": "Calle Juan Díaz Porlier, 9 (barrio Matogrande), 15009, A Coruña",
+      "contact": "662 25 11 89",
+      "hours": "10:00-21:00",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566116421",
+      "city": "A Coruña",
+      "country": "España",
+      "name": "Gomías Golosinas",
+      "address": "Fuente Álamo, 22 Bajo, 15010, A Coruña",
+      "contact": "633 900 116",
+      "hours": "Lunes a domingo de 10:00 a 14:00 y de 16:00 a 21:00",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566161037",
+      "city": "A Coruña",
+      "country": "España",
+      "name": "Sugary Club (Repostería Creativa)",
+      "address": "Emilio González López, 53 Bajo, 15011, A Coruña",
+      "contact": "624 189 825",
+      "hours": "Lunes a viernes de 9:30 a 14:00 y de 16:30 a 19:00",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566196935",
+      "city": "A Coruña",
+      "country": "España",
+      "name": "Van Barber's",
+      "address": "Travesía de Rianxo, 7 Bajo, 15009, A Coruña",
+      "contact": "",
+      "hours": "No especificado",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566429878",
+      "city": "A Coruña",
+      "country": "España",
+      "name": "Margarida Xoguetes",
+      "address": "C. Paraíso, 26, 15175 Carral, A Coruña",
+      "contact": "641 88 71 39",
+      "hours": "10:00 AM – 2:00 PM, 5:00 – 8:00 PM",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566566226",
+      "city": "Milladoiro",
+      "country": "España",
+      "name": "O Recuncho de Adrián",
+      "address": "Rúa Agro do Medio, 13 Bajo, 15895, O Milladoiro, Ames (A Coruña)",
+      "contact": "610 476 840",
+      "hours": "Lunes a jueves 9:00–23:00. Viernes a domingo y festivos 9:00–23:30.",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566655789",
+      "city": "Milladoiro",
+      "country": "España",
+      "name": "Korizza (Café/Brunch House)",
+      "address": "Avda. Rosalía de Castro, 29, 15895, O Milladoiro, Ames (A Coruña)",
+      "contact": "641 240 580",
+      "hours": "Lunes 9:00–14:00 y 17:00–21:00. Martes cerrado. Miércoles a domingo 9:00–14:00 y 17:00–21:00.",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566757670",
+      "city": "Sada",
+      "country": "España",
+      "name": "Supermarkt",
+      "address": "Avenida Mariñas 7",
+      "contact": "",
+      "hours": "No especificado",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566892734",
+      "city": "Rois",
+      "country": "España",
+      "name": "El Malecón",
+      "address": "Lugar antequeira, 15, 15911 Antequeira, A Coruña",
+      "contact": "612 56 59 77",
+      "hours": "12:00 PM - 3:00 AM",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566963091",
+      "city": "Bertamirans",
+      "country": "España",
+      "name": "Denny Barber Broth",
+      "address": "Avenida da Maía, 63, 15220 Bertamiráns, A Coruña",
+      "contact": "695 58 65 10",
+      "hours": "9:30 AM – 2:00 PM, 4:00 – 8:30 PM",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782566999943",
+      "city": "Vigo",
+      "country": "España",
+      "name": "Carrefour Express Teixugueiras",
+      "address": "Calle Teixugueiras, 23, 36212, Vigo",
+      "contact": "",
+      "hours": "Lunes a sábado de 9:00 a 22:00. Festivos algunos días de 10:00 a 22:00 (o 9:00–14:00).",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782567047792",
+      "city": "Santiago de Compostela",
+      "country": "España",
+      "name": "Lirio Studio Creativo",
+      "address": "Romero donallo 23, Bajo",
+      "contact": "625 42 93 97",
+      "hours": "Domingo 16:00- 20:00 Lunes a viernes 17:00-20:00",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782567132794",
+      "city": "Milladoiro",
+      "country": "España",
+      "name": "Go Compostela",
+      "address": "Rua Palmeira 22A",
+      "contact": "",
+      "hours": "Sábado 12:30- 17:00. Domingo 12:30-00:00. Lunes a viernes: 12:30- 17:00",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782567317286",
+      "city": "A Coruña",
+      "country": "España",
+      "name": "Hairlis",
+      "address": "Rúa Agra do Orzán, 32, Bajo, 15010, A Coruña",
+      "contact": "",
+      "hours": "10:00- 20:00 excepto domingo",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782567656475",
+      "city": "Ourense",
+      "country": "España",
+      "name": "Gozza!",
+      "address": "Rúa Benito Vicetto, 1, 32004 Ourense",
+      "contact": "698 13 77 30",
+      "hours": "10:00 AM - 8:00 PM",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782572135741",
+      "city": "Monforte de Lemos",
+      "country": "España",
+      "name": "A Nosa Bodeguilla",
+      "address": "Praza campo San Antonio, #37",
+      "contact": "",
+      "hours": "8:00 AM – 12:00 AM",
+      "acceptedItems": ["Alimentos no perecederos", "Medicinas", "Mantas"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782572254123",
+      "city": "Brión",
+      "country": "España",
+      "name": "Café bar la terraza",
+      "address": "C.c monte balado planta 3. Local 2",
+      "contact": "",
+      "hours": "10:00 AM – 1:00 AM Lunes cerrado",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782572529842",
+      "city": "Ordes",
+      "country": "España",
+      "name": "Piscina Municipal de Ordes \"O Muiño\"",
+      "address": "Piscina Municipal de Ordes \"O Muiño\", 15689 Ordes, A Coruña",
+      "contact": "",
+      "hours": "10:00 AM – 9:00 PM",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782572842899",
+      "city": "Santiago de Compostela",
+      "country": "España",
+      "name": "Pollos y pepitos +58",
+      "address": "Av. de Barcelona, 33, 15706 Santiago de Compostela, A Coruña",
+      "contact": "",
+      "hours": "Sábado: 10:00-16:00, 19:30-23:00 | Domingo: 11:00-16:00 | Lunes: 8:30-16:00, 19:30-23:00 | Martes y Miércoles: 8:30-17:00 | Jueves y Viernes: 8:30-16:00, 19:30-23:00",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782586913216",
+      "city": "Chantada- Lugo",
+      "country": "España",
+      "name": "Pastelería Gofer",
+      "address": "Avenida de Monforte 13 Bajo",
+      "contact": "",
+      "hours": "No especificado",
+      "acceptedItems": ["Alimentos no perecederos", "Medicinas", "Mantas"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782588031649",
+      "city": "Ribeira",
+      "country": "España",
+      "name": "Mj Tecsystem Ribeira",
+      "address": "Avenida Rosalía De Castro número 2 , Ribeira 15960",
+      "contact": "",
+      "hours": "De 10:00 a 14:00 y de 17:00 a 20:30",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
+    },
+    {
+      "id": "cent-1782588076544",
+      "city": "Santiago de Compostela",
+      "country": "España",
+      "name": "Phone Factory",
+      "address": "avenida romero Donallo 25",
+      "contact": "",
+      "hours": "De 9:00 a 20:00 (Horario continuo)",
+      "acceptedItems": ["Alimentos no perecederos"],
+      "urgentNeeds": ["Alimentos no perecederos", "baterías", "ropa", "insumos médicos"],
+      "mapsUrl": "https://maps.google.com"
     }
   ],
   "faqs": [
@@ -588,6 +834,14 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_6jkwm0tiz",
+      "timestamp": "2026-06-28T04:05:53.823Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1638x907] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_bpt8e2nzk",
       "timestamp": "2026-06-27T19:56:41.152Z",
