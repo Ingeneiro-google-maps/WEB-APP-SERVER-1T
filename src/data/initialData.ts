@@ -1037,13 +1037,30 @@ export const INITIAL_STATE: GlobalState = {
       "action": "Publicó aviso urgente de envío de convoy humanitario cargado con 450 kg de alimentos no perecederos."
     }
   ],
+  "whatsappMessages": [
+    {
+      "id": "msg-1",
+      "senderName": "Coordinador Carlos",
+      "senderRole": "Admin",
+      "text": "Acaba de salir un camión hacia el centro de acopio de Madrid. Necesitamos 3 voluntarios más para descargar.",
+      "timestamp": "10:24 AM",
+      "isOfficial": true
+    },
+    {
+      "id": "msg-2",
+      "senderName": "María L.",
+      "text": "¡Yo puedo ir a ayudar! Llego en 15 minutos.",
+      "timestamp": "10:25 AM"
+    }
+  ],
   "visibleBlocks": {
     "suppliesGrid": true,
     "centersGrid": true,
     "donationsList": true,
     "newsSection": true,
     "faqSection": true,
-    "suggestionsSection": true
+    "suggestionsSection": true,
+    "whatsappSection": true
   },
   "donationPassword": "VENEZUELAVIVE2026",
   "headerVideoEnabled": true,
@@ -1055,6 +1072,22 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_z49h52mc8",
+      "timestamp": "2026-06-29T15:08:57.056Z",
+      "ip": "90.166.156.254",
+      "device": "💻 Escritorio (macOS) [Pantalla: 944x603] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_tx28hsu5f",
+      "timestamp": "2026-06-29T15:08:06.467Z",
+      "ip": "90.166.156.254",
+      "device": "💻 Escritorio (macOS) [Pantalla: 944x603] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_2gsr9cjm4",
       "timestamp": "2026-06-28T04:26:15.696Z",

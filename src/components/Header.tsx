@@ -77,6 +77,12 @@ export const Header: React.FC<HeaderProps> = ({
             {state.visibleBlocks?.faqSection !== false && (
               <a href="#faq" className="hover:text-[#008CBA] transition">FAQ</a>
             )}
+            {state.visibleBlocks?.whatsappSection !== false && (
+              <a href="#whatsapp" className="hover:text-[#25D366] transition flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse"></span>
+                Chat al Vivo
+              </a>
+            )}
             {state.visibleBlocks?.suggestionsSection !== false && (
               <a href="#sugerencias" className="hover:text-[#008CBA] transition">Sugerencias</a>
             )}
@@ -198,13 +204,27 @@ export const Header: React.FC<HeaderProps> = ({
                         </a>
                       )}
                       
+                      {state.visibleBlocks?.whatsappSection !== false && (
+                        <a 
+                          href="#whatsapp" 
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 hover:text-[#25D366] text-xs font-bold transition-all"
+                        >
+                          <span className="text-base bg-emerald-50 text-[#25D366] p-1.5 rounded-xl shrink-0 shadow-sm animate-pulse">💬</span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="truncate text-[#25D366]">Chat al Vivo</span>
+                            <span className="text-[9px] text-slate-400 font-normal truncate">Coordinación de envíos en tiempo real</span>
+                          </div>
+                        </a>
+                      )}
+                      
                       {state.visibleBlocks?.suggestionsSection !== false && (
                         <a 
                           href="#sugerencias" 
                           onClick={() => setIsMenuOpen(false)}
                           className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 hover:text-[#008CBA] text-xs font-bold transition-all"
                         >
-                          <span className="text-base bg-slate-100 p-1.5 rounded-xl shrink-0">💬</span>
+                          <span className="text-base bg-slate-100 p-1.5 rounded-xl shrink-0">💡</span>
                           <div className="flex flex-col min-w-0">
                             <span className="truncate">Sugerencias y Dudas</span>
                             <span className="text-[9px] text-slate-400 font-normal truncate">Canal de contacto directo</span>

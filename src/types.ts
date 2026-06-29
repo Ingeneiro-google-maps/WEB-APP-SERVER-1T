@@ -66,6 +66,15 @@ export interface SuggestionItem {
   date: string;
 }
 
+export interface WhatsAppMessage {
+  id: string;
+  senderName: string;
+  senderRole?: string;
+  text: string;
+  timestamp: string;
+  isOfficial?: boolean;
+}
+
 export interface GlobalState {
   codeVersion?: string;
   autoUpdateActive?: boolean;
@@ -90,6 +99,7 @@ export interface GlobalState {
   syncLogs: SyncLog[];
   news: NewsItem[];
   suggestions: SuggestionItem[];
+  whatsappMessages?: WhatsAppMessage[];
   hasNewDonationAlert?: boolean;
   supabaseActive?: boolean;
   supabaseTableMissing?: boolean;
@@ -103,6 +113,7 @@ export interface GlobalState {
     newsSection?: boolean;
     faqSection?: boolean;
     suggestionsSection?: boolean;
+    whatsappSection?: boolean;
   };
   donationPassword?: string;
   webAccessLogs?: WebAccessLog[];

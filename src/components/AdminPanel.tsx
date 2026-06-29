@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import confetti from 'canvas-confetti';
+import { fireConfetti as confetti } from '../utils/confettiWrapper';
 import { GlobalState, SupplyItem, CollectionCenter, FAQItem, AdminUser, UserChangeLog } from '../types';
 import { 
   Settings, RefreshCw, Plus, Trash2, Edit3, Save, Database, 
@@ -43,7 +43,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'centros' | 'categorias_donacion' | 'noticias' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -278,6 +278,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     author: 'Coordinación Central ONG España'
   });
 
+  const [newWhatsAppMsg, setNewWhatsAppMsg] = useState({
+    text: '',
+    senderName: 'Coordinador',
+    senderRole: 'Admin',
+    isOfficial: true
+  });
+
   // Estados de edición para FAQs
   const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
   const [editFaqForm, setEditFaqForm] = useState<Partial<FAQItem>>({});
@@ -308,6 +315,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [showNewsSection, setShowNewsSection] = useState<boolean>(state.visibleBlocks?.newsSection !== false);
   const [showFaqSection, setShowFaqSection] = useState<boolean>(state.visibleBlocks?.faqSection !== false);
   const [showSuggestionsSection, setShowSuggestionsSection] = useState<boolean>(state.visibleBlocks?.suggestionsSection !== false);
+  const [showWhatsappSection, setShowWhatsappSection] = useState<boolean>(state.visibleBlocks?.whatsappSection !== false);
 
   // Campos de personalización de portada (100% Modificable)
   const [campaignTitleText, setCampaignTitleText] = useState<string>(state.campaignTitle || '');
@@ -494,6 +502,35 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     showToast('✅ Noticia o alerta publicada exitosamente.');
   };
 
+  const handleAddWhatsApp = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newWhatsAppMsg.text) return;
+    const item = {
+      id: 'msg-' + Date.now(),
+      text: newWhatsAppMsg.text,
+      senderName: newWhatsAppMsg.senderName || 'Anónimo',
+      senderRole: newWhatsAppMsg.senderRole,
+      isOfficial: newWhatsAppMsg.isOfficial,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    handleUpdateStateWithLog(
+      { whatsappMessages: [...(state.whatsappMessages || []), item] },
+      `Publicó mensaje en el Chat en Vivo`
+    );
+    setNewWhatsAppMsg({ ...newWhatsAppMsg, text: '' });
+    showToast('✅ Mensaje de WhatsApp publicado.');
+  };
+
+  const handleDeleteWhatsApp = (id: string) => {
+    if (confirm('¿Desea borrar este mensaje del chat?')) {
+      handleUpdateStateWithLog(
+        { whatsappMessages: (state.whatsappMessages || []).filter(n => n.id !== id) },
+        `Eliminó mensaje del Chat en Vivo`
+      );
+      showToast('🗑️ Mensaje eliminado.');
+    }
+  };
+
   const handleStartEditNews = (n: any) => {
     setEditingNewsId(n.id);
     setEditNewsForm({ ...n });
@@ -585,7 +622,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         donationsList: showDonationsList,
         newsSection: showNewsSection,
         faqSection: showFaqSection,
-        suggestionsSection: showSuggestionsSection
+        suggestionsSection: showSuggestionsSection,
+        whatsappSection: showWhatsappSection
       }
     }, `Actualizó la configuración global, contraseña de donaciones y visibilidad de bloques de la web (Meta: ${targetTons}T)`);
     showToast('⚙️ Configuración y sincronización guardadas en el servidor.');
@@ -1011,6 +1049,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('whatsapp')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'whatsapp' 
+                ? 'bg-emerald-600 text-white shadow-xl' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <MessageCircle className="w-5 h-5 text-emerald-300" />
+            <span>💬 Chat al Vivo ({state.whatsappMessages?.length || 0})</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('faqs')}
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
               activeTab === 'faqs' 
@@ -1370,6 +1420,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <tr>
                         <th className="px-4 py-3">Donante</th>
                         <th className="px-4 py-3">Kilos</th>
+                        <th className="px-4 py-3">Descripción / Productos</th>
                         <th className="px-4 py-3">Centro</th>
                         <th className="px-4 py-3">Categoría</th>
                         <th className="px-4 py-3 w-10"></th>
@@ -1381,10 +1432,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           <td className="px-4 py-2">
                             <input 
                               type="text" 
-                              value={r.donor || ''} 
+                              value={r.donorName || ''} 
                               onChange={(e) => {
                                 const newResults = [...scannerResults];
-                                newResults[i].donor = e.target.value;
+                                newResults[i].donorName = e.target.value;
                                 setScannerResults(newResults);
                               }}
                               className="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 text-white text-sm"
@@ -1395,16 +1446,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             <div className="flex items-center gap-1">
                               <input 
                                 type="number" 
-                                value={r.kilos || ''} 
+                                value={r.pledgeKilos || ''} 
                                 onChange={(e) => {
                                   const newResults = [...scannerResults];
-                                  newResults[i].kilos = Number(e.target.value);
+                                  newResults[i].pledgeKilos = Number(e.target.value);
                                   setScannerResults(newResults);
                                 }}
                                 className="w-20 bg-slate-950 border border-slate-700 rounded-md px-2 py-1 text-amber-400 font-bold text-sm"
                               />
                               <span className="text-amber-400 font-bold text-xs">kg</span>
                             </div>
+                          </td>
+                          <td className="px-4 py-2">
+                            <input 
+                              type="text" 
+                              value={r.message || ''} 
+                              onChange={(e) => {
+                                const newResults = [...scannerResults];
+                                newResults[i].message = e.target.value;
+                                setScannerResults(newResults);
+                              }}
+                              className="w-full bg-slate-950 border border-slate-700 rounded-md px-2 py-1 text-white text-sm"
+                              placeholder="Ej. Atún, pañales..."
+                            />
                           </td>
                           <td className="px-4 py-2">
                             <input 
@@ -2082,6 +2146,113 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
         )}
 
+        {/* --- CONTENIDO PESTAÑA: WHATSAPP --- */}
+        {activeTab === 'whatsapp' && (
+          <div className="space-y-8">
+            <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl">
+              <h3 className="text-xl font-black uppercase text-emerald-400 mb-6 flex items-center gap-2">
+                <MessageCircle className="w-6 h-6" />
+                <span>Simulador de Chat en Vivo (Estilo WhatsApp)</span>
+              </h3>
+              
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-6">
+                <p className="text-sm text-slate-300">
+                  Añade mensajes para simular la coordinación logística en tiempo real. Estos mensajes aparecerán en la sección "Conversaciones al Vivo" de la página principal.
+                </p>
+              </div>
+
+              <form onSubmit={handleAddWhatsApp} className="space-y-4 max-w-4xl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-black uppercase text-slate-400 block mb-1">Nombre del Remitente</label>
+                    <input
+                      required
+                      type="text"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition outline-none"
+                      placeholder="Ej. Coordinador Carlos"
+                      value={newWhatsAppMsg.senderName}
+                      onChange={(e) => setNewWhatsAppMsg({ ...newWhatsAppMsg, senderName: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-black uppercase text-slate-400 block mb-1">Rol (Opcional)</label>
+                    <input
+                      type="text"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition outline-none"
+                      placeholder="Ej. Admin, Voluntario, Chofer"
+                      value={newWhatsAppMsg.senderRole}
+                      onChange={(e) => setNewWhatsAppMsg({ ...newWhatsAppMsg, senderRole: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-black uppercase text-slate-400 block mb-1">Mensaje</label>
+                  <textarea
+                    required
+                    rows={3}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition outline-none resize-none"
+                    placeholder="Escribe el mensaje..."
+                    value={newWhatsAppMsg.text}
+                    onChange={(e) => setNewWhatsAppMsg({ ...newWhatsAppMsg, text: e.target.value })}
+                  />
+                </div>
+                
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="checkbox"
+                    id="isOfficial"
+                    checked={newWhatsAppMsg.isOfficial}
+                    onChange={(e) => setNewWhatsAppMsg({ ...newWhatsAppMsg, isOfficial: e.target.checked })}
+                    className="w-4 h-4 bg-slate-950 border-slate-700 rounded text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <label htmlFor="isOfficial" className="text-sm font-medium text-slate-300">
+                    Mensaje Oficial (Se mostrará a la derecha, color verde)
+                  </label>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black uppercase tracking-wider text-sm transition shadow-lg shadow-emerald-600/20 cursor-pointer">
+                    Publicar Mensaje en Chat
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="text-lg font-bold text-white uppercase tracking-wider flex items-center justify-between">
+                <span>Historial de Mensajes ({state.whatsappMessages?.length || 0})</span>
+              </h4>
+              
+              {(!state.whatsappMessages || state.whatsappMessages.length === 0) ? (
+                <div className="bg-slate-900/50 rounded-3xl p-8 border border-slate-800 border-dashed text-center">
+                  <MessageCircle className="w-12 h-12 text-slate-700 mx-auto mb-3" />
+                  <p className="text-slate-500 font-medium">No hay mensajes en el chat actualmente.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {(state.whatsappMessages || []).slice().reverse().map(msg => (
+                    <div key={msg.id} className="bg-slate-900 p-4 rounded-xl border border-slate-800 flex items-start justify-between gap-4">
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm font-bold ${msg.isOfficial ? 'text-emerald-400' : 'text-blue-400'}`}>{msg.senderName}</span>
+                          {msg.senderRole && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 rounded-sm uppercase">{msg.senderRole}</span>}
+                          <span className="text-xs text-slate-500">{msg.timestamp}</span>
+                        </div>
+                        <p className="text-slate-300 text-sm mt-1 bg-slate-950/50 p-2 rounded-lg border border-slate-800">{msg.text}</p>
+                      </div>
+                      
+                      <button onClick={() => handleDeleteWhatsApp(msg.id)} className="p-2 bg-slate-800 hover:bg-red-600 rounded-lg text-slate-400 hover:text-white transition cursor-pointer shrink-0">
+                        <Trash2 className="w-4 h-4"/>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* --- CONTENIDO PESTAÑA 4: PREGUNTAS Y RESPUESTAS (FAQ) --- */}
         {activeTab === 'faqs' && (
           <div className="space-y-8">
@@ -2633,6 +2804,22 @@ ON CONFLICT (id) DO NOTHING;`}
                         Buzón de Sugerencias
                       </label>
                       <span className="text-[10px] text-slate-500">Canal de retroalimentación pública</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="blk_whatsapp"
+                      checked={showWhatsappSection}
+                      onChange={e => setShowWhatsappSection(e.target.checked)}
+                      className="w-5 h-5 accent-[#008CBA] rounded cursor-pointer shrink-0"
+                    />
+                    <div>
+                      <label htmlFor="blk_whatsapp" className="text-xs font-black uppercase text-slate-200 cursor-pointer block">
+                        Conversaciones al Vivo (WhatsApp)
+                      </label>
+                      <span className="text-[10px] text-slate-500">Feed público de coordinación y logística</span>
                     </div>
                   </div>
 

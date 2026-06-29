@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { GlobalState } from '../types';
 import { Scale, RefreshCw, HeartHandshake, PackageOpen } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { fireConfetti as confetti } from '../utils/confettiWrapper';
 
 function getYoutubeId(url: string): string {
   if (!url) return '';
