@@ -23,13 +23,13 @@ export const parseWhatsAppChat = (text: string): WhatsAppMessage[] => {
       }
       
       // Clean hidden characters (like LRM) and the ~ prefix WhatsApp adds to unknown contacts
-      const cleanSender = match[2].replace(/[\u200E\u200F\u202A-\u202E\u202C]/g, '').replace(/^~\s*/, '').trim();
+      let cleanSender = match[2].replace(/[\u200E\u200F\u202A-\u202E\u202C]/g, '').replace(/^~\s*/, '').trim();
       const cleanText = match[3].replace(/[\u200E\u200F\u202A-\u202E\u202C]/g, '').trim();
-      const rawTimestamp = match[1].trim();
-
-      // Attempt to extract only the time from the timestamp for cleaner UI
-      const timeMatch = rawTimestamp.match(/\d{1,2}:\d{2}(?::\d{2})?(?:[\s\u202F]*[a-zA-Z\.]{2,4})?/);
-      const timeString = timeMatch ? timeMatch[0].trim() : rawTimestamp;
+      
+      // If the sender is a phone number, replace it with a generic name
+      if (/^\+?[\d\s\-]+$/.test(cleanSender)) {
+        cleanSender = 'Voluntario';
+      }
 
       // Filter out common WhatsApp system messages
       const isSystemMessage = 
@@ -52,7 +52,7 @@ export const parseWhatsAppChat = (text: string): WhatsAppMessage[] => {
           id: 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
           senderName: cleanSender,
           text: cleanText,
-          timestamp: timeString,
+          timestamp: '', // Removing time/date as requested
           isOfficial: cleanSender.toLowerCase().includes('admin') || cleanSender.toLowerCase().includes('voluntario'),
         };
       } else {

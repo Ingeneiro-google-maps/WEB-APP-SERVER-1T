@@ -540,7 +540,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     
     let txt = '=== CHAT EN VIVO - EXPORTACIÓN ===\n\n';
     state.whatsappMessages.forEach(msg => {
-      txt += `${msg.senderName}: ${msg.text}\n\n`;
+      if (msg.timestamp) {
+        txt += `[${msg.timestamp}] ${msg.senderName}: ${msg.text}\n\n`;
+      } else {
+        txt += `${msg.senderName}: ${msg.text}\n\n`;
+      }
     });
     
     const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
