@@ -8,7 +8,7 @@ import { DonationList } from './components/DonationList';
 import { NewsSection } from './components/NewsSection';
 import { FAQSection } from './components/FAQSection';
 import { SuggestionsSection } from './components/SuggestionsSection';
-import { WhatsAppLiveFeed } from './components/WhatsAppLiveFeed';
+import { WhatsAppModal } from './components/WhatsAppModal';
 import { AdminPanel } from './components/AdminPanel';
 import { DonationModal } from './components/DonationModal';
 import { AiAssistantModal } from './components/AiAssistantModal';
@@ -21,6 +21,7 @@ export default function App() {
   const [isAdminView, setIsAdminView] = useState(false);
   const [isDonationOpen, setIsDonationOpen] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
   const [viewMode] = useState<'normal' | 'all-centers'>(() => {
@@ -218,6 +219,7 @@ export default function App() {
         state={state}
         onOpenAdmin={() => setIsAdminView(!isAdminView)}
         onOpenAi={() => setIsAiOpen(true)}
+        onOpenWhatsApp={() => setIsWhatsAppOpen(true)}
         isAdminView={isAdminView}
         lastSyncTime={state.lastSyncTime}
         onTriggerSync={() => handleTriggerSync(true)}
@@ -263,20 +265,6 @@ export default function App() {
               <FAQSection faqs={state.faqs} />
             )}
 
-            {state.visibleBlocks?.whatsappSection !== false && (
-              <div className="mb-16">
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl md:text-4xl font-black text-white uppercase tracking-wider">
-                    Conversaciones al Vivo
-                  </h2>
-                  <p className="text-blue-400 mt-2 font-medium tracking-wide">
-                    Sigue la coordinación de logística y voluntarios en tiempo real
-                  </p>
-                </div>
-                <WhatsAppLiveFeed messages={state.whatsappMessages || []} />
-              </div>
-            )}
-
             {state.visibleBlocks?.suggestionsSection !== false && (
               <SuggestionsSection suggestions={state.suggestions || []} />
             )}
@@ -301,6 +289,12 @@ export default function App() {
         isOpen={isAiOpen}
         onClose={() => setIsAiOpen(false)}
         campaignTitle={state.campaignTitle}
+      />
+
+      <WhatsAppModal
+        isOpen={isWhatsAppOpen}
+        onClose={() => setIsWhatsAppOpen(false)}
+        messages={state.whatsappMessages || []}
       />
 
       <IntroVideoModal

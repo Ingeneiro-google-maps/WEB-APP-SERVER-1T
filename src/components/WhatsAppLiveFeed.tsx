@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { WhatsAppMessage } from '../types';
-import { MessageCircle, CheckCheck, Users, ExternalLink } from 'lucide-react';
+import { MessageCircle, CheckCheck, Users, ExternalLink, RefreshCw } from 'lucide-react';
 
 interface WhatsAppLiveFeedProps {
   messages: WhatsAppMessage[];
@@ -8,12 +8,25 @@ interface WhatsAppLiveFeedProps {
 
 export const WhatsAppLiveFeed: React.FC<WhatsAppLiveFeedProps> = ({ messages }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isSearching]);
+
+  useEffect(() => {
+    // 3 minutos = 180000 milisegundos
+    const interval = setInterval(() => {
+      setIsSearching(true);
+      setTimeout(() => {
+        setIsSearching(false);
+      }, 3000); // 3 segundos de "búsqueda"
+    }, 180000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const defaultMessages: WhatsAppMessage[] = [
     {
@@ -27,10 +40,10 @@ export const WhatsAppLiveFeed: React.FC<WhatsAppLiveFeedProps> = ({ messages }) 
   const displayMessages = messages && messages.length > 0 ? messages : defaultMessages;
 
   return (
-    <section id="whatsapp" className="scroll-mt-32 mb-16 relative">
+    <div className="relative h-full">
       <div className="absolute inset-0 bg-gradient-to-b from-[#25D366]/5 to-transparent -z-10 rounded-3xl" />
       
-      <div className="bg-slate-900 border border-[#25D366]/20 rounded-[2rem] overflow-hidden shadow-2xl flex flex-col h-[600px] max-w-4xl mx-auto relative backdrop-blur-sm">
+      <div className="bg-slate-900 border border-[#25D366]/20 rounded-[2rem] overflow-hidden shadow-2xl flex flex-col h-[600px] sm:h-[70vh] md:h-[80vh] max-w-4xl mx-auto relative backdrop-blur-sm">
         
         {/* Header (Elegant Glassmorphism) */}
         <div className="bg-slate-900/80 backdrop-blur-md border-b border-white/10 p-5 flex items-center justify-between shrink-0 sticky top-0 z-10">
@@ -42,7 +55,12 @@ export const WhatsAppLiveFeed: React.FC<WhatsAppLiveFeedProps> = ({ messages }) 
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-slate-900 animate-pulse" />
             </div>
             <div>
-              <h2 className="font-black text-xl text-white tracking-tight">Coordinación en Vivo</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-black text-xl text-white tracking-tight">Coordinación en Vivo</h2>
+                <span className="hidden sm:inline-flex bg-slate-800 text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-slate-700">
+                  Solo Lectura
+                </span>
+              </div>
               <p className="text-emerald-400 text-sm font-medium flex items-center gap-1.5 mt-0.5">
                 <Users className="w-3.5 h-3.5" />
                 Grupo Oficial de Voluntarios
@@ -127,6 +145,15 @@ export const WhatsAppLiveFeed: React.FC<WhatsAppLiveFeedProps> = ({ messages }) 
               </div>
             );
           })}
+
+          {isSearching && (
+            <div className="flex justify-center my-4 animate-fade-in-up">
+              <span className="flex items-center gap-2 bg-slate-800/90 backdrop-blur-sm text-emerald-400 text-xs font-bold px-4 py-2 rounded-full border border-slate-700/50 shadow-sm uppercase tracking-widest">
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                Buscando nuevas conversaciones...
+              </span>
+            </div>
+          )}
         </div>
         
         {/* Footer (Elegant Join Banner for Mobile) */}
@@ -142,6 +169,6 @@ export const WhatsAppLiveFeed: React.FC<WhatsAppLiveFeedProps> = ({ messages }) 
           </a>
         </div>
       </div>
-    </section>
+    </div>
   );
 };

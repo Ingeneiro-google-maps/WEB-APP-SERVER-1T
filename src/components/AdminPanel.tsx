@@ -7,7 +7,7 @@ import {
   Lock, Download, Upload, Building2, Newspaper, HelpCircle, Lightbulb,  
   Search, X, ExternalLink, Package, MapPin, Phone, Clock,
   Users, History, User, UserPlus, ShieldCheck, Calendar, Terminal, Activity,
-  Scale, Video, Play, Check, Sparkles, Scan
+  Scale, Video, Play, Check, Sparkles, Scan, MessageCircle
 } from 'lucide-react';
 
 function getYoutubeId(url: string): string {
@@ -2167,9 +2167,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   <input 
                     type="checkbox" 
                     className="sr-only peer"
-                    checked={state.visibleBlocks?.whatsappSection !== false}
+                    checked={showWhatsappSection}
                     onChange={(e) => {
                       const isVisible = e.target.checked;
+                      setShowWhatsappSection(isVisible);
                       handleUpdateStateWithLog({
                         visibleBlocks: {
                           ...(state.visibleBlocks || {}),
