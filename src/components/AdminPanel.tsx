@@ -2152,15 +2152,37 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl">
               <h3 className="text-xl font-black uppercase text-emerald-400 mb-6 flex items-center gap-2">
                 <MessageCircle className="w-6 h-6" />
-                <span>Simulador de Chat en Vivo (Estilo WhatsApp)</span>
+                <span>Gestión de Chat en Vivo (Estilo WhatsApp)</span>
               </h3>
               
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-6">
-                <p className="text-sm text-slate-300">
-                  Añade mensajes para simular la coordinación logística en tiempo real. Estos mensajes aparecerán en la sección "Conversaciones al Vivo" de la página principal.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-800/50 p-5 rounded-xl border border-slate-700 mb-8">
+                <div>
+                  <p className="text-base text-emerald-400 font-bold mb-1">Visibilidad en la Web Pública</p>
+                  <p className="text-sm text-slate-400">
+                    Activa o desactiva la sección de "Conversaciones al Vivo" en la página principal. 
+                    Esta sección es un visor de solo lectura para los visitantes.
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer"
+                    checked={state.visibleBlocks?.whatsappSection !== false}
+                    onChange={(e) => {
+                      const isVisible = e.target.checked;
+                      handleUpdateStateWithLog({
+                        visibleBlocks: {
+                          ...(state.visibleBlocks || {}),
+                          whatsappSection: isVisible
+                        }
+                      }, `Cambió la visibilidad del Chat de WhatsApp a ${isVisible ? 'Visible' : 'Oculto'}`);
+                    }}
+                  />
+                  <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500 shadow-inner"></div>
+                </label>
               </div>
 
+              <h4 className="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Añadir Nuevo Mensaje de Simulación</h4>
               <form onSubmit={handleAddWhatsApp} className="space-y-4 max-w-4xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
