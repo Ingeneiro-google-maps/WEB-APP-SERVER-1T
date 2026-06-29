@@ -15,6 +15,7 @@ import { AiAssistantModal } from './components/AiAssistantModal';
 import { Footer } from './components/Footer';
 import { IntroVideoModal } from './components/IntroVideoModal';
 import { MaintenanceScreen } from './components/MaintenanceScreen';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 export default function App() {
   const [state, setState] = useState<GlobalState>(INITIAL_STATE);
@@ -228,13 +229,15 @@ export default function App() {
 
       <main className="flex-1">
         {isAdminView ? (
-          <AdminPanel
-            state={state}
-            onUpdateState={handleUpdateState}
-            onTriggerSync={() => handleTriggerSync(true)}
-            syncing={syncing}
-            onExitAdmin={() => setIsAdminView(false)}
-          />
+          <ErrorBoundary>
+            <AdminPanel
+              state={state}
+              onUpdateState={handleUpdateState}
+              onTriggerSync={() => handleTriggerSync(true)}
+              syncing={syncing}
+              onExitAdmin={() => setIsAdminView(false)}
+            />
+          </ErrorBoundary>
         ) : (
           <div>
             <HeroCounter

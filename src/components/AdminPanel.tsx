@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { fireConfetti as confetti } from '../utils/confettiWrapper';
+import { parseWhatsAppChat } from '../utils/whatsappParser';
 import { GlobalState, SupplyItem, CollectionCenter, FAQItem, AdminUser, UserChangeLog } from '../types';
 import { 
   Settings, RefreshCw, Plus, Trash2, Edit3, Save, Database, 
@@ -500,6 +501,58 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     );
     setNewNews({ title: '', content: '', severity: 'red', author: 'Coordinación Central ONG España' });
     showToast('✅ Noticia o alerta publicada exitosamente.');
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportTxt = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (text) {
+        const parsedMessages = parseWhatsAppChat(text);
+        if (parsedMessages.length > 0) {
+          handleUpdateStateWithLog(
+            { whatsappMessages: [...(state.whatsappMessages || []), ...parsedMessages] },
+            `Importó ${parsedMessages.length} mensajes al Chat en Vivo desde TXT`
+          );
+          showToast(`✅ ${parsedMessages.length} mensajes importados exitosamente.`);
+        } else {
+          showToast('⚠️ No se encontraron mensajes válidos en el archivo TXT.');
+        }
+      }
+    };
+    reader.readAsText(file);
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleExportTxt = () => {
+    if (!state.whatsappMessages || state.whatsappMessages.length === 0) {
+      showToast('⚠️ No hay mensajes para exportar.');
+      return;
+    }
+    
+    let txt = '';
+    state.whatsappMessages.forEach(msg => {
+      txt += `[${new Date().toLocaleDateString()}, ${msg.timestamp}] ${msg.senderName}: ${msg.text.replace(/\n/g, ' ')}\n`;
+    });
+    
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `chat_en_vivo_export_${new Date().getTime()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast('✅ Conversación exportada a TXT.');
   };
 
   const handleAddWhatsApp = (e: React.FormEvent) => {
@@ -2245,6 +2298,42 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <div className="space-y-4">
               <h4 className="text-lg font-bold text-white uppercase tracking-wider flex items-center justify-between">
                 <span>Historial de Mensajes ({state.whatsappMessages?.length || 0})</span>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="file" 
+                    accept=".txt" 
+                    className="hidden" 
+                    ref={fileInputRef} 
+                    onChange={handleImportTxt}
+                  />
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg transition"
+                    title="Importar chat exportado desde WhatsApp (.txt)"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Importar TXT</span>
+                  </button>
+                  <button 
+                    onClick={handleExportTxt}
+                    className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg transition"
+                    title="Exportar mensajes actuales a un archivo .txt"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Exportar TXT</span>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (confirm('¿Eliminar TODO el historial del chat?')) {
+                        handleUpdateStateWithLog({ whatsappMessages: [] }, 'Vació el historial del Chat de WhatsApp');
+                      }
+                    }}
+                    className="flex items-center gap-2 bg-red-900/30 hover:bg-red-900/50 text-red-400 text-xs px-3 py-1.5 rounded-lg transition"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Vaciar</span>
+                  </button>
+                </div>
               </h4>
               
               {(!state.whatsappMessages || state.whatsappMessages.length === 0) ? (
