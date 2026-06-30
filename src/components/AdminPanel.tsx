@@ -8,7 +8,7 @@ import {
   Lock, Download, Upload, Building2, Newspaper, HelpCircle, Lightbulb,  
   Search, X, ExternalLink, Package, MapPin, Phone, Clock,
   Users, History, User, UserPlus, ShieldCheck, Calendar, Terminal, Activity,
-  Scale, Video, Play, Check, Sparkles, Scan, MessageCircle
+  Scale, Video, Play, Check, Sparkles, Scan, MessageCircle, Heart
 } from 'lucide-react';
 
 function getYoutubeId(url: string): string {
@@ -44,7 +44,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'voluntarios' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -317,6 +317,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [showFaqSection, setShowFaqSection] = useState<boolean>(state.visibleBlocks?.faqSection !== false);
   const [showSuggestionsSection, setShowSuggestionsSection] = useState<boolean>(state.visibleBlocks?.suggestionsSection !== false);
   const [showWhatsappSection, setShowWhatsappSection] = useState<boolean>(state.visibleBlocks?.whatsappSection !== false);
+  const [showVolunteersSection, setShowVolunteersSection] = useState<boolean>(state.visibleBlocks?.volunteersSection !== false);
+
+  // Estados de edición para Voluntarios
+  const [editingVolunteerId, setEditingVolunteerId] = useState<string | null>(null);
+  const [editVolunteerForm, setEditVolunteerForm] = useState<any>({ name: '', role: '', photoUrl: '' });
+  const [newVolunteer, setNewVolunteer] = useState({ name: '', role: '', photoUrl: '' });
 
   // Campos de personalización de portada (100% Modificable)
   const [campaignTitleText, setCampaignTitleText] = useState<string>(state.campaignTitle || '');
@@ -584,6 +590,53 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
+  const handleAddVolunteer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newVolunteer.name) return;
+    const item = {
+      id: 'vol-' + Date.now(),
+      name: newVolunteer.name.trim(),
+      role: newVolunteer.role.trim() || 'Voluntario Activo',
+      photoUrl: newVolunteer.photoUrl.trim() || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+      createdAt: new Date().toISOString()
+    };
+    handleUpdateStateWithLog(
+      { volunteers: [...(state.volunteers || []), item] },
+      `Agregó un nuevo héroe voluntario: "${item.name}" con el rol "${item.role}"`
+    );
+    setNewVolunteer({ name: '', role: '', photoUrl: '' });
+    showToast('❤️ ¡Voluntario registrado y añadido al mural!');
+  };
+
+  const handleDeleteVolunteer = (id: string) => {
+    const vol = (state.volunteers || []).find(v => v.id === id);
+    const volName = vol ? vol.name : 'Desconocido';
+    if (confirm(`¿Está seguro de que desea eliminar a ${volName} del mural de voluntarios?`)) {
+      handleUpdateStateWithLog(
+        { volunteers: (state.volunteers || []).filter(v => v.id !== id) },
+        `Eliminó al voluntario "${volName}" del mural`
+      );
+      showToast('🗑️ Voluntario eliminado del mural.');
+    }
+  };
+
+  const handleStartEditVolunteer = (v: any) => {
+    setEditingVolunteerId(v.id);
+    setEditVolunteerForm({ ...v });
+  };
+
+  const handleSaveEditVolunteer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingVolunteerId || !editVolunteerForm.name) return;
+    const updated = (state.volunteers || []).map(v => v.id === editingVolunteerId ? { ...v, ...editVolunteerForm } : v);
+    handleUpdateStateWithLog(
+      { volunteers: updated },
+      `Modificó datos del voluntario: "${editVolunteerForm.name}"`
+    );
+    setEditingVolunteerId(null);
+    showToast('✅ Cambios guardados con éxito.');
+  };
+
   const handleStartEditNews = (n: any) => {
     setEditingNewsId(n.id);
     setEditNewsForm({ ...n });
@@ -676,7 +729,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         newsSection: showNewsSection,
         faqSection: showFaqSection,
         suggestionsSection: showSuggestionsSection,
-        whatsappSection: showWhatsappSection
+        whatsappSection: showWhatsappSection,
+        volunteersSection: showVolunteersSection
       }
     }, `Actualizó la configuración global, contraseña de donaciones y visibilidad de bloques de la web (Meta: ${targetTons}T)`);
     showToast('⚙️ Configuración y sincronización guardadas en el servidor.');
@@ -1102,15 +1156,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </button>
 
           <button
-            onClick={() => setActiveTab('whatsapp')}
+            onClick={() => setActiveTab('voluntarios')}
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
-              activeTab === 'whatsapp' 
-                ? 'bg-emerald-600 text-white shadow-xl' 
+              activeTab === 'voluntarios' 
+                ? 'bg-rose-600 text-white shadow-xl' 
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
-            <MessageCircle className="w-5 h-5 text-emerald-300" />
-            <span>💬 Chat al Vivo ({state.whatsappMessages?.length || 0})</span>
+            <Users className="w-5 h-5 text-rose-300" />
+            <span>❤️ Gestionar Voluntarios ({state.volunteers?.length || 0})</span>
           </button>
 
           <button
@@ -2199,164 +2253,193 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
         )}
 
-        {/* --- CONTENIDO PESTAÑA: WHATSAPP --- */}
-        {activeTab === 'whatsapp' && (
-          <div className="space-y-8">
+        {/* --- CONTENIDO PESTAÑA: VOLUNTARIOS --- */}
+        {activeTab === 'voluntarios' && (
+          <div className="space-y-8 animate-fade-in-up">
             <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl">
-              <h3 className="text-xl font-black uppercase text-emerald-400 mb-6 flex items-center gap-2">
-                <MessageCircle className="w-6 h-6" />
-                <span>Gestión de Chat en Vivo (Estilo WhatsApp)</span>
+              <h3 className="text-xl font-black uppercase text-rose-400 mb-6 flex items-center gap-2">
+                <Users className="w-6 h-6 text-rose-500" />
+                <span>Gestión de Mural de Voluntarios (Héroes Solidarios)</span>
               </h3>
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-800/50 p-5 rounded-xl border border-slate-700 mb-8">
                 <div>
-                  <p className="text-base text-emerald-400 font-bold mb-1">Visibilidad en la Web Pública</p>
+                  <p className="text-base text-rose-400 font-bold mb-1">Mural de Voluntarios en la Web Pública</p>
                   <p className="text-sm text-slate-400">
-                    Activa o desactiva la sección de "Conversaciones al Vivo" en la página principal. 
-                    Esta sección es un visor de solo lectura para los visitantes.
+                    Activa o desactiva la galería de fotos y nombres de los voluntarios en la página principal. 
+                    Muestra el agradecimiento público a todos los que apoyan.
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input 
                     type="checkbox" 
                     className="sr-only peer"
-                    checked={showWhatsappSection}
+                    checked={showVolunteersSection}
                     onChange={(e) => {
                       const isVisible = e.target.checked;
-                      setShowWhatsappSection(isVisible);
+                      setShowVolunteersSection(isVisible);
                       handleUpdateStateWithLog({
                         visibleBlocks: {
                           ...(state.visibleBlocks || {}),
-                          whatsappSection: isVisible
+                          volunteersSection: isVisible
                         }
-                      }, `Cambió la visibilidad del Chat de WhatsApp a ${isVisible ? 'Visible' : 'Oculto'}`);
+                      }, `Cambió la visibilidad del Mural de Voluntarios a ${isVisible ? 'Visible' : 'Oculto'}`);
                     }}
                   />
-                  <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500 shadow-inner"></div>
+                  <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-rose-500 shadow-inner"></div>
                 </label>
               </div>
 
-              <h4 className="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Añadir Nuevo Mensaje de Simulación</h4>
-              <form onSubmit={handleAddWhatsApp} className="space-y-4 max-w-4xl">
+              <h4 className="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+                <span>Registrar Nuevo Voluntario en el Mural</span>
+              </h4>
+              
+              <form onSubmit={handleAddVolunteer} className="space-y-4 max-w-4xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-black uppercase text-slate-400 block mb-1">Nombre del Remitente</label>
+                    <label className="text-xs font-black uppercase text-slate-400 block mb-1">Nombre Completo</label>
                     <input
                       required
                       type="text"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition outline-none"
-                      placeholder="Ej. Coordinador Carlos"
-                      value={newWhatsAppMsg.senderName}
-                      onChange={(e) => setNewWhatsAppMsg({ ...newWhatsAppMsg, senderName: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition outline-none"
+                      placeholder="Ej. Christian Venegalle"
+                      value={newVolunteer.name}
+                      onChange={(e) => setNewVolunteer({ ...newVolunteer, name: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-black uppercase text-slate-400 block mb-1">Rol (Opcional)</label>
+                    <label className="text-xs font-black uppercase text-slate-400 block mb-1">Función, Rol o Comentario</label>
                     <input
                       type="text"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition outline-none"
-                      placeholder="Ej. Admin, Voluntario, Chofer"
-                      value={newWhatsAppMsg.senderRole}
-                      onChange={(e) => setNewWhatsAppMsg({ ...newWhatsAppMsg, senderRole: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition outline-none"
+                      placeholder="Ej. Coordinador de Cajas, Apoyo Logístico, Transporte"
+                      value={newVolunteer.role}
+                      onChange={(e) => setNewVolunteer({ ...newVolunteer, role: e.target.value })}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-black uppercase text-slate-400 block mb-1">Mensaje</label>
-                  <textarea
-                    required
-                    rows={3}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition outline-none resize-none"
-                    placeholder="Escribe el mensaje..."
-                    value={newWhatsAppMsg.text}
-                    onChange={(e) => setNewWhatsAppMsg({ ...newWhatsAppMsg, text: e.target.value })}
-                  />
-                </div>
-                
-                <div className="flex items-center gap-2 mt-2">
+                  <label className="text-xs font-black uppercase text-slate-400 block mb-1">Enlace de Dropbox (Foto del Voluntario)</label>
                   <input
-                    type="checkbox"
-                    id="isOfficial"
-                    checked={newWhatsAppMsg.isOfficial}
-                    onChange={(e) => setNewWhatsAppMsg({ ...newWhatsAppMsg, isOfficial: e.target.checked })}
-                    className="w-4 h-4 bg-slate-950 border-slate-700 rounded text-emerald-600 focus:ring-emerald-500"
+                    required
+                    type="url"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition outline-none"
+                    placeholder="https://www.dropbox.com/scl/fi/..."
+                    value={newVolunteer.photoUrl}
+                    onChange={(e) => setNewVolunteer({ ...newVolunteer, photoUrl: e.target.value })}
                   />
-                  <label htmlFor="isOfficial" className="text-sm font-medium text-slate-300">
-                    Mensaje Oficial (Se mostrará a la derecha, color verde)
-                  </label>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    💡 <b>Ahorro de espacio:</b> Se admite cualquier enlace de Dropbox. El sistema lo convertirá automáticamente en enlace directo de imagen al instante para renderizarlo.
+                  </p>
                 </div>
 
-                <div className="flex justify-end pt-4">
-                  <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black uppercase tracking-wider text-sm transition shadow-lg shadow-emerald-600/20 cursor-pointer">
-                    Publicar Mensaje en Chat
+                <div className="flex justify-end pt-2">
+                  <button type="submit" className="bg-rose-600 hover:bg-rose-500 text-white px-8 py-3.5 rounded-xl font-black uppercase tracking-wider text-sm transition shadow-lg shadow-rose-600/20 cursor-pointer">
+                    Añadir Voluntario
                   </button>
                 </div>
               </form>
             </div>
 
             <div className="space-y-4">
-              <h4 className="text-lg font-bold text-white uppercase tracking-wider flex items-center justify-between">
-                <span>Historial de Mensajes ({state.whatsappMessages?.length || 0})</span>
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="file" 
-                    accept=".txt" 
-                    className="hidden" 
-                    ref={fileInputRef} 
-                    onChange={handleImportTxt}
-                  />
-                  <button 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg transition"
-                    title="Importar chat exportado desde WhatsApp (.txt)"
-                  >
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>Importar TXT</span>
-                  </button>
-                  <button 
-                    onClick={handleExportTxt}
-                    className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg transition"
-                    title="Exportar mensajes actuales a un archivo .txt"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Exportar TXT</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (confirm('¿Eliminar TODO el historial del chat?')) {
-                        handleUpdateStateWithLog({ whatsappMessages: [] }, 'Vació el historial del Chat de WhatsApp');
-                      }
-                    }}
-                    className="flex items-center gap-2 bg-red-900/30 hover:bg-red-900/50 text-red-400 text-xs px-3 py-1.5 rounded-lg transition"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Vaciar</span>
-                  </button>
-                </div>
+              <h4 className="text-lg font-bold text-white uppercase tracking-wider flex items-center justify-between border-b border-slate-800 pb-2">
+                <span>Héroes Registrados ({state.volunteers?.length || 0})</span>
               </h4>
               
-              {(!state.whatsappMessages || state.whatsappMessages.length === 0) ? (
+              {(!state.volunteers || state.volunteers.length === 0) ? (
                 <div className="bg-slate-900/50 rounded-3xl p-8 border border-slate-800 border-dashed text-center">
-                  <MessageCircle className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-500 font-medium">No hay mensajes en el chat actualmente.</p>
+                  <Users className="w-12 h-12 text-slate-700 mx-auto mb-3" />
+                  <p className="text-slate-500 font-medium">No hay voluntarios registrados en el mural actualmente.</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {(state.whatsappMessages || []).slice().reverse().map(msg => (
-                    <div key={msg.id} className="bg-slate-900 p-4 rounded-xl border border-slate-800 flex items-start justify-between gap-4">
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-sm font-bold ${msg.isOfficial ? 'text-emerald-400' : 'text-blue-400'}`}>{msg.senderName}</span>
-                          {msg.senderRole && <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 rounded-sm uppercase">{msg.senderRole}</span>}
-                          <span className="text-xs text-slate-500">{msg.timestamp}</span>
-                        </div>
-                        <p className="text-slate-300 text-sm mt-1 bg-slate-950/50 p-2 rounded-lg border border-slate-800">{msg.text}</p>
-                      </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(state.volunteers || []).map(vol => (
+                    <div key={vol.id} className="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-start gap-4 shadow-md">
                       
-                      <button onClick={() => handleDeleteWhatsApp(msg.id)} className="p-2 bg-slate-800 hover:bg-red-600 rounded-lg text-slate-400 hover:text-white transition cursor-pointer shrink-0">
-                        <Trash2 className="w-4 h-4"/>
-                      </button>
+                      {/* Photo preview */}
+                      <div className="w-16 h-16 rounded-xl bg-slate-950 overflow-hidden border border-slate-800 shrink-0">
+                        <img 
+                          src={vol.photoUrl ? (vol.photoUrl.trim().includes('dropbox.com') ? vol.photoUrl.replace(/dl=0/g, 'raw=1').replace(/dl=1/g, 'raw=1').replace('www.dropbox.com', 'dl.dropboxusercontent.com') : vol.photoUrl) : ''} 
+                          alt={vol.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
+                          }}
+                        />
+                      </div>
+
+                      {/* Info & Actions */}
+                      <div className="flex-1 min-w-0">
+                        {editingVolunteerId === vol.id ? (
+                          <form onSubmit={handleSaveEditVolunteer} className="space-y-3">
+                            <div>
+                              <label className="text-[10px] font-black uppercase text-slate-500 block">Nombre</label>
+                              <input 
+                                required
+                                type="text"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                                value={editVolunteerForm.name}
+                                onChange={(e) => setEditVolunteerForm({ ...editVolunteerForm, name: e.target.value })}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-black uppercase text-slate-500 block">Función / Rol</label>
+                              <input 
+                                type="text"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                                value={editVolunteerForm.role}
+                                onChange={(e) => setEditVolunteerForm({ ...editVolunteerForm, role: e.target.value })}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-black uppercase text-slate-500 block">Enlace de Foto (Dropbox)</label>
+                              <input 
+                                required
+                                type="url"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                                value={editVolunteerForm.photoUrl}
+                                onChange={(e) => setEditVolunteerForm({ ...editVolunteerForm, photoUrl: e.target.value })}
+                              />
+                            </div>
+                            <div className="flex items-center gap-2 pt-1">
+                              <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1">
+                                <Save className="w-3 h-3" />
+                                <span>Guardar</span>
+                              </button>
+                              <button type="button" onClick={() => setEditingVolunteerId(null)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg">
+                                Cancelar
+                              </button>
+                            </div>
+                          </form>
+                        ) : (
+                          <div className="h-full flex flex-col justify-between">
+                            <div>
+                              <h5 className="font-extrabold text-white text-base truncate">{vol.name}</h5>
+                              <p className="text-xs text-rose-400 font-bold uppercase tracking-wider mt-0.5">{vol.role || 'Voluntario Activo'}</p>
+                              <p className="text-[10px] text-slate-500 truncate mt-1 select-all" title={vol.photoUrl}>{vol.photoUrl}</p>
+                            </div>
+                            <div className="flex items-center gap-2 mt-3.5 border-t border-slate-800/60 pt-2">
+                              <button 
+                                onClick={() => handleStartEditVolunteer(vol)}
+                                className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg transition"
+                              >
+                                <Edit3 className="w-3 h-3" />
+                                <span>Editar</span>
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteVolunteer(vol.id)}
+                                className="flex items-center gap-1.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 text-xs px-2.5 py-1.5 rounded-lg transition"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                <span>Eliminar</span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                     </div>
                   ))}
                 </div>
@@ -2383,7 +2466,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       required
                       placeholder="ej. Donaciones, Logística..."
                       value={newFaq.category}
-                      onChange={e => setNewFaq({ ...newFaq, category: e.target.value })}
+                      onChange={e => setNewFaq({ ...newFaq, category: e.target.value as any })}
                       className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white"
                     />
                   </div>
@@ -2428,7 +2511,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   {editingFaqId === faq.id ? (
                     <div className="space-y-3">
                       <span className="text-purple-400 font-bold text-xs">✏️ Modificando FAQ:</span>
-                      <input type="text" value={editFaqForm.category || ''} onChange={e => setEditFaqForm({ ...editFaqForm, category: e.target.value })} className="w-full p-2 bg-slate-950 border border-slate-700 rounded text-xs text-white"/>
+                      <input type="text" value={editFaqForm.category || ''} onChange={e => setEditFaqForm({ ...editFaqForm, category: e.target.value as any })} className="w-full p-2 bg-slate-950 border border-slate-700 rounded text-xs text-white"/>
                       <input type="text" value={editFaqForm.question || ''} onChange={e => setEditFaqForm({ ...editFaqForm, question: e.target.value })} className="w-full p-2 bg-slate-950 border border-slate-700 rounded text-sm text-white font-bold"/>
                       <textarea rows={3} value={editFaqForm.answer || ''} onChange={e => setEditFaqForm({ ...editFaqForm, answer: e.target.value })} className="w-full p-2 bg-slate-950 border border-slate-700 rounded text-sm text-white"></textarea>
                       <button onClick={handleSaveEditFaq} className="w-full py-2 bg-emerald-600 text-white font-bold rounded-lg text-xs cursor-pointer">💾 Guardar FAQ</button>

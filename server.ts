@@ -96,6 +96,7 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
   merged.syncLogs = db.syncLogs || [];
   merged.webAccessLogs = db.webAccessLogs || [];
   merged.userChangeLogs = db.userChangeLogs || [];
+  merged.volunteers = (db.volunteers && db.volunteers.length > 0) ? db.volunteers : (local.volunteers || []);
 
   // 2. Supplies (Insumos):
   // Combinamos los metadatos de código local (nombres, unidades, objetivos) con el progreso actual de Supabase
@@ -203,7 +204,8 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
   if (db.visibleBlocks) {
     merged.visibleBlocks = {
       ...(local.visibleBlocks || {}),
-      ...(db.visibleBlocks || {})
+      ...(db.visibleBlocks || {}),
+      whatsappSection: false
     };
   }
 

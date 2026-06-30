@@ -6,7 +6,7 @@ interface HeaderProps {
   state: GlobalState;
   onOpenAdmin: () => void;
   onOpenAi: () => void;
-  onOpenWhatsApp: () => void;
+  onOpenVolunteers: () => void;
   isAdminView: boolean;
   lastSyncTime: string;
   onTriggerSync: () => void;
@@ -17,7 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   state,
   onOpenAdmin,
   onOpenAi,
-  onOpenWhatsApp,
+  onOpenVolunteers,
   isAdminView,
   lastSyncTime,
   onTriggerSync,
@@ -79,10 +79,10 @@ export const Header: React.FC<HeaderProps> = ({
             {state.visibleBlocks?.faqSection !== false && (
               <a href="#faq" className="hover:text-[#008CBA] transition">FAQ</a>
             )}
-            {state.visibleBlocks?.whatsappSection !== false && (
-              <button onClick={onOpenWhatsApp} className="hover:text-[#25D366] transition flex items-center gap-1 font-bold">
-                <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse"></span>
-                Chat al Vivo
+            {state.visibleBlocks?.volunteersSection !== false && (
+              <button onClick={onOpenVolunteers} className="hover:text-rose-500 transition flex items-center gap-1 font-bold text-rose-600">
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                Voluntarios
               </button>
             )}
             {state.visibleBlocks?.suggestionsSection !== false && (
@@ -206,18 +206,18 @@ export const Header: React.FC<HeaderProps> = ({
                         </a>
                       )}
                       
-                      {state.visibleBlocks?.whatsappSection !== false && (
+                      {state.visibleBlocks?.volunteersSection !== false && (
                         <button 
                           onClick={() => {
                             setIsMenuOpen(false);
-                            onOpenWhatsApp();
+                            onOpenVolunteers();
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 hover:text-[#25D366] text-xs font-bold transition-all w-full text-left"
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 hover:text-rose-500 text-xs font-bold transition-all w-full text-left"
                         >
-                          <span className="text-base bg-emerald-50 text-[#25D366] p-1.5 rounded-xl shrink-0 shadow-sm animate-pulse">💬</span>
+                          <span className="text-base bg-rose-50 text-rose-500 p-1.5 rounded-xl shrink-0 shadow-sm animate-pulse">❤️</span>
                           <div className="flex flex-col min-w-0">
-                            <span className="truncate text-[#25D366]">Chat al Vivo</span>
-                            <span className="text-[9px] text-slate-400 font-normal truncate">Coordinación de envíos en tiempo real</span>
+                            <span className="truncate text-rose-500">Voluntarios</span>
+                            <span className="text-[9px] text-slate-400 font-normal truncate">Mural de héroes de la campaña</span>
                           </div>
                         </button>
                       )}

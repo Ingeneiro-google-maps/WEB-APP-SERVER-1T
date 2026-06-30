@@ -75,6 +75,14 @@ export interface WhatsAppMessage {
   isOfficial?: boolean;
 }
 
+export interface Volunteer {
+  id: string;
+  name: string;
+  role?: string;
+  photoUrl: string;
+  createdAt?: string;
+}
+
 export interface GlobalState {
   codeVersion?: string;
   autoUpdateActive?: boolean;
@@ -100,6 +108,7 @@ export interface GlobalState {
   news: NewsItem[];
   suggestions: SuggestionItem[];
   whatsappMessages?: WhatsAppMessage[];
+  volunteers?: Volunteer[];
   hasNewDonationAlert?: boolean;
   supabaseActive?: boolean;
   supabaseTableMissing?: boolean;
@@ -114,6 +123,7 @@ export interface GlobalState {
     faqSection?: boolean;
     suggestionsSection?: boolean;
     whatsappSection?: boolean;
+    volunteersSection?: boolean;
   };
   donationPassword?: string;
   webAccessLogs?: WebAccessLog[];

@@ -1,7 +1,7 @@
 import { GlobalState } from '../types';
 
 export const INITIAL_STATE: GlobalState = {
-  "codeVersion": "1.7",
+  "codeVersion": "1.8",
   "autoUpdateActive": true,
   "campaignTitle": "Por 1T — Ayuda Humanitaria Emergencia Venezuela",
   "emergencySubtitle": "Respuesta Operativa de Emergencia por el Terremoto . Cada kilo suma para salvar vidas.",
@@ -1053,6 +1053,32 @@ export const INITIAL_STATE: GlobalState = {
       "timestamp": "10:25 AM"
     }
   ],
+  "volunteers": [
+    {
+      "id": "vol-1",
+      "name": "Christian Venegalle",
+      "role": "Coordinador General",
+      "photoUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+    },
+    {
+      "id": "vol-2",
+      "name": "Jesy Liriostudio",
+      "role": "Coordinación Logística",
+      "photoUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80"
+    },
+    {
+      "id": "vol-3",
+      "name": "Jose Magan",
+      "role": "Logística y Almacén",
+      "photoUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
+    },
+    {
+      "id": "vol-4",
+      "name": "Kelly Morales",
+      "role": "Apoyo Logístico Santiago",
+      "photoUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80"
+    }
+  ],
   "visibleBlocks": {
     "suppliesGrid": true,
     "centersGrid": true,
@@ -1060,7 +1086,8 @@ export const INITIAL_STATE: GlobalState = {
     "newsSection": true,
     "faqSection": true,
     "suggestionsSection": true,
-    "whatsappSection": true
+    "whatsappSection": false,
+    "volunteersSection": true
   },
   "donationPassword": "VENEZUELAVIVE2026",
   "headerVideoEnabled": true,
@@ -1072,6 +1099,30 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_p3lpjlgkw",
+      "timestamp": "2026-06-30T13:47:17.753Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 0x0] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_degjq52x1",
+      "timestamp": "2026-06-30T13:37:50.489Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1638x907] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_n803l0obq",
+      "timestamp": "2026-06-30T13:35:18.573Z",
+      "ip": "84.77.212.187",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1638x907] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_z49h52mc8",
       "timestamp": "2026-06-29T15:08:57.056Z",

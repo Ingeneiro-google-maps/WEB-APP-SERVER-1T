@@ -8,7 +8,7 @@ import { DonationList } from './components/DonationList';
 import { NewsSection } from './components/NewsSection';
 import { FAQSection } from './components/FAQSection';
 import { SuggestionsSection } from './components/SuggestionsSection';
-import { WhatsAppModal } from './components/WhatsAppModal';
+import { VolunteersModal } from './components/VolunteersModal';
 import { AdminPanel } from './components/AdminPanel';
 import { DonationModal } from './components/DonationModal';
 import { AiAssistantModal } from './components/AiAssistantModal';
@@ -22,7 +22,7 @@ export default function App() {
   const [isAdminView, setIsAdminView] = useState(false);
   const [isDonationOpen, setIsDonationOpen] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
-  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
+  const [isVolunteersOpen, setIsVolunteersOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
   const [viewMode] = useState<'normal' | 'all-centers'>(() => {
@@ -191,6 +191,7 @@ export default function App() {
             window.location.href = '/';
           }}
           onOpenAi={() => setIsAiOpen(true)}
+          onOpenVolunteers={() => setIsVolunteersOpen(true)}
           isAdminView={false}
           lastSyncTime={state.lastSyncTime}
           onTriggerSync={() => handleTriggerSync(true)}
@@ -220,7 +221,7 @@ export default function App() {
         state={state}
         onOpenAdmin={() => setIsAdminView(!isAdminView)}
         onOpenAi={() => setIsAiOpen(true)}
-        onOpenWhatsApp={() => setIsWhatsAppOpen(true)}
+        onOpenVolunteers={() => setIsVolunteersOpen(true)}
         isAdminView={isAdminView}
         lastSyncTime={state.lastSyncTime}
         onTriggerSync={() => handleTriggerSync(true)}
@@ -294,10 +295,10 @@ export default function App() {
         campaignTitle={state.campaignTitle}
       />
 
-      <WhatsAppModal
-        isOpen={isWhatsAppOpen}
-        onClose={() => setIsWhatsAppOpen(false)}
-        messages={state.whatsappMessages || []}
+      <VolunteersModal
+        isOpen={isVolunteersOpen}
+        onClose={() => setIsVolunteersOpen(false)}
+        volunteers={state.volunteers || []}
       />
 
       <IntroVideoModal
