@@ -508,6 +508,8 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
             phase1={state.donationsEurosPhase1 || 1000}
             phase2={state.donationsEurosPhase2 || 200000}
             phase3={state.donationsEurosPhase3 || 300000}
+            template={state.donationPotTemplate || 'template1'}
+            showRecentDonors={state.showRecentDonors ?? false}
           />
         )}
 

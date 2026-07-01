@@ -155,6 +155,8 @@ export interface GlobalState {
   donationsEurosPhase1?: number;
   donationsEurosPhase2?: number;
   donationsEurosPhase3?: number;
+  donationPotTemplate?: string;
+  showRecentDonors?: boolean;
 }
 
 export interface WebAccessLog {

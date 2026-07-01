@@ -45,7 +45,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'importar_donaciones' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'voluntarios' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'importar_donaciones' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'voluntarios' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'plantillas_donacion' | 'videos' | 'mantenimiento'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -399,6 +399,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [tempDonationsPhase1, setTempDonationsPhase1] = useState(state.donationsEurosPhase1 || 1000);
   const [tempDonationsPhase2, setTempDonationsPhase2] = useState(state.donationsEurosPhase2 || 200000);
   const [tempDonationsPhase3, setTempDonationsPhase3] = useState(state.donationsEurosPhase3 || 300000);
+  const [tempDonationPotTemplate, setTempDonationPotTemplate] = useState(state.donationPotTemplate || 'template1');
+  const [tempShowRecentDonors, setTempShowRecentDonors] = useState(state.showRecentDonors ?? false);
 
   const [tempMaintenanceModeEnabled, setTempMaintenanceModeEnabled] = useState(state.maintenanceModeEnabled || false);
   const [tempMaintenanceReason, setTempMaintenanceReason] = useState(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
@@ -431,6 +433,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setTempDonationsPhase1(state.donationsEurosPhase1 || 1000);
       setTempDonationsPhase2(state.donationsEurosPhase2 || 200000);
       setTempDonationsPhase3(state.donationsEurosPhase3 || 300000);
+      setTempDonationPotTemplate(state.donationPotTemplate || 'template1');
+      setTempShowRecentDonors(state.showRecentDonors ?? false);
       
       setTempMaintenanceModeEnabled(state.maintenanceModeEnabled || false);
       setTempMaintenanceReason(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
@@ -1490,6 +1494,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           >
             <Scale className="w-5 h-5 text-emerald-400 animate-bounce" />
             <span>📊 Contador en vivo ({state.globalTargetTons}T)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('plantillas_donacion')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'plantillas_donacion' 
+                ? 'bg-cyan-600 text-white shadow-xl shadow-cyan-500/20' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Heart className="w-5 h-5 text-cyan-400 animate-pulse" />
+            <span>💖 Fondo de Asistencia Humanitaria</span>
           </button>
 
           <button
@@ -4589,15 +4605,85 @@ ON CONFLICT (id) DO NOTHING;`}
                 </div>
               </div>
 
-              {/* 5. FONDO DE DONACIONES (EUROS) */}
-              <div className="space-y-4 pt-6 border-t border-slate-800">
+
+
+              {/* Guardar cambios */}
+              <div className="pt-6 border-t border-slate-800 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTempRedLabel('ROJO — DÉFICIT CRÍTICO INICIAL');
+                    setTempOrangeLabel('NARANJA / AMARILLO — EN PROGRESO CONSTANTE');
+                    setTempGreenLabel('VERDE — ¡META PRÓXIMA / ALCANZADA!');
+                    setTempShowStateBadge(true);
+                    setTempLegend0('0% Rojo');
+                    setTempLegend30('30% Naranja');
+                    setTempLegend70('70% Amarillo');
+                    setTempLegend100('100% Verde');
+                    setTempShowLegends(true);
+                    setTempCelebrationType('confetti');
+                    setTempProgressBarStyle('default');
+                    showToast('🔄 Se han restablecido los valores por defecto locales (Haga clic en Guardar para aplicarlos)');
+                  }}
+                  className="px-4 py-2.5 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition cursor-pointer"
+                >
+                  Restablecer Predeterminados
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleUpdateStateWithLog({
+                      liveCounterStateRedLabel: tempRedLabel,
+                      liveCounterStateOrangeLabel: tempOrangeLabel,
+                      liveCounterStateGreenLabel: tempGreenLabel,
+                      liveCounterShowStateBadge: tempShowStateBadge,
+                      liveCounterLegend0: tempLegend0,
+                      liveCounterLegend30: tempLegend30,
+                      liveCounterLegend70: tempLegend70,
+                      liveCounterLegend100: tempLegend100,
+                      liveCounterShowLegends: tempShowLegends,
+                      celebrationType: tempCelebrationType,
+                      progressBarStyle: tempProgressBarStyle
+                    }, 'Actualizó la configuración de estados, leyendas, animaciones y barras del contador en vivo');
+                    showToast('💾 ¡Configuración del contador en vivo guardada correctamente!');
+                  }}
+                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-950/40"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Guardar Cambios</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          )
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: PLANTILLAS DONACIÓN --- */}
+        {activeTab === 'plantillas_donacion' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-cyan-900/60 via-slate-900 to-slate-900 p-8 rounded-3xl border border-cyan-500/40 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 font-sans">
+              <div>
+                <span className="px-3 py-1 bg-cyan-600 text-white text-xs font-black uppercase tracking-widest rounded-full">Fondos Monetarios</span>
+                <h2 className="text-2xl sm:text-3xl font-black uppercase text-white mt-3 flex items-center gap-2.5 font-sans">
+                  <Heart className="w-8 h-8 text-cyan-400" />
+                  <span>💖 FONDO DE ASISTENCIA HUMANITARIA</span>
+                </h2>
+                <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+                  Administra las plantillas de diseño, las animaciones en tiempo real y la visualización de la lista de donantes.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-xl p-6 sm:p-10 mb-8 animate-in fade-in zoom-in-95 duration-300">
+              <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                    <h4 className="text-sm font-black uppercase tracking-wider text-cyan-400 flex items-center gap-2">
                       <span>💰 Fondo de Donaciones (Euros)</span>
                     </h4>
                     <p className="text-slate-400 text-xs mt-1">
-                      Módulo interactivo y animado del cofre de donaciones. 
+                      Módulo interactivo y animado de recaudación de donaciones. 
                     </p>
                   </div>
                   <label className="flex items-center gap-3 cursor-pointer">
@@ -4609,7 +4695,7 @@ ON CONFLICT (id) DO NOTHING;`}
                         checked={tempDonationsEurosEnabled}
                         onChange={(e) => setTempDonationsEurosEnabled(e.target.checked)}
                       />
-                      <div className={`block w-12 h-6 rounded-full transition-colors ${tempDonationsEurosEnabled ? 'bg-emerald-500' : 'bg-slate-700'}`}></div>
+                      <div className={`block w-12 h-6 rounded-full transition-colors ${tempDonationsEurosEnabled ? 'bg-cyan-500' : 'bg-slate-700'}`}></div>
                       <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${tempDonationsEurosEnabled ? 'translate-x-6' : 'translate-x-0'}`}></div>
                     </div>
                   </label>
@@ -4619,17 +4705,17 @@ ON CONFLICT (id) DO NOTHING;`}
                   <>
                     <div className="flex flex-col gap-4">
                       {/* Revolut */}
-                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
                         <div className="flex-1">
                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Sincronización con Revolut (API)</label>
                           <p className="text-xs text-slate-500 mb-2">
-                            Extrae el saldo de tu cuenta EUR desde Revolut. Requiere <code className="text-emerald-400 bg-emerald-950 px-1 py-0.5 rounded">REVOLUT_API_KEY</code> en <code>.env</code>.
+                            Extrae el saldo de tu cuenta EUR desde Revolut. Requiere <code className="text-cyan-400 bg-cyan-950 px-1 py-0.5 rounded">REVOLUT_API_KEY</code> en <code>.env</code>.
                           </p>
                         </div>
                         <button
                           onClick={handleRevolutSync}
                           disabled={isSyncingRevolut}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-black uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
+                          className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-black uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
                         >
                           <RefreshCw className={`w-4 h-4 ${isSyncingRevolut ? 'animate-spin' : ''}`} />
                           {isSyncingRevolut ? 'Sincronizando...' : 'Sincronizar Revolut'}
@@ -4637,7 +4723,7 @@ ON CONFLICT (id) DO NOTHING;`}
                       </div>
 
                       {/* BBVA */}
-                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 bg-slate-900 p-4 rounded-xl border border-[#072146]">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 bg-slate-950 p-4 rounded-xl border border-[#072146]">
                         <div className="flex-1">
                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Sincronización con BBVA</label>
                           <p className="text-xs text-slate-500 mb-2">
@@ -4661,101 +4747,120 @@ ON CONFLICT (id) DO NOTHING;`}
                           type="number"
                           value={tempDonationsEuros}
                           onChange={(e) => setTempDonationsEuros(Number(e.target.value))}
-                          className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                          className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-cyan-500"
                         />
                       </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 1 (Euros)</label>
-                    <input
-                      type="number"
-                      value={tempDonationsPhase1}
-                      onChange={(e) => setTempDonationsPhase1(Number(e.target.value))}
-                      className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 2 (Euros)</label>
-                    <input
-                      type="number"
-                      value={tempDonationsPhase2}
-                      onChange={(e) => setTempDonationsPhase2(Number(e.target.value))}
-                      className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 3 (Euros)</label>
-                    <input
-                      type="number"
-                      value={tempDonationsPhase3}
-                      onChange={(e) => setTempDonationsPhase3(Number(e.target.value))}
-                      className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                </div>
-                </>
-                )}
-              </div>
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 1 (Euros)</label>
+                        <input
+                          type="number"
+                          value={tempDonationsPhase1}
+                          onChange={(e) => setTempDonationsPhase1(Number(e.target.value))}
+                          className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-cyan-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 2 (Euros)</label>
+                        <input
+                          type="number"
+                          value={tempDonationsPhase2}
+                          onChange={(e) => setTempDonationsPhase2(Number(e.target.value))}
+                          className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-cyan-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 3 (Euros)</label>
+                        <input
+                          type="number"
+                          value={tempDonationsPhase3}
+                          onChange={(e) => setTempDonationsPhase3(Number(e.target.value))}
+                          className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-cyan-500"
+                        />
+                      </div>
+                    </div>
 
-              {/* Guardar cambios */}
-              <div className="pt-6 border-t border-slate-800 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTempRedLabel('ROJO — DÉFICIT CRÍTICO INICIAL');
-                    setTempOrangeLabel('NARANJA / AMARILLO — EN PROGRESO CONSTANTE');
-                    setTempGreenLabel('VERDE — ¡META PRÓXIMA / ALCANZADA!');
-                    setTempShowStateBadge(true);
-                    setTempLegend0('0% Rojo');
-                    setTempLegend30('30% Naranja');
-                    setTempLegend70('70% Amarillo');
-                    setTempLegend100('100% Verde');
-                    setTempShowLegends(true);
-                    setTempCelebrationType('confetti');
-                    setTempProgressBarStyle('default');
-                    setTempDonationsEurosEnabled(true);
-                    setTempDonationsEuros(0);
-                    setTempDonationsPhase1(1000);
-                    setTempDonationsPhase2(200000);
-                    setTempDonationsPhase3(300000);
-                    showToast('🔄 Se han restablecido los valores por defecto locales (Haga clic en Guardar para aplicarlos)');
-                  }}
-                  className="px-4 py-2.5 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition cursor-pointer"
-                >
-                  Restablecer Predeterminados
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleUpdateStateWithLog({
-                      liveCounterStateRedLabel: tempRedLabel,
-                      liveCounterStateOrangeLabel: tempOrangeLabel,
-                      liveCounterStateGreenLabel: tempGreenLabel,
-                      liveCounterShowStateBadge: tempShowStateBadge,
-                      liveCounterLegend0: tempLegend0,
-                      liveCounterLegend30: tempLegend30,
-                      liveCounterLegend70: tempLegend70,
-                      liveCounterLegend100: tempLegend100,
-                      liveCounterShowLegends: tempShowLegends,
-                      celebrationType: tempCelebrationType,
-                      progressBarStyle: tempProgressBarStyle,
-                      donationsEurosEnabled: tempDonationsEurosEnabled,
-                      donationsEuros: tempDonationsEuros,
-                      donationsEurosPhase1: tempDonationsPhase1,
-                      donationsEurosPhase2: tempDonationsPhase2,
-                      donationsEurosPhase3: tempDonationsPhase3
-                    }, 'Actualizó la configuración de estados, leyendas, animaciones, barras y fondo de euros del contador en vivo');
-                    showToast('💾 ¡Configuración del contador en vivo guardada correctamente!');
-                  }}
-                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-950/40"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Guardar Cambios</span>
-                </button>
+                    {/* Templates and Donors */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Diseño / Plantilla (Template)</label>
+                        <select
+                          value={tempDonationPotTemplate}
+                          onChange={(e) => setTempDonationPotTemplate(e.target.value)}
+                          className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-cyan-500"
+                        >
+                          <option value="template1">1. Elegante Fundación (Azul/Blanco)</option>
+                          <option value="template2">2. Moderno Neón (Oscuro/Brillante)</option>
+                          <option value="template3">3. Minimalista (Grises/Limpios)</option>
+                          <option value="template4">4. Cálido Esperanza (Naranja/Oro)</option>
+                          <option value="template5">5. Tecnológico (Cyan/Malla)</option>
+                          <option value="template6">6. Orgánico (Verde/Naturaleza)</option>
+                          <option value="template7">7. Royal (Púrpura/Dorado)</option>
+                          <option value="template8">8. Corporativo (Gris Pizarra/Azul)</option>
+                          <option value="template9">9. Festivo (Multicolor)</option>
+                          <option value="template10">10. Ultra-Premium (Negro/Platino)</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center">
+                        <label className="flex items-center gap-3 cursor-pointer mt-4">
+                          <span className="text-xs font-bold text-slate-300 uppercase">Mostrar Listado de Donantes (Generados)</span>
+                          <div className="relative">
+                            <input 
+                              type="checkbox" 
+                              className="sr-only" 
+                              checked={tempShowRecentDonors}
+                              onChange={(e) => setTempShowRecentDonors(e.target.checked)}
+                            />
+                            <div className={`block w-12 h-6 rounded-full transition-colors ${tempShowRecentDonors ? 'bg-cyan-500' : 'bg-slate-700'}`}></div>
+                            <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${tempShowRecentDonors ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Guardar cambios */}
+                <div className="pt-6 border-t border-slate-800 flex justify-end gap-3 mt-8">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTempDonationsEurosEnabled(true);
+                      setTempDonationsEuros(0);
+                      setTempDonationsPhase1(1000);
+                      setTempDonationsPhase2(200000);
+                      setTempDonationsPhase3(300000);
+                      setTempDonationPotTemplate('template1');
+                      setTempShowRecentDonors(false);
+                      showToast('🔄 Se han restablecido los valores por defecto (Guardar para aplicar)');
+                    }}
+                    className="px-4 py-2.5 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition cursor-pointer"
+                  >
+                    Restablecer
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleUpdateStateWithLog({
+                        donationsEurosEnabled: tempDonationsEurosEnabled,
+                        donationsEuros: tempDonationsEuros,
+                        donationsEurosPhase1: tempDonationsPhase1,
+                        donationsEurosPhase2: tempDonationsPhase2,
+                        donationsEurosPhase3: tempDonationsPhase3,
+                        donationPotTemplate: tempDonationPotTemplate,
+                        showRecentDonors: tempShowRecentDonors
+                      }, 'Actualizó la configuración del Fondo de Asistencia Humanitaria (Plantillas y Donantes)');
+                      showToast('💾 ¡Configuración del fondo guardada correctamente!');
+                    }}
+                    className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-cyan-950/40"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Guardar Cambios</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-          )
         )}
 
         {/* --- CONTENIDO PESTAÑA: CATEGORÍA DE VIDEOS --- */}
