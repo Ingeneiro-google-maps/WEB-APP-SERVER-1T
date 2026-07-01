@@ -192,7 +192,8 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
     "donationPassword", "headerVideoEnabled", "headerVideoYoutubeUrl",
     "introVideoEnabled", "introVideoYoutubeUrl", "introVideoBadgeText",
     "introVideoTitle", "introVideoSubtitle", "introVideoBtnText",
-    "celebrationType", "progressBarStyle", "donationsEurosEnabled", "donationsEuros", "donationsEurosPhase1", "donationsEurosPhase2", "donationsEurosPhase3", "donationPotTemplate", "showRecentDonors"
+    "celebrationType", "progressBarStyle", "donationsEurosEnabled", "donationsEuros", "donationsEurosPhase1", "donationsEurosPhase2", "donationsEurosPhase3", "donationPotTemplate", "showRecentDonors",
+    "publicVisitCounterEnabled", "publicVisitCounterBase", "publicVisitCounterStartDate", "publicVisitCounterUpdateInterval"
   ];
 
   scalarKeys.forEach(key => {

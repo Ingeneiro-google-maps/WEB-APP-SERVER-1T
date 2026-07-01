@@ -202,9 +202,16 @@ export default function App() {
           <CollectionCenters centers={state.centers} showAll={true} />
         </main>
 
-        <Footer onUnlockAdmin={() => {
-          window.location.href = '/';
-        }} />
+        <Footer 
+          onUnlockAdmin={() => {
+            window.location.href = '/';
+          }} 
+          codeVersion={state.codeVersion}
+          publicVisitCounterEnabled={state.publicVisitCounterEnabled}
+          publicVisitCounterBase={state.publicVisitCounterBase}
+          publicVisitCounterStartDate={state.publicVisitCounterStartDate}
+          publicVisitCounterUpdateInterval={state.publicVisitCounterUpdateInterval}
+        />
 
         <AiAssistantModal
           isOpen={isAiOpen}
@@ -276,7 +283,14 @@ export default function App() {
         )}
       </main>
 
-      <Footer onUnlockAdmin={() => setIsAdminView(true)} codeVersion={state.codeVersion} />
+      <Footer 
+        onUnlockAdmin={() => setIsAdminView(true)} 
+        codeVersion={state.codeVersion}
+        publicVisitCounterEnabled={state.publicVisitCounterEnabled}
+        publicVisitCounterBase={state.publicVisitCounterBase}
+        publicVisitCounterStartDate={state.publicVisitCounterStartDate}
+        publicVisitCounterUpdateInterval={state.publicVisitCounterUpdateInterval}
+      />
 
       {/* Modals */}
       <DonationModal

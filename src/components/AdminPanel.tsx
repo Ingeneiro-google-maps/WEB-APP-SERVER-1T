@@ -401,6 +401,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [tempDonationsPhase3, setTempDonationsPhase3] = useState(state.donationsEurosPhase3 || 300000);
   const [tempDonationPotTemplate, setTempDonationPotTemplate] = useState(state.donationPotTemplate || 'template1');
   const [tempShowRecentDonors, setTempShowRecentDonors] = useState(state.showRecentDonors ?? false);
+  const [tempPublicVisitCounterEnabled, setTempPublicVisitCounterEnabled] = useState(state.publicVisitCounterEnabled ?? true);
+  const [tempPublicVisitCounterBase, setTempPublicVisitCounterBase] = useState(state.publicVisitCounterBase || 15000);
+  const [tempPublicVisitCounterStartDate, setTempPublicVisitCounterStartDate] = useState(state.publicVisitCounterStartDate || new Date().toISOString());
+  const [tempPublicVisitCounterUpdateInterval, setTempPublicVisitCounterUpdateInterval] = useState(state.publicVisitCounterUpdateInterval || 4500);
 
   const [tempMaintenanceModeEnabled, setTempMaintenanceModeEnabled] = useState(state.maintenanceModeEnabled || false);
   const [tempMaintenanceReason, setTempMaintenanceReason] = useState(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
@@ -3997,6 +4001,94 @@ ON CONFLICT (id) DO NOTHING;`}
                   {(state.webAccessLogs || []).filter(l => (l.device || '').includes('📟') || (!(l.device || '').includes('📱') && !(l.device || '').includes('💻'))).length}
                 </div>
                 <div className="text-[10px] text-slate-500 mt-1">Otros navegadores y agentes</div>
+              </div>
+            </div>
+
+            {/* Configuración del Contador Público de Visitas */}
+            <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                <div>
+                  <h4 className="text-sm font-black uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+                    <Activity className="w-5 h-5" />
+                    <span>Contador Público de Visitas (Simulado)</span>
+                  </h4>
+                  <p className="text-slate-400 text-xs mt-1">
+                    Configura el contador de visitas público en la web. Este añade automáticamente visitas aleatorias diarias (aprox. &gt; 300) y muestra las banderas de los países en tiempo real.
+                  </p>
+                </div>
+                <label className="flex items-center gap-3 cursor-pointer shrink-0">
+                  <span className="text-xs font-bold text-slate-300 uppercase">Mostrar en Web</span>
+                  <div className="relative">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only" 
+                      checked={tempPublicVisitCounterEnabled}
+                      onChange={(e) => setTempPublicVisitCounterEnabled(e.target.checked)}
+                    />
+                    <div className={`block w-12 h-6 rounded-full transition-colors ${tempPublicVisitCounterEnabled ? 'bg-indigo-500' : 'bg-slate-700'}`}></div>
+                    <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${tempPublicVisitCounterEnabled ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                  </div>
+                </label>
+              </div>
+
+              {tempPublicVisitCounterEnabled && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Inicio del Contador (Visitas Base)</label>
+                    <input
+                      type="number"
+                      value={tempPublicVisitCounterBase}
+                      onChange={(e) => setTempPublicVisitCounterBase(Number(e.target.value))}
+                      className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                      placeholder="Ej. 15000"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Intervalo de subida (milisegundos)</label>
+                    <input
+                      type="number"
+                      value={tempPublicVisitCounterUpdateInterval}
+                      onChange={(e) => setTempPublicVisitCounterUpdateInterval(Number(e.target.value))}
+                      className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                      placeholder="Ej. 4500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fecha de Inicio de la Simulación</label>
+                    <input
+                      type="datetime-local"
+                      value={tempPublicVisitCounterStartDate.slice(0, 16)}
+                      onChange={(e) => {
+                        try {
+                          const date = new Date(e.target.value);
+                          if (!isNaN(date.getTime())) {
+                            setTempPublicVisitCounterStartDate(date.toISOString());
+                          }
+                        } catch (err) {}
+                      }}
+                      className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end pt-4 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleUpdateStateWithLog({
+                      publicVisitCounterEnabled: tempPublicVisitCounterEnabled,
+                      publicVisitCounterBase: tempPublicVisitCounterBase,
+                      publicVisitCounterStartDate: tempPublicVisitCounterStartDate,
+                      publicVisitCounterUpdateInterval: tempPublicVisitCounterUpdateInterval
+                    }, 'Actualizó la configuración del contador público de visitas simulado');
+                    showToast('💾 ¡Configuración del contador de visitas guardada correctamente!');
+                  }}
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-indigo-950/40"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Guardar Configuración</span>
+                </button>
               </div>
             </div>
 

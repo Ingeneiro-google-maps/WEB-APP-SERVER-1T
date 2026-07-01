@@ -1,15 +1,70 @@
-import React, { useState } from 'react';
-import { Heart, Lock, KeyRound, AlertCircle, X, Instagram } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Heart, Lock, KeyRound, AlertCircle, X, Instagram, Users, Globe2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface FooterProps {
   onUnlockAdmin?: () => void;
   codeVersion?: string;
+  publicVisitCounterEnabled?: boolean;
+  publicVisitCounterBase?: number;
+  publicVisitCounterStartDate?: string;
+  publicVisitCounterUpdateInterval?: number;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onUnlockAdmin, codeVersion = '1.0' }) => {
+export const Footer: React.FC<FooterProps> = ({ 
+  onUnlockAdmin, 
+  codeVersion = '1.0',
+  publicVisitCounterEnabled = false,
+  publicVisitCounterBase = 15000,
+  publicVisitCounterStartDate = new Date().toISOString(),
+  publicVisitCounterUpdateInterval = 4500
+}) => {
   const [isLockModalOpen, setIsLockModalOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+  
+  const [currentVisits, setCurrentVisits] = useState(publicVisitCounterBase);
+  const [activeFlags, setActiveFlags] = useState<string[]>(['🇪🇸', '🇻🇪']);
+
+  const LATAM_EU_FLAGS = [
+    '🇪🇸', '🇻🇪', '🇨🇴', '🇦🇷', '🇲🇽', '🇵🇪', '🇨🇱', '🇪🇨', '🇮🇹', '🇫🇷', '🇩🇪', '🇵🇹', '🇬🇧', '🇺🇸'
+  ];
+
+  useEffect(() => {
+    if (!publicVisitCounterEnabled) return;
+
+    // Calculate base + daily visits
+    const startDate = new Date(publicVisitCounterStartDate);
+    const now = new Date();
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const daysSinceStart = Math.max(0, Math.floor((now.getTime() - startDate.getTime()) / msPerDay));
+    
+    // Base + ~300 per day since start
+    const calculatedBase = publicVisitCounterBase + (daysSinceStart * 342);
+    setCurrentVisits(calculatedBase);
+
+    // Simulate new visits popping in
+    const interval = setInterval(() => {
+      // Randomly add 1 to 3 visits every few seconds
+      setCurrentVisits(prev => prev + Math.floor(Math.random() * 3) + 1);
+      
+      // Randomly change a flag
+      setActiveFlags(prev => {
+        const newFlags = [...prev];
+        if (Math.random() > 0.5) {
+          const randomFlag = LATAM_EU_FLAGS[Math.floor(Math.random() * LATAM_EU_FLAGS.length)];
+          // Keep array size max 5
+          if (!newFlags.includes(randomFlag)) {
+            newFlags.unshift(randomFlag);
+            if (newFlags.length > 5) newFlags.pop();
+          }
+        }
+        return newFlags;
+      });
+    }, publicVisitCounterUpdateInterval);
+
+    return () => clearInterval(interval);
+  }, [publicVisitCounterEnabled, publicVisitCounterBase, publicVisitCounterStartDate, publicVisitCounterUpdateInterval]);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +144,40 @@ export const Footer: React.FC<FooterProps> = ({ onUnlockAdmin, codeVersion = '1.
           </div>
 
         </div>
+
+        {/* --- CONTADOR DE VISITAS PÚBLICO --- */}
+        {publicVisitCounterEnabled && (
+          <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-slate-100 flex flex-col md:flex-row justify-center items-center gap-4 text-slate-600">
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl shadow-sm">
+              <Globe2 className="w-4 h-4 text-[#008CBA]" />
+              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Visitas Totales:</span>
+              <span className="font-mono font-bold text-slate-800 tracking-tight text-sm">
+                {currentVisits.toLocaleString('es-ES')}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Visitantes en tiempo real:</span>
+              <div className="flex -space-x-1">
+                <AnimatePresence>
+                  {activeFlags.map((flag, index) => (
+                    <motion.div
+                      key={`${flag}-${index}`}
+                      initial={{ opacity: 0, scale: 0, x: -10 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0 }}
+                      className="w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-xs relative z-10"
+                      style={{ zIndex: 10 - index }}
+                    >
+                      {flag}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        )}
+
       </footer>
 
       {/* Lock Password Modal */}

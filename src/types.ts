@@ -157,6 +157,10 @@ export interface GlobalState {
   donationsEurosPhase3?: number;
   donationPotTemplate?: string;
   showRecentDonors?: boolean;
+  publicVisitCounterEnabled?: boolean;
+  publicVisitCounterBase?: number;
+  publicVisitCounterStartDate?: string;
+  publicVisitCounterUpdateInterval?: number;
 }
 
 export interface WebAccessLog {
