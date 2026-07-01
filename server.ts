@@ -1030,16 +1030,49 @@ if (supabase) {
   // Export Pledges as Excel CSV (Base de Datos)
   app.get('/api/export-excel', (req, res) => {
     const headers = ["ID Registro", "Fecha", "Nombre Donante", "Email", "Ciudad", "Categoría", "Kilos Donados", "Descripción / Comentarios"];
-    const rows = appState.pledges.map(p => [
-      p.id,
-      p.date,
-      `"${(p.donorName || '').replace(/"/g, '""')}"`,
-      `"${(p.email || '').replace(/"/g, '""')}"`,
-      `"${(p.city || '').replace(/"/g, '""')}"`,
-      `"${(p.category || '').replace(/"/g, '""')}"`,
-      p.pledgeKilos || 0,
-      `"${((p.description || p.message) || '').replace(/"/g, '""')}"`
-    ]);
+    const rows = appState.pledges.map(p => {
+      let dName = p.donorName || '';
+      if (!dName || ['anónimo', 'anonimo', 'desconocido', 'almacén', 'almacen', 'kilos'].includes(dName.toLowerCase()) || /^[0-9\s.,kgKG]+$/.test(dName)) {
+        dName = 'Desconocido';
+      }
+
+      let category = p.category || '';
+      if (!category || category.toLowerCase() === 'varios' || category.toLowerCase() === 'general' || category === 'Alimentos no perecederos') {
+        const fullText = `${p.description || ''} ${p.message || ''}`.toLowerCase();
+        const keywordMap: Record<string, string[]> = {
+          'Alimentos no perecederos': ['alimento', 'agua', 'bebida', 'vívere', 'vivere', 'conserva', 'lata', 'botella', 'arroz', 'frijol', 'pasta', 'grano', 'enlatado'],
+          'Medicinas e Insumos Médicos': ['medicina', 'medicamento', 'rescate', 'botiquín', 'botiquin', 'alcohol', 'gasa', 'venda', 'insumo', 'pastilla', 'jarabe'],
+          'Ropa y Abrigo': ['ropa', 'abrigo', 'manta', 'cobija', 'zapato', 'calcetín', 'calcetin', 'suéter', 'sueter', 'chamarra', 'pantalón', 'pantalon'],
+          'Kits Infantiles y Fórmulas': ['bebe', 'bebé', 'pañal', 'pañales', 'leche', 'fórmula', 'formula', 'infantil'],
+          'Baterías y Pilas': ['batería', 'bateria', 'pila', 'linterna'],
+          'General': ['higiene', 'limpieza', 'jabón', 'jabon', 'shampoo', 'papel', 'toalla', 'mascota', 'perro', 'gato', 'croqueta', 'animal', 'animales', 'herramienta', 'pala', 'pico', 'guante']
+        };
+        
+        let foundCategory = false;
+        for (const [sysCat, keywords] of Object.entries(keywordMap)) {
+          if (keywords.some(kw => fullText.includes(kw))) {
+            category = sysCat;
+            foundCategory = true;
+            break;
+          }
+        }
+        
+        if (!foundCategory && !category) {
+          category = 'General';
+        }
+      }
+
+      return [
+        p.id,
+        new Date().toLocaleDateString(), // Siempre la fecha del día que se haga la exportación
+        `"${dName.replace(/"/g, '""')}"`,
+        `"${(p.email || '').replace(/"/g, '""')}"`,
+        `"${(p.city || '').replace(/"/g, '""')}"`,
+        `"${category.replace(/"/g, '""')}"`,
+        p.pledgeKilos || 0,
+        `"${((p.description || p.message) || '').replace(/"/g, '""')}"`
+      ];
+    });
     const csv = "\uFEFF" + [headers.join(";"), ...rows.map(r => r.join(";"))].join("\n");
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="Base_de_Datos_Donaciones_Excel_Venezuela.csv"`);

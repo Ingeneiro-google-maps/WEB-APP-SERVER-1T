@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import { fireConfetti as confetti } from '../utils/confettiWrapper';
 import { parseWhatsAppChat } from '../utils/whatsappParser';
 import { GlobalState, SupplyItem, CollectionCenter, FAQItem, AdminUser, UserChangeLog } from '../types';
@@ -44,7 +45,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'voluntarios' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'importar_donaciones' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'voluntarios' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'videos' | 'mantenimiento'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -398,6 +399,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [tempMaintenanceReason, setTempMaintenanceReason] = useState(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
   const [tempMaintenanceEndTimestamp, setTempMaintenanceEndTimestamp] = useState(state.maintenanceEndTimestamp || '');
 
+  // Estados para importar donaciones desde Excel
+  const [importText, setImportText] = useState('');
+  const [previewDonations, setPreviewDonations] = useState<any[]>([]);
+
   React.useEffect(() => {
     if (state) {
       setTempRedLabel(state.liveCounterStateRedLabel !== undefined ? state.liveCounterStateRedLabel : 'ROJO — DÉFICIT CRÍTICO INICIAL');
@@ -588,6 +593,145 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       );
       showToast('🗑️ Mensaje eliminado.');
     }
+  };
+
+  // --- IMPORTAR DONACIONES DE EXCEL ---
+  const excelFileInputRef = useRef<HTMLInputElement>(null);
+
+  const parseDonationRow = (row: any[], index: number) => {
+    // La fecha será siempre la del día actual según lo solicitado
+    const date = new Date().toLocaleDateString();
+    
+    let donorName = row[1]?.toString().trim() || '';
+    let email = row[2]?.toString().trim() || '';
+    let city = row[3]?.toString().trim() || '';
+    let category = row[4]?.toString().trim() || '';
+    let kilosStr = row[5]?.toString().trim() || '';
+    let desc = row[6]?.toString().trim() || '';
+
+    let pledgeKilos = parseFloat(kilosStr.replace(',', '.')) || 0;
+    
+    // Si toda la fila fue unida o está vacía (p.ej. al pegar texto desestructurado), unimos todo para buscar
+    const fullText = row.join(' ').toLowerCase();
+
+    // Heurística para kilos en cualquier columna o texto plano
+    if (pledgeKilos === 0 || isNaN(pledgeKilos)) {
+      const match = fullText.match(/(?:^|\s|:|-)([0-9]+(?:[.,][0-9]+)?)\s*(?:kg|kilos|kilo|kgs|k)(?:\s|$)/);
+      if (match) {
+        pledgeKilos = parseFloat(match[1].replace(',', '.'));
+      }
+    }
+
+    // Heurística para categorías en el texto asignando a la categoría del sistema
+    if (!category || category.toLowerCase() === 'varios' || category.toLowerCase() === 'general' || category === 'Alimentos no perecederos') {
+      const keywordMap: Record<string, string[]> = {
+        'Alimentos no perecederos': ['alimento', 'agua', 'bebida', 'vívere', 'vivere', 'conserva', 'lata', 'botella', 'arroz', 'frijol', 'pasta', 'grano', 'enlatado'],
+        'Medicinas e Insumos Médicos': ['medicina', 'medicamento', 'rescate', 'botiquín', 'botiquin', 'alcohol', 'gasa', 'venda', 'insumo', 'pastilla', 'jarabe'],
+        'Ropa y Abrigo': ['ropa', 'abrigo', 'manta', 'cobija', 'zapato', 'calcetín', 'calcetin', 'suéter', 'sueter', 'chamarra', 'pantalón', 'pantalon'],
+        'Kits Infantiles y Fórmulas': ['bebe', 'bebé', 'pañal', 'pañales', 'leche', 'fórmula', 'formula', 'infantil'],
+        'Baterías y Pilas': ['batería', 'bateria', 'pila', 'linterna'],
+        'General': ['higiene', 'limpieza', 'jabón', 'jabon', 'shampoo', 'papel', 'toalla', 'mascota', 'perro', 'gato', 'croqueta', 'animal', 'animales', 'herramienta', 'pala', 'pico', 'guante']
+      };
+      
+      let foundCategory = false;
+      for (const [sysCat, keywords] of Object.entries(keywordMap)) {
+        if (keywords.some(kw => fullText.includes(kw))) {
+          category = sysCat;
+          foundCategory = true;
+          break;
+        }
+      }
+      
+      if (!foundCategory) {
+        category = 'General';
+      }
+    }
+    
+    if (!category) {
+      category = 'General';
+    }
+
+    // Si no hay campo de donantes o está desconocido, o es simplemente números/kilos, colocar "Desconocido"
+    if (!donorName || ['anónimo', 'anonimo', 'desconocido', 'almacén', 'almacen', 'kilos'].includes(donorName.toLowerCase()) || /^[0-9\s.,kgKG]+$/.test(donorName)) {
+      donorName = 'Desconocido';
+    }
+
+    if (!city || city === 'Desconocida' || city.toLowerCase() === 'desconocido') {
+      city = 'Desconocido';
+    }
+
+    return {
+      id: `import-${Date.now()}-${index}`,
+      date,
+      donorName,
+      email,
+      city,
+      category,
+      pledgeKilos,
+      description: fullText.length > 200 ? fullText.substring(0, 200) + '...' : fullText,
+      message: desc || fullText
+    };
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        
+        const parsed = [];
+        // Empezamos desde 1 para saltar la cabecera
+        for (let i = 1; i < data.length; i++) {
+          const row: any = data[i];
+          if (!row || row.length === 0) continue;
+          
+          parsed.push(parseDonationRow(row, i));
+        }
+        setPreviewDonations(parsed);
+        showToast(`✅ Se detectaron ${parsed.length} registros del archivo.`);
+      } catch (err) {
+        showToast('❌ Error al leer el archivo Excel.');
+        console.error(err);
+      }
+      if (excelFileInputRef.current) {
+        excelFileInputRef.current.value = '';
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
+  const handleParseImport = () => {
+    if (!importText.trim()) return;
+    
+    const lines = importText.split('\n').filter(line => line.trim());
+    const parsed = lines.map((line, idx) => {
+      const cols = line.split('\t');
+      const cleanCols = cols.length > 1 ? cols : line.split(',');
+      return parseDonationRow(cleanCols, idx);
+    });
+    setPreviewDonations(parsed);
+  };
+
+  const handleConfirmImport = () => {
+    if (previewDonations.length === 0) return;
+    const newPledges = [...(state.pledges || []), ...previewDonations];
+    
+    handleUpdateStateWithLog(
+      { pledges: newPledges },
+      `Importó ${previewDonations.length} donaciones desde Excel (cálculo revisado)`
+    );
+    
+    setImportText('');
+    setPreviewDonations([]);
+    showToast(`✅ Se han importado ${previewDonations.length} registros correctamente.`);
+    setActiveTab('excel_bd'); // go back to db tab
   };
 
   const handleAddVolunteer = (e: React.FormEvent) => {
@@ -1108,6 +1252,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('importar_donaciones')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'importar_donaciones' 
+                ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/30' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Package className="w-5 h-5 text-amber-300" />
+            <span>📦 Registrar Donación / Mercancía (cálculo revisado)</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('ia_scanner')}
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
               activeTab === 'ia_scanner' 
@@ -1425,6 +1581,128 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 </table>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: IMPORTAR DONACIONES EXCEL --- */}
+        {activeTab === 'importar_donaciones' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-emerald-900/60 via-slate-900 to-slate-900 p-8 rounded-3xl border border-emerald-500/40 shadow-2xl">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-black uppercase text-white flex items-center gap-3">
+                    <Package className="w-8 h-8 text-amber-300" />
+                    Registrar Donación / Mercancía
+                  </h2>
+                  <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+                    Importa registros de una fuente externa de hoja de cálculo (Excel, Google Sheets). 
+                    Sube un archivo Excel (.xlsx, .xls) o copia y pega las filas directamente aquí. 
+                    Asegúrate de que las columnas tengan el siguiente orden:<br />
+                    <b>Fecha | Donante | Email | Ciudad | Categoría | Kilos | Descripción</b>
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <input 
+                    type="file" 
+                    accept=".xlsx,.xls,.csv" 
+                    ref={excelFileInputRef} 
+                    onChange={handleFileUpload} 
+                    className="hidden" 
+                  />
+                  <button
+                    onClick={() => excelFileInputRef.current?.click()}
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-600/30"
+                  >
+                    <Upload className="w-5 h-5" />
+                    Subir Archivo Excel
+                  </button>
+                  <span className="text-xs text-slate-400 font-medium">Formatos soportados: .xlsx, .xls</span>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-4">
+                <textarea
+                  className="w-full h-40 bg-slate-950 border border-slate-700 rounded-2xl p-4 text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500 transition"
+                  placeholder="Pega aquí las celdas copiadas de Excel (separadas por tabulación)...&#10;01/07/2026&#9;Juan Pérez&#9;juan@ejemplo.com&#9;Madrid&#9;Alimentos no perecederos&#9;50&#9;Cajas de arroz"
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                />
+                
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleParseImport}
+                    disabled={!importText.trim()}
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold rounded-xl transition flex items-center gap-2"
+                  >
+                    <Search className="w-4 h-4" />
+                    Vista Previa de Importación
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {previewDonations.length > 0 && (
+              <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-black text-amber-400">
+                    🔍 VISTA PREVIA (Cálculo Revisado)
+                  </h3>
+                  <span className="px-3 py-1 bg-amber-500/20 text-amber-400 font-bold text-xs rounded-full">
+                    {previewDonations.length} Registros Detectados
+                  </span>
+                </div>
+                
+                <div className="overflow-x-auto rounded-xl border border-slate-700">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-800/80 text-slate-300 text-xs font-black uppercase tracking-wider border-b border-slate-700">
+                        <th className="py-3 px-4">Fecha</th>
+                        <th className="py-3 px-4">Donante</th>
+                        <th className="py-3 px-4">Ciudad</th>
+                        <th className="py-3 px-4">Categoría</th>
+                        <th className="py-3 px-4 text-right">Kilos</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800 text-sm font-medium bg-slate-950/50">
+                      {previewDonations.map((p, idx) => (
+                        <tr key={idx} className="hover:bg-slate-800/50 transition">
+                          <td className="py-3 px-4 font-mono text-xs text-slate-400">{p.date}</td>
+                          <td className="py-3 px-4 text-white">{p.donorName}</td>
+                          <td className="py-3 px-4 text-emerald-400 font-bold">{p.city}</td>
+                          <td className="py-3 px-4">
+                            <span className="px-2 py-1 bg-slate-800 rounded-lg text-xs font-bold text-slate-200">
+                              {p.category}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-right font-black text-amber-400 font-mono">
+                            +{p.pledgeKilos} kg
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-6 flex justify-end gap-4">
+                  <button
+                    onClick={() => {
+                      setPreviewDonations([]);
+                      setImportText('');
+                    }}
+                    className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleConfirmImport}
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-wider rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-600/30"
+                  >
+                    <Download className="w-5 h-5" />
+                    Confirmar y Exportar a la Web
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
