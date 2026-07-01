@@ -13,8 +13,13 @@ export const INITIAL_STATE: GlobalState = {
   "globalTargetTons": 1,
   "celebrationType": "fireworks",
   "progressBarStyle": "default",
-  "lastSyncTime": "2026-06-28T04:28:16.186Z",
-  "nextSyncTime": "2026-06-28T04:22:18.284Z",
+  "donationsEurosEnabled": true,
+  "donationsEuros": 250,
+  "donationsEurosPhase1": 10000,
+  "donationsEurosPhase2": 200000,
+  "donationsEurosPhase3": 300000,
+  "lastSyncTime": "2026-07-01T16:24:45.787Z",
+  "nextSyncTime": "2026-07-01T16:34:45.787Z",
   "googleSheetUrl": "https://docs.google.com/spreadsheets/d/1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC/edit?gid=762536088#gid=762536088",
   "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbxfiM27NiOzQx9FWqn2AFG6IeaG_MyCcNKTjiA29YF8MZ9NObXDlSUG7bLqWl_rHiw/exec",
   "autoSyncEnabled": true,
@@ -24,7 +29,7 @@ export const INITIAL_STATE: GlobalState = {
       "id": "sup-1",
       "category": "Alimentos no perecederos",
       "name": "Harina de Maíz, Arroz y Pasta",
-      "currentKilos": 210,
+      "currentKilos": 2788.270000000001,
       "targetKilos": 500,
       "unit": "kg",
       "iconName": "Utensils"
@@ -51,7 +56,7 @@ export const INITIAL_STATE: GlobalState = {
       "id": "sup-4",
       "category": "Ropa y Abrigo",
       "name": "Mantas Térmicas y Ropa de Abrigo (Todas las tallas)",
-      "currentKilos": 45,
+      "currentKilos": 1587.9499999999998,
       "targetKilos": 200,
       "unit": "kg",
       "iconName": "Shirt"
@@ -60,7 +65,7 @@ export const INITIAL_STATE: GlobalState = {
       "id": "sup-5",
       "category": "Medicinas e Insumos",
       "name": "Kits de Primeros Auxilios y Analgésicos",
-      "currentKilos": 126,
+      "currentKilos": 1088.1699999999998,
       "targetKilos": 100,
       "unit": "kg",
       "iconName": "Cross"
@@ -774,148 +779,1948 @@ export const INITIAL_STATE: GlobalState = {
       "pledgeKilos": 2,
       "message": "Entrega registrada",
       "date": "6/27/2026"
+    },
+    {
+      "id": "excel-17-6",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 6,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-18-5",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-19-5",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-20-9",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 9,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-21-30",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 30,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-22-13",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 13,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-23-22",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 22,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-24-10",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 10,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-25-13",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 13,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-26-17",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 17,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-27-8",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-28-14",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 14,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-29-10",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 10,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-30-89",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 89,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-31-53",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 53,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-32-19",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 18.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-33-16",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 16,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-34-13",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 13,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-35-14",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 13.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-36-11",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 10.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-37-18",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 18,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-38-24",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 24,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-39-17",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 17.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-40-21",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 20.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-41-19",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 19,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-42-20",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 20,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-43-19",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 18.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-44-54",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 54,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-45-10",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 10,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-46-50",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 50,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-47-34",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 34,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-48-48",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 48,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-49-20",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 20.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-50-15",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 15,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-51-6",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 5.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-52-7",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 7,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-53-32",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 32,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-54-11",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 11,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-55-352",
+      "donorName": "CONJUNTO",
+      "email": "anonimo@donante.org",
+      "city": "A Nosa Bodeguilla (Monforte de Lemos)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 352.17,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-56-13",
+      "donorName": "Dayana",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 13.02,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-57-32",
+      "donorName": "Gofer",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 31.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-58-22",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 22,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-59-12",
+      "donorName": "Paola",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 12.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-60-10",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 9.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-61-8",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 8.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-62-11",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 11,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-63-5",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 5.4,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-64-40",
+      "donorName": "alimentos varios",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 40,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-65-32",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 31.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-66-48",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 48.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-67-69",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 69.1,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-68-7",
+      "donorName": "ropa varia",
+      "email": "anonimo@donante.org",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 6.9,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-69-11",
+      "donorName": "ropa varia",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 10.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-70-59",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 58.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-71-12",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 11.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-72-10",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 10,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-73-8",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-74-48",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 48.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-75-10",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "Pastelería Gofer (Chantada- Lugo)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 10,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-76-3",
+      "donorName": "Chantada",
+      "email": "dashafg7@gmail.com",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-77-23",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 23,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-78-19",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 18.7,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-79-12",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 12.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-80-14",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 14.4,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-81-12",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 12.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-82-14",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 14,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-83-12",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 12.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-84-16",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 16,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-85-26",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 25.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-86-43",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 43.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-87-641",
+      "donorName": "Anónimo varios",
+      "email": "holla@pollospepitos58.com",
+      "city": "Piscina Municipal de Ordes O Muiño (Ordes)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 641.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-88-32",
+      "donorName": "lirio studio",
+      "email": "anonimo@donante.org",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 32.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-89-50",
+      "donorName": "Anonimomordes",
+      "email": "holla@pollospepitos58.com",
+      "city": "Piscina Municipal de Ordes O Muiño (Ordes)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 50,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-90-29",
+      "donorName": "lirio studio",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 29.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-91-45",
+      "donorName": "lirio studio",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 45.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-92-27",
+      "donorName": "lirio studio",
+      "email": "anonimo@donante.org",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 27.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-93-83",
+      "donorName": "Anónimo ordes",
+      "email": "holla@pollospepitos58.com",
+      "city": "Piscina Municipal de Ordes O Muiño (Ordes)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 82.55,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-94-14",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 14.4,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-95-9",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 9.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-96-20",
+      "donorName": "ALIMENTOS VARIOS",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 20,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-97-290",
+      "donorName": "Anónimo ordes",
+      "email": "holla@pollospepitos58.com",
+      "city": "Piscina Municipal de Ordes O Muiño (Ordes)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 290.15,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-98-13",
+      "donorName": "LIRIOS STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 12.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-99-112",
+      "donorName": "Anónimo ordes",
+      "email": "holla@pollospepitos58.com",
+      "city": "Piscina Municipal de Ordes O Muiño (Ordes)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 112.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-100-30",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 30.1,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-101-8",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 8.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-102-27",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 27,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-103-96",
+      "donorName": "Anónimo ordes",
+      "email": "holla@pollospepitos58.com",
+      "city": "Piscina Municipal de Ordes O Muiño (Ordes)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 96.15,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-104-6",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 5.6,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-105-8",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 7.9,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-106-22",
+      "donorName": "LIRIO DE STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 22,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-107-3",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 2.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-108-472",
+      "donorName": "Anónimo ordes",
+      "email": "holla@pollospepitos58.com",
+      "city": "Piscina Municipal de Ordes O Muiño (Ordes)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 471.75,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-109-24",
+      "donorName": "Anónimo ordes",
+      "email": "holla@pollospepitos58.com",
+      "city": "Piscina Municipal de Ordes O Muiño (Ordes)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 24,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-110-15",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 15,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-111-88",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 88,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-112-7",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 7.4,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-113-16",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 15.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-114-5",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 5.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-115-9",
+      "donorName": "LIRIO STUDIOS",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 9.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-116-14",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 13.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-117-8",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 8.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-118-13",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 12.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-119-10",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 10.4,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-120-14",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 13.7,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-121-6",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 5.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-122-12",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 11.9,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-123-11",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 10.9,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-124-14",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 13.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-125-16",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 16.4,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-126-29",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 28.6,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-127-12",
+      "donorName": "Lirio Studio",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 12.1,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-128-12",
+      "donorName": "lirio studio",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 11.6,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-129-8",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-130-8",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 7.6,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-131-28",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 27.7,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-132-18",
+      "donorName": "LIIRO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 18,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-133-17",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "O Delas (Cafetería) (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 16.5,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-134-6",
+      "donorName": "LIRIOS STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 6.2,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-135-16",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 15.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-136-15",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 15.1,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-137-19",
+      "donorName": "LIRIOS STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 19.4,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-138-14",
+      "donorName": "LIRIOS STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 13.7,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-139-7",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 7.3,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-140-11",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 10.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-141-9",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 9,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-142-14",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 13.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-143-12",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 11.9,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-144-12",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 11.8,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-145-5",
+      "donorName": "LIRIO STUDIO",
+      "email": "anonimo@donante.org",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 5.4,
+      "message": "Entrega registrada",
+      "date": "6/28/2026"
+    },
+    {
+      "id": "excel-146-21",
+      "donorName": "Gozza",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 21,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-147-38",
+      "donorName": "OMAYRA PEREIRA IGLESIAS",
+      "email": "margaridaxoguetescarral@gmail.com",
+      "city": "Margarida Xoguetes (A Coruña)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 38.2,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-148-13",
+      "donorName": "OMAYRA PEREIRA IGLESIAS",
+      "email": "margaridaxoguetescarral@gmail.com",
+      "city": "Margarida Xoguetes (A Coruña)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 13.4,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-149-13",
+      "donorName": "Mj Tecsystem",
+      "email": "mjtecsystem@gmail.com",
+      "city": "Mj Tecsystem Ribeira   (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 13,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-150-21",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 21,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-151-5",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-152-25",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 25,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-153-13",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 13,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-154-13",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 13,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-155-15",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 15,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-156-17",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 17,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-157-20",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 20,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-158-18",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 18,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-159-8",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 8,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-160-3",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 3,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-161-8",
+      "donorName": "Sabela Pérez Navarro",
+      "email": "sabelaperez1718@gmail.com",
+      "city": "Lirio Studio Creativo (Santiago de Compostela)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 8,
+      "message": "Entrega registrada",
+      "date": "6/29/2026"
+    },
+    {
+      "id": "excel-162-37",
+      "donorName": "OMAYRA PEREIRA IGLESIAS",
+      "email": "margaridaxoguetescarral@gmail.com",
+      "city": "Margarida Xoguetes (A Coruña)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 36.5,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-163-3",
+      "donorName": "MJ TECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 2.5,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-164-5",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-165-2",
+      "donorName": "MJTECSYSTEM",
+      "email": "anonimo@donante.org",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 2,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-166-2",
+      "donorName": "MJTECSYSTEM",
+      "email": "anonimo@donante.org",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 2,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-167-9",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 9,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-168-10",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 10,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-169-7",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 7,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-170-10",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 10,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-171-6",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 6,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-172-9",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 9,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-173-3",
+      "donorName": "MJTECSYSTEM",
+      "email": "anonimo@donante.org",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 2.5,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-174-10",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 9.9,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-175-10",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 9.8,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-176-10",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTE@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 9.8,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-177-7",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 7,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-178-10",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 9.7,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-179-5",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-180-6",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 6,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-181-12",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 12,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-182-7",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 7,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-183-18",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTME@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 18.2,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-184-5",
+      "donorName": "MJTECSYSTEM",
+      "email": "MJTECSYSTEM@GMAIL.COM",
+      "city": "Mj Tecsystem Ribeira (Ribeira)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 4.5,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-185-13",
+      "donorName": "OMAYRA PEREIRA IGLESIAS",
+      "email": "margaridaxoguetescarral@gmail.com",
+      "city": "Margarida Xoguetes (A Coruña)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 12.7,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-186-85",
+      "donorName": "Katherine",
+      "email": "anonimo@donante.org",
+      "city": "Carrefour Express Teixugueiras (Vigo)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 85.4,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-187-28",
+      "donorName": "KATHERINE",
+      "email": "anonimo@donante.org",
+      "city": "Carrefour Express Teixugueiras (Vigo)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 27.6,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-188-23",
+      "donorName": "KATHERINE",
+      "email": "anonimo@donante.org",
+      "city": "Carrefour Express Teixugueiras (Vigo)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 22.5,
+      "message": "Entrega registrada",
+      "date": "6/30/2026"
+    },
+    {
+      "id": "excel-189-15",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 15,
+      "message": "Entrega registrada",
+      "date": "7/1/2026"
+    },
+    {
+      "id": "excel-190-10",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Kits Infantiles y Fórmulas",
+      "pledgeKilos": 10,
+      "message": "Entrega registrada",
+      "date": "7/1/2026"
+    },
+    {
+      "id": "excel-191-5",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "7/1/2026"
+    },
+    {
+      "id": "excel-192-8",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Ropa y Abrigo",
+      "pledgeKilos": 8,
+      "message": "Entrega registrada",
+      "date": "7/1/2026"
+    },
+    {
+      "id": "excel-193-5",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 5,
+      "message": "Entrega registrada",
+      "date": "7/1/2026"
+    },
+    {
+      "id": "excel-194-23",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 23,
+      "message": "Entrega registrada",
+      "date": "7/1/2026"
+    },
+    {
+      "id": "excel-195-12",
+      "donorName": "GOZZA",
+      "email": "gozza.ou@gmail.com",
+      "city": "Gozza! (Ourense)",
+      "category": "Alimentos no perecederos",
+      "pledgeKilos": 12,
+      "message": "Entrega registrada",
+      "date": "7/1/2026"
+    },
+    {
+      "id": "excel-196-3",
+      "donorName": "OMAYRA PEREIRA IGLESIAS",
+      "email": "margaridaxoguetescarral@gmail.com",
+      "city": "Margarida Xoguetes (A Coruña)",
+      "category": "Medicinas e Insumos Médicos",
+      "pledgeKilos": 2.8,
+      "message": "Entrega registrada",
+      "date": "7/1/2026"
     }
   ],
   "syncLogs": [
     {
-      "id": "log-1782619938284",
-      "timestamp": "4:12:18 AM",
+      "id": "log-1782923085787",
+      "timestamp": "4:24:45 PM",
       "status": "success",
-      "message": "[Sustracción Manual] [Excel BD Sincronizada] Se extrajeron con éxito 16 donaciones de la hoja de cálculo. Peso total acumulado: 381 kg.",
-      "kilosUpdated": 381
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782590152405",
-      "timestamp": "7:55:52 PM",
+      "id": "log-1782922965094",
+      "timestamp": "4:22:45 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 14 donaciones de la hoja de cálculo. Peso total acumulado: 219 kg.",
-      "kilosUpdated": 219
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782589559555",
-      "timestamp": "7:45:59 PM",
+      "id": "log-1782922486292",
+      "timestamp": "4:14:46 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 14 donaciones de la hoja de cálculo. Peso total acumulado: 219 kg.",
-      "kilosUpdated": 219
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782588960980",
-      "timestamp": "7:36:00 PM",
+      "id": "log-1782922365103",
+      "timestamp": "4:12:45 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 12 donaciones de la hoja de cálculo. Peso total acumulado: 206 kg.",
-      "kilosUpdated": 206
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782588360008",
-      "timestamp": "7:26:00 PM",
+      "id": "log-1782922281210",
+      "timestamp": "4:11:21 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 10 donaciones de la hoja de cálculo. Peso total acumulado: 193 kg.",
-      "kilosUpdated": 193
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782587759514",
-      "timestamp": "7:15:59 PM",
+      "id": "log-1782921885957",
+      "timestamp": "4:04:45 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 7 donaciones de la hoja de cálculo. Peso total acumulado: 184 kg.",
-      "kilosUpdated": 184
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782587159517",
-      "timestamp": "7:05:59 PM",
+      "id": "log-1782921764513",
+      "timestamp": "4:02:44 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 5 donaciones de la hoja de cálculo. Peso total acumulado: 170 kg.",
-      "kilosUpdated": 170
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782586559367",
-      "timestamp": "6:55:59 PM",
+      "id": "log-1782921382433",
+      "timestamp": "3:56:22 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 4 donaciones de la hoja de cálculo. Peso total acumulado: 100 kg.",
-      "kilosUpdated": 100
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782585959505",
-      "timestamp": "6:45:59 PM",
+      "id": "log-1782921285868",
+      "timestamp": "3:54:45 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 2 donaciones de la hoja de cálculo. Peso total acumulado: 58 kg.",
-      "kilosUpdated": 58
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782585359387",
-      "timestamp": "6:35:59 PM",
+      "id": "log-1782921165232",
+      "timestamp": "3:52:45 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 2 donaciones de la hoja de cálculo. Peso total acumulado: 58 kg.",
-      "kilosUpdated": 58
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782584759578",
-      "timestamp": "6:25:59 PM",
+      "id": "log-1782920686766",
+      "timestamp": "3:44:46 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 2 donaciones de la hoja de cálculo. Peso total acumulado: 58 kg.",
-      "kilosUpdated": 58
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782584159734",
-      "timestamp": "6:15:59 PM",
+      "id": "log-1782920086956",
+      "timestamp": "3:34:46 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782583559367",
-      "timestamp": "6:05:59 PM",
+      "id": "log-1782919487672",
+      "timestamp": "3:24:47 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
+      "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782582959477",
-      "timestamp": "5:55:59 PM",
+      "id": "log-1782918888369",
+      "timestamp": "3:14:48 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 195 donaciones de la hoja de cálculo. Peso total acumulado: 5,461.59 kg.",
+      "kilosUpdated": 5461.590000000001
     },
     {
-      "id": "log-1782582360174",
-      "timestamp": "5:46:00 PM",
+      "id": "log-1782918286155",
+      "timestamp": "3:04:46 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 195 donaciones de la hoja de cálculo. Peso total acumulado: 5,461.59 kg.",
+      "kilosUpdated": 5461.590000000001
     },
     {
-      "id": "log-1782581759311",
-      "timestamp": "5:35:59 PM",
+      "id": "log-1782917686589",
+      "timestamp": "2:54:46 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 195 donaciones de la hoja de cálculo. Peso total acumulado: 5,461.59 kg.",
+      "kilosUpdated": 5461.590000000001
     },
     {
-      "id": "log-1782581162805",
-      "timestamp": "5:26:02 PM",
+      "id": "log-1782917085981",
+      "timestamp": "2:44:45 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 195 donaciones de la hoja de cálculo. Peso total acumulado: 5,461.59 kg.",
+      "kilosUpdated": 5461.590000000001
     },
     {
-      "id": "log-1782580559328",
-      "timestamp": "5:15:59 PM",
+      "id": "log-1782916486113",
+      "timestamp": "2:34:46 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 195 donaciones de la hoja de cálculo. Peso total acumulado: 5,461.59 kg.",
+      "kilosUpdated": 5461.590000000001
     },
     {
-      "id": "log-1782579959343",
-      "timestamp": "5:05:59 PM",
+      "id": "log-1782915885856",
+      "timestamp": "2:24:45 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 195 donaciones de la hoja de cálculo. Peso total acumulado: 5,461.59 kg.",
+      "kilosUpdated": 5461.590000000001
     },
     {
-      "id": "log-1782579359214",
-      "timestamp": "4:55:59 PM",
+      "id": "log-1782915286101",
+      "timestamp": "2:14:46 PM",
       "status": "success",
-      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 1 donaciones de la hoja de cálculo. Peso total acumulado: 10 kg.",
-      "kilosUpdated": 10
+      "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 195 donaciones de la hoja de cálculo. Peso total acumulado: 5,461.59 kg.",
+      "kilosUpdated": 5461.590000000001
     }
   ],
   "news": [
@@ -982,6 +2787,24 @@ export const INITIAL_STATE: GlobalState = {
     }
   ],
   "userChangeLogs": [
+    {
+      "id": "ulog-1782922976464-cpy8",
+      "userId": "usr-orlando",
+      "userName": "Ing. Orlando Galdámez",
+      "userEmail": "eng.orlandogaldamez@gmail.com",
+      "date": "01/07/2026",
+      "time": "18:22:56",
+      "action": "Actualizó la configuración de estados, leyendas, animaciones, barras y fondo de euros del contador en vivo"
+    },
+    {
+      "id": "ulog-1782922599834-un72",
+      "userId": "usr-orlando",
+      "userName": "Ing. Orlando Galdámez",
+      "userEmail": "eng.orlandogaldamez@gmail.com",
+      "date": "01/07/2026",
+      "time": "18:16:39",
+      "action": "Actualizó la configuración de estados, leyendas, animaciones, barras y fondo de euros del contador en vivo"
+    },
     {
       "id": "ulog-1782620895862-jwt9",
       "userId": "usr-orlando",
@@ -1099,6 +2922,134 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_ckhiw0lwk",
+      "timestamp": "2026-07-01T16:18:09.358Z",
+      "ip": "90.166.153.203",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_utzc0s39l",
+      "timestamp": "2026-07-01T16:14:15.598Z",
+      "ip": "90.166.153.203",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_hb8ygtae5",
+      "timestamp": "2026-07-01T16:01:20.627Z",
+      "ip": "90.166.153.203",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_63s8sslvc",
+      "timestamp": "2026-07-01T13:49:14.191Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_j305ijg77",
+      "timestamp": "2026-07-01T13:42:22.289Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 0x0] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_jilvb3yay",
+      "timestamp": "2026-07-01T13:34:19.856Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_xm58fvqtj",
+      "timestamp": "2026-07-01T13:31:36.871Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_qkmjxdwco",
+      "timestamp": "2026-07-01T13:30:35.860Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 0x0] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_n0ajg76fp",
+      "timestamp": "2026-07-01T13:28:10.482Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_glvuwx3fe",
+      "timestamp": "2026-07-01T13:24:51.762Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_sltogv02t",
+      "timestamp": "2026-07-01T13:21:28.302Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_525bozksn",
+      "timestamp": "2026-07-01T13:15:00.574Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_esvmcvj7m",
+      "timestamp": "2026-07-01T13:02:09.820Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 0x0] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_eernsb93y",
+      "timestamp": "2026-07-01T12:45:21.845Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 0x0] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_s4k3q547s",
+      "timestamp": "2026-07-01T12:33:32.209Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 944x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_ncui9lbzh",
+      "timestamp": "2026-07-01T12:32:37.282Z",
+      "ip": "90.160.203.197",
+      "device": "💻 Escritorio (macOS) [Pantalla: 944x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_p3lpjlgkw",
       "timestamp": "2026-06-30T13:47:17.753Z",

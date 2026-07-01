@@ -192,7 +192,7 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
     "donationPassword", "headerVideoEnabled", "headerVideoYoutubeUrl",
     "introVideoEnabled", "introVideoYoutubeUrl", "introVideoBadgeText",
     "introVideoTitle", "introVideoSubtitle", "introVideoBtnText",
-    "celebrationType", "progressBarStyle"
+    "celebrationType", "progressBarStyle", "donationsEurosEnabled", "donationsEuros", "donationsEurosPhase1", "donationsEurosPhase2", "donationsEurosPhase3"
   ];
 
   scalarKeys.forEach(key => {
@@ -820,6 +820,85 @@ if (supabase) {
       res.json({ success: true, state: { ...appState, supabaseActive: !!supabase, supabaseTableMissing: supabaseTableMissing } });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Sync with BBVA (Simulated for username/password as requested)
+  app.post('/api/bbva/sync', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ error: 'Usuario y contraseña son requeridos para BBVA.' });
+      }
+
+      // Simulate network request to BBVA API or legacy endpoint
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Simple mock logic: if password is "demo" it works, otherwise 401
+      // Alternatively, we just accept any non-empty user/pass since it's a structural demo
+      if (password.toLowerCase() === 'error') {
+        return res.status(401).json({ error: 'Credenciales inválidas en BBVA. Inténtelo de nuevo.' });
+      }
+
+      // Generate a random but somewhat stable balance for demonstration
+      const balance = Math.floor(Math.random() * 50000) + 15000;
+
+      appState = {
+        ...appState,
+        donationsEuros: balance,
+        lastSyncTime: new Date().toISOString()
+      };
+      
+      await saveAndPersistState(true);
+      res.json({ success: true, balance, state: { ...appState, supabaseActive: !!supabase, supabaseTableMissing: supabaseTableMissing } });
+      
+    } catch (err: any) {
+      console.error('Error sincronizando con BBVA:', err);
+      res.status(500).json({ error: err.message || 'Error al conectar con BBVA.' });
+    }
+  });
+
+  // Sync with Revolut
+  app.post('/api/revolut/sync', async (req, res) => {
+    try {
+      const apiKey = process.env.REVOLUT_API_KEY;
+      if (!apiKey) {
+        return res.status(400).json({ error: 'La API Key de Revolut (REVOLUT_API_KEY) no está configurada en las variables de entorno del servidor (.env).' });
+      }
+
+      // Revolut Business API to fetch accounts
+      const response = await fetch('https://b2b.revolut.com/api/1.0/accounts', {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error de Revolut: ${response.status} ${response.statusText}`);
+      }
+
+      const accounts = await response.json();
+      
+      // Find the first EUR account
+      const eurAccount = accounts.find((acc: any) => acc.currency === 'EUR');
+      
+      if (eurAccount) {
+        const balance = eurAccount.balance;
+        appState = {
+          ...appState,
+          donationsEuros: balance,
+          lastSyncTime: new Date().toISOString()
+        };
+        await saveAndPersistState(true);
+        res.json({ success: true, balance, state: { ...appState, supabaseActive: !!supabase, supabaseTableMissing: supabaseTableMissing } });
+      } else {
+        res.status(404).json({ error: 'No se encontró una cuenta en Euros (EUR) en Revolut.' });
+      }
+    } catch (err: any) {
+      console.error('Error sincronizando con Revolut:', err);
+      res.status(500).json({ error: err.message || 'Error al conectar con Revolut.' });
     }
   });
 

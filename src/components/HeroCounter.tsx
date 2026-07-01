@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { GlobalState } from '../types';
 import { Scale, RefreshCw, HeartHandshake, PackageOpen } from 'lucide-react';
 import { fireConfetti as confetti } from '../utils/confettiWrapper';
+import { DonationPot } from './DonationPot';
 
 function getYoutubeId(url: string): string {
   if (!url) return '';
@@ -498,6 +499,16 @@ export const HeroCounter: React.FC<HeroCounterProps> = ({
               })}
             </div>
           </div>
+        )}
+        
+        {/* Euro Donations Animated Pot */}
+        {state.donationsEurosEnabled !== false && state.donationsEuros !== undefined && (
+          <DonationPot 
+            currentEuros={state.donationsEuros} 
+            phase1={state.donationsEurosPhase1 || 1000}
+            phase2={state.donationsEurosPhase2 || 200000}
+            phase3={state.donationsEurosPhase3 || 300000}
+          />
         )}
 
       </div>

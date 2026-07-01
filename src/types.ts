@@ -150,6 +150,11 @@ export interface GlobalState {
   maintenanceEndTimestamp?: string; // ISO or timestamp
   celebrationType?: 'confetti' | 'balloons' | 'fireworks' | 'sparkles' | 'none';
   progressBarStyle?: 'default' | 'striped-animated' | 'neon-glow' | 'gradient-wave' | 'retro-blocks';
+  donationsEurosEnabled?: boolean;
+  donationsEuros?: number;
+  donationsEurosPhase1?: number;
+  donationsEurosPhase2?: number;
+  donationsEurosPhase3?: number;
 }
 
 export interface WebAccessLog {

@@ -394,6 +394,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [tempShowLegends, setTempShowLegends] = useState(state.liveCounterShowLegends !== false);
   const [tempCelebrationType, setTempCelebrationType] = useState<'confetti' | 'balloons' | 'fireworks' | 'sparkles' | 'none'>(state.celebrationType || 'confetti');
   const [tempProgressBarStyle, setTempProgressBarStyle] = useState<'default' | 'striped-animated' | 'neon-glow' | 'gradient-wave' | 'retro-blocks'>(state.progressBarStyle || 'default');
+  const [tempDonationsEurosEnabled, setTempDonationsEurosEnabled] = useState(state.donationsEurosEnabled ?? true);
+  const [tempDonationsEuros, setTempDonationsEuros] = useState(state.donationsEuros || 0);
+  const [tempDonationsPhase1, setTempDonationsPhase1] = useState(state.donationsEurosPhase1 || 1000);
+  const [tempDonationsPhase2, setTempDonationsPhase2] = useState(state.donationsEurosPhase2 || 200000);
+  const [tempDonationsPhase3, setTempDonationsPhase3] = useState(state.donationsEurosPhase3 || 300000);
 
   const [tempMaintenanceModeEnabled, setTempMaintenanceModeEnabled] = useState(state.maintenanceModeEnabled || false);
   const [tempMaintenanceReason, setTempMaintenanceReason] = useState(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
@@ -402,6 +407,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Estados para importar donaciones desde Excel
   const [importText, setImportText] = useState('');
   const [previewDonations, setPreviewDonations] = useState<any[]>([]);
+  const [isSyncingRevolut, setIsSyncingRevolut] = useState(false);
+  const [showBbvaModal, setShowBbvaModal] = useState(false);
+  const [bbvaUsername, setBbvaUsername] = useState('');
+  const [bbvaPassword, setBbvaPassword] = useState('');
+  const [isSyncingBbva, setIsSyncingBbva] = useState(false);
 
   React.useEffect(() => {
     if (state) {
@@ -416,6 +426,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setTempShowLegends(state.liveCounterShowLegends !== false);
       setTempCelebrationType(state.celebrationType || 'confetti');
       setTempProgressBarStyle(state.progressBarStyle || 'default');
+      setTempDonationsEurosEnabled(state.donationsEurosEnabled ?? true);
+      setTempDonationsEuros(state.donationsEuros || 0);
+      setTempDonationsPhase1(state.donationsEurosPhase1 || 1000);
+      setTempDonationsPhase2(state.donationsEurosPhase2 || 200000);
+      setTempDonationsPhase3(state.donationsEurosPhase3 || 300000);
       
       setTempMaintenanceModeEnabled(state.maintenanceModeEnabled || false);
       setTempMaintenanceReason(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
@@ -1148,6 +1163,59 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     };
     reader.readAsText(file);
     e.target.value = '';
+  };
+
+  const handleRevolutSync = async () => {
+    setIsSyncingRevolut(true);
+    try {
+      const res = await fetch('/api/revolut/sync', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(`✅ Saldo sincronizado con Revolut: €${data.balance}`);
+        if (data.state) {
+          onUpdateState(data.state);
+        }
+      } else {
+        alert(data.error || 'Error desconocido al sincronizar con Revolut');
+      }
+    } catch (err: any) {
+      alert('Error de conexión al sincronizar con Revolut: ' + err.message);
+    } finally {
+      setIsSyncingRevolut(false);
+    }
+  };
+
+  const handleBbvaSync = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bbvaUsername || !bbvaPassword) {
+      alert('Por favor ingrese usuario y contraseña.');
+      return;
+    }
+    
+    setIsSyncingBbva(true);
+    try {
+      const res = await fetch('/api/bbva/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: bbvaUsername, password: bbvaPassword })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(`✅ Saldo sincronizado con BBVA: €${data.balance}`);
+        setTempDonationsEuros(data.balance);
+        if (data.state) {
+          onUpdateState(data.state);
+        }
+        setShowBbvaModal(false);
+        setBbvaPassword('');
+      } else {
+        alert(data.error || 'Error desconocido al sincronizar con BBVA');
+      }
+    } catch (err: any) {
+      alert('Error de conexión al sincronizar con BBVA: ' + err.message);
+    } finally {
+      setIsSyncingBbva(false);
+    }
   };
 
   // Filtrado de Pledges (Excel BD)
@@ -4521,6 +4589,113 @@ ON CONFLICT (id) DO NOTHING;`}
                 </div>
               </div>
 
+              {/* 5. FONDO DE DONACIONES (EUROS) */}
+              <div className="space-y-4 pt-6 border-t border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="text-sm font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                      <span>💰 Fondo de Donaciones (Euros)</span>
+                    </h4>
+                    <p className="text-slate-400 text-xs mt-1">
+                      Módulo interactivo y animado del cofre de donaciones. 
+                    </p>
+                  </div>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <span className="text-xs font-bold text-slate-300 uppercase">Activar Módulo</span>
+                    <div className="relative">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only" 
+                        checked={tempDonationsEurosEnabled}
+                        onChange={(e) => setTempDonationsEurosEnabled(e.target.checked)}
+                      />
+                      <div className={`block w-12 h-6 rounded-full transition-colors ${tempDonationsEurosEnabled ? 'bg-emerald-500' : 'bg-slate-700'}`}></div>
+                      <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${tempDonationsEurosEnabled ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                    </div>
+                  </label>
+                </div>
+                
+                {tempDonationsEurosEnabled && (
+                  <>
+                    <div className="flex flex-col gap-4">
+                      {/* Revolut */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                        <div className="flex-1">
+                          <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Sincronización con Revolut (API)</label>
+                          <p className="text-xs text-slate-500 mb-2">
+                            Extrae el saldo de tu cuenta EUR desde Revolut. Requiere <code className="text-emerald-400 bg-emerald-950 px-1 py-0.5 rounded">REVOLUT_API_KEY</code> en <code>.env</code>.
+                          </p>
+                        </div>
+                        <button
+                          onClick={handleRevolutSync}
+                          disabled={isSyncingRevolut}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-black uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
+                        >
+                          <RefreshCw className={`w-4 h-4 ${isSyncingRevolut ? 'animate-spin' : ''}`} />
+                          {isSyncingRevolut ? 'Sincronizando...' : 'Sincronizar Revolut'}
+                        </button>
+                      </div>
+
+                      {/* BBVA */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 bg-slate-900 p-4 rounded-xl border border-[#072146]">
+                        <div className="flex-1">
+                          <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Sincronización con BBVA</label>
+                          <p className="text-xs text-slate-500 mb-2">
+                            Extrae el saldo de tu cuenta EUR autenticándote con tus credenciales de BBVA.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setShowBbvaModal(true)}
+                          className="px-4 py-2 bg-[#1464A5] hover:bg-[#072146] text-white text-xs font-black uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          Iniciar Sesión BBVA
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Donaciones Recaudadas</label>
+                        <input
+                          type="number"
+                          value={tempDonationsEuros}
+                          onChange={(e) => setTempDonationsEuros(Number(e.target.value))}
+                          className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 1 (Euros)</label>
+                    <input
+                      type="number"
+                      value={tempDonationsPhase1}
+                      onChange={(e) => setTempDonationsPhase1(Number(e.target.value))}
+                      className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 2 (Euros)</label>
+                    <input
+                      type="number"
+                      value={tempDonationsPhase2}
+                      onChange={(e) => setTempDonationsPhase2(Number(e.target.value))}
+                      className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fase 3 (Euros)</label>
+                    <input
+                      type="number"
+                      value={tempDonationsPhase3}
+                      onChange={(e) => setTempDonationsPhase3(Number(e.target.value))}
+                      className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+                </>
+                )}
+              </div>
+
               {/* Guardar cambios */}
               <div className="pt-6 border-t border-slate-800 flex justify-end gap-3">
                 <button
@@ -4537,6 +4712,11 @@ ON CONFLICT (id) DO NOTHING;`}
                     setTempShowLegends(true);
                     setTempCelebrationType('confetti');
                     setTempProgressBarStyle('default');
+                    setTempDonationsEurosEnabled(true);
+                    setTempDonationsEuros(0);
+                    setTempDonationsPhase1(1000);
+                    setTempDonationsPhase2(200000);
+                    setTempDonationsPhase3(300000);
                     showToast('🔄 Se han restablecido los valores por defecto locales (Haga clic en Guardar para aplicarlos)');
                   }}
                   className="px-4 py-2.5 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-black uppercase tracking-wider rounded-xl transition cursor-pointer"
@@ -4558,8 +4738,13 @@ ON CONFLICT (id) DO NOTHING;`}
                       liveCounterLegend100: tempLegend100,
                       liveCounterShowLegends: tempShowLegends,
                       celebrationType: tempCelebrationType,
-                      progressBarStyle: tempProgressBarStyle
-                    }, 'Actualizó la configuración de estados, leyendas, animaciones y barras del contador en vivo de Navarra');
+                      progressBarStyle: tempProgressBarStyle,
+                      donationsEurosEnabled: tempDonationsEurosEnabled,
+                      donationsEuros: tempDonationsEuros,
+                      donationsEurosPhase1: tempDonationsPhase1,
+                      donationsEurosPhase2: tempDonationsPhase2,
+                      donationsEurosPhase3: tempDonationsPhase3
+                    }, 'Actualizó la configuración de estados, leyendas, animaciones, barras y fondo de euros del contador en vivo');
                     showToast('💾 ¡Configuración del contador en vivo guardada correctamente!');
                   }}
                   className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-950/40"
@@ -5275,6 +5460,67 @@ ON CONFLICT (id) DO NOTHING;`}
             <div className="mt-5 border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 font-medium">
               <span>* Para dar de alta nuevos perfiles, acceda a la pestaña <b>Control de Usuarios</b>.</span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Iniciar Sesión BBVA */}
+      {showBbvaModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowBbvaModal(false)}></div>
+          <div className="relative bg-white text-slate-900 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-[#072146] text-white p-6 relative overflow-hidden">
+              <div className="relative z-10">
+                <h3 className="text-2xl font-black mb-1">BBVA Net Cash</h3>
+                <p className="text-[#49A5E6] text-sm font-medium">Sincronización de Saldo (Lectura)</p>
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#1464A5] rounded-full opacity-50 blur-2xl"></div>
+              <div className="absolute -left-4 -bottom-4 w-32 h-32 bg-[#49A5E6] rounded-full opacity-20 blur-2xl"></div>
+            </div>
+            
+            <form onSubmit={handleBbvaSync} className="p-6 space-y-5">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Usuario / NIF</label>
+                <input 
+                  type="text" 
+                  autoFocus
+                  required
+                  value={bbvaUsername}
+                  onChange={(e) => setBbvaUsername(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 font-semibold focus:outline-none focus:ring-2 focus:ring-[#1464A5] transition-all"
+                  placeholder="Usuario BBVA"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Clave de Acceso</label>
+                <input 
+                  type="password" 
+                  required
+                  value={bbvaPassword}
+                  onChange={(e) => setBbvaPassword(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 font-semibold focus:outline-none focus:ring-2 focus:ring-[#1464A5] transition-all"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setShowBbvaModal(false)}
+                  className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSyncingBbva}
+                  className="flex-1 px-4 py-3 bg-[#1464A5] hover:bg-[#072146] disabled:opacity-50 text-white font-bold rounded-xl transition-colors flex justify-center items-center gap-2"
+                >
+                  {isSyncingBbva ? <RefreshCw className="w-5 h-5 animate-spin" /> : 'Entrar y Consultar'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
