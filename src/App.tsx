@@ -16,6 +16,7 @@ import { Footer } from './components/Footer';
 import { IntroVideoModal } from './components/IntroVideoModal';
 import { MaintenanceScreen } from './components/MaintenanceScreen';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { VeneAssistant } from './components/VeneAssistant';
 
 export default function App() {
   const [state, setState] = useState<GlobalState>(INITIAL_STATE);
@@ -324,6 +325,8 @@ export default function App() {
         btnText={state.introVideoBtnText}
         onClose={() => {}}
       />
+      
+      <VeneAssistant enabled={state.assistantVeneEnabled !== false} />
     </div>
   );
 }

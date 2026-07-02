@@ -23,9 +23,10 @@ export const INITIAL_STATE: GlobalState = {
   "publicVisitCounterEnabled": true,
   "publicVisitCounterBase": 15000,
   "publicVisitCounterStartDate": "2026-07-01T00:00:00.000Z",
-  "publicVisitCounterUpdateInterval": 4500,
-  "lastSyncTime": "2026-07-01T17:44:46.079Z",
-  "nextSyncTime": "2026-07-01T17:54:46.079Z",
+  "assistantVeneEnabled": true,
+  "assistantVenePrompt": "Eres Vene, un asistente virtual experto y amable enfocado exclusivamente en las noticias y actualizaciones sobre el reciente terremoto en Venezuela. Tu objetivo principal es ayudar a las personas proporcionando información precisa y útil obtenida de la web sobre el terremoto, centros de acopio, donaciones y estado de emergencia. Además, debes actuar con empatía y apoyo psicológico, ofreciendo palabras de aliento y sugiriendo buscar ayuda profesional si notas que el usuario está muy angustiado. Si la pregunta no está relacionada con el terremoto en Venezuela o la situación de emergencia, debes indicar amablemente que solo estás capacitado para ayudar en temas relacionados con el terremoto.",
+  "lastSyncTime": "2026-07-02T09:14:45.795Z",
+  "nextSyncTime": "2026-07-02T09:24:45.795Z",
   "googleSheetUrl": "https://docs.google.com/spreadsheets/d/1PukE4Ns_98aDcHbsTth3Mx6_tJNQcFmC/edit?gid=762536088#gid=762536088",
   "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbxfiM27NiOzQx9FWqn2AFG6IeaG_MyCcNKTjiA29YF8MZ9NObXDlSUG7bLqWl_rHiw/exec",
   "autoSyncEnabled": true,
@@ -2589,141 +2590,141 @@ export const INITIAL_STATE: GlobalState = {
   ],
   "syncLogs": [
     {
-      "id": "log-1782927886079",
-      "timestamp": "5:44:46 PM",
+      "id": "log-1782983685795",
+      "timestamp": "9:14:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782927809150",
-      "timestamp": "5:43:29 PM",
+      "id": "log-1782983637648",
+      "timestamp": "9:13:57 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782927765158",
-      "timestamp": "5:42:45 PM",
+      "id": "log-1782983581653",
+      "timestamp": "9:13:01 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782927286378",
-      "timestamp": "5:34:46 PM",
+      "id": "log-1782983085559",
+      "timestamp": "9:04:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782927165976",
-      "timestamp": "5:32:45 PM",
+      "id": "log-1782982489646",
+      "timestamp": "8:54:49 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782926685876",
-      "timestamp": "5:24:45 PM",
+      "id": "log-1782981886932",
+      "timestamp": "8:44:46 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782926564661",
-      "timestamp": "5:22:44 PM",
+      "id": "log-1782981286060",
+      "timestamp": "8:34:46 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782926085790",
-      "timestamp": "5:14:45 PM",
+      "id": "log-1782980685802",
+      "timestamp": "8:24:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782926056026",
-      "timestamp": "5:14:16 PM",
+      "id": "log-1782980086559",
+      "timestamp": "8:14:46 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782925965249",
-      "timestamp": "5:12:45 PM",
+      "id": "log-1782979485707",
+      "timestamp": "8:04:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782925486411",
-      "timestamp": "5:04:46 PM",
+      "id": "log-1782978885646",
+      "timestamp": "7:54:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782925364423",
-      "timestamp": "5:02:44 PM",
+      "id": "log-1782978285782",
+      "timestamp": "7:44:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782925244969",
-      "timestamp": "5:00:44 PM",
+      "id": "log-1782977685708",
+      "timestamp": "7:34:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782924885834",
-      "timestamp": "4:54:45 PM",
+      "id": "log-1782977085675",
+      "timestamp": "7:24:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782924764714",
-      "timestamp": "4:52:44 PM",
+      "id": "log-1782976485704",
+      "timestamp": "7:14:45 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782924645756",
-      "timestamp": "4:50:45 PM",
+      "id": "log-1782975886045",
+      "timestamp": "7:04:46 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782924285975",
-      "timestamp": "4:44:45 PM",
+      "id": "log-1782975451730",
+      "timestamp": "6:57:31 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782924165798",
-      "timestamp": "4:42:45 PM",
+      "id": "log-1782975386723",
+      "timestamp": "6:56:26 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782923687108",
-      "timestamp": "4:34:47 PM",
+      "id": "log-1782975286176",
+      "timestamp": "6:54:46 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
     },
     {
-      "id": "log-1782923564420",
-      "timestamp": "4:32:44 PM",
+      "id": "log-1782974686132",
+      "timestamp": "6:44:46 AM",
       "status": "success",
       "message": "[Sincronización Programada] [Excel BD Sincronizada] Se extrajeron con éxito 196 donaciones de la hoja de cálculo. Peso total acumulado: 5,464.39 kg.",
       "kilosUpdated": 5464.390000000001
@@ -2964,6 +2965,38 @@ export const INITIAL_STATE: GlobalState = {
   "introVideoSubtitle": "Conoce más de nuestra iniciativa en marcha por 1 Tonelada.",
   "introVideoBtnText": "Ingresar a la Web de la Campaña ➔",
   "webAccessLogs": [
+    {
+      "id": "acc_icjxw2t16",
+      "timestamp": "2026-07-02T09:20:41.075Z",
+      "ip": "83.165.96.202",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_amg4urou5",
+      "timestamp": "2026-07-02T09:20:23.236Z",
+      "ip": "83.165.96.202",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1180x608] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_0mg0z81wf",
+      "timestamp": "2026-07-02T09:19:28.306Z",
+      "ip": "83.165.96.202",
+      "device": "💻 Escritorio (macOS) [Pantalla: 0x0] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
+    {
+      "id": "acc_6djlnyqjn",
+      "timestamp": "2026-07-01T17:53:41.955Z",
+      "ip": "90.166.153.203",
+      "device": "💻 Escritorio (macOS) [Pantalla: 1163x609] (es-GT)",
+      "location": "Europe/Madrid",
+      "page": "/"
+    },
     {
       "id": "acc_nokzijjho",
       "timestamp": "2026-07-01T17:48:16.606Z",

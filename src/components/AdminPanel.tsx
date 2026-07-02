@@ -9,7 +9,7 @@ import {
   Lock, Download, Upload, Building2, Newspaper, HelpCircle, Lightbulb,  
   Search, X, ExternalLink, Package, MapPin, Phone, Clock,
   Users, History, User, UserPlus, ShieldCheck, Calendar, Terminal, Activity,
-  Scale, Video, Play, Check, Sparkles, Scan, MessageCircle, Heart
+  Scale, Video, Play, Check, Sparkles, Scan, MessageCircle, Heart, Bot
 } from 'lucide-react';
 
 function getYoutubeId(url: string): string {
@@ -45,7 +45,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   syncing,
   onExitAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'importar_donaciones' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'voluntarios' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'plantillas_donacion' | 'videos' | 'mantenimiento'>('excel_bd');
+  const [activeTab, setActiveTab] = useState<'excel_bd' | 'ia_scanner' | 'importar_donaciones' | 'centros' | 'categorias_donacion' | 'noticias' | 'whatsapp' | 'voluntarios' | 'faqs' | 'sugerencias' | 'config' | 'portada' | 'usuarios' | 'cambios_web' | 'saludar_sistema' | 'accesos_web' | 'contador_vivo' | 'plantillas_donacion' | 'videos' | 'mantenimiento' | 'asistente_vene'>('excel_bd');
   const [message, setMessage] = useState<string | null>(null);
 
   // Active User Profile management in browser session
@@ -377,10 +377,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const [isContadorTabUnlocked, setIsContadorTabUnlocked] = useState(false);
   const [isConfigTabUnlocked, setIsConfigTabUnlocked] = useState(false);
+  const [isContadorSimuladoUnlocked, setIsContadorSimuladoUnlocked] = useState(false);
   const [contadorPasswordAttempt, setContadorPasswordAttempt] = useState('');
   const [configPasswordAttempt, setConfigPasswordAttempt] = useState('');
+  const [contadorSimuladoPasswordAttempt, setContadorSimuladoPasswordAttempt] = useState('');
   const [contadorError, setContadorError] = useState('');
   const [configError, setConfigError] = useState('');
+  const [contadorSimuladoError, setContadorSimuladoError] = useState('');
 
   // Customizable live counter values states
   const [tempRedLabel, setTempRedLabel] = useState(state.liveCounterStateRedLabel || 'ROJO — DÉFICIT CRÍTICO INICIAL');
@@ -405,6 +408,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [tempPublicVisitCounterBase, setTempPublicVisitCounterBase] = useState(state.publicVisitCounterBase || 15000);
   const [tempPublicVisitCounterStartDate, setTempPublicVisitCounterStartDate] = useState(state.publicVisitCounterStartDate || new Date().toISOString());
   const [tempPublicVisitCounterUpdateInterval, setTempPublicVisitCounterUpdateInterval] = useState(state.publicVisitCounterUpdateInterval || 4500);
+  const [tempAssistantVeneEnabled, setTempAssistantVeneEnabled] = useState(state.assistantVeneEnabled ?? true);
+  const [tempAssistantVenePrompt, setTempAssistantVenePrompt] = useState(state.assistantVenePrompt || 'Eres Vene, un asistente virtual experto y amable enfocado exclusivamente en las noticias y actualizaciones sobre el reciente terremoto en Venezuela. Tu objetivo principal es ayudar a las personas proporcionando información precisa y útil obtenida de la web sobre el terremoto, centros de acopio, donaciones y estado de emergencia. Además, debes actuar con empatía y apoyo psicológico, ofreciendo palabras de aliento y sugiriendo buscar ayuda profesional si notas que el usuario está muy angustiado. Si la pregunta no está relacionada con el terremoto en Venezuela o la situación de emergencia, debes indicar amablemente que solo estás capacitado para ayudar en temas relacionados con el terremoto.');
 
   const [tempMaintenanceModeEnabled, setTempMaintenanceModeEnabled] = useState(state.maintenanceModeEnabled || false);
   const [tempMaintenanceReason, setTempMaintenanceReason] = useState(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
@@ -440,6 +445,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setTempDonationPotTemplate(state.donationPotTemplate || 'template1');
       setTempShowRecentDonors(state.showRecentDonors ?? false);
       
+      setTempAssistantVeneEnabled(state.assistantVeneEnabled ?? true);
+      setTempAssistantVenePrompt(state.assistantVenePrompt || 'Eres Vene, un asistente virtual experto y amable enfocado exclusivamente en las noticias y actualizaciones sobre el reciente terremoto en Venezuela. Tu objetivo principal es ayudar a las personas proporcionando información precisa y útil obtenida de la web sobre el terremoto, centros de acopio, donaciones y estado de emergencia. Además, debes actuar con empatía y apoyo psicológico, ofreciendo palabras de aliento y sugiriendo buscar ayuda profesional si notas que el usuario está muy angustiado. Si la pregunta no está relacionada con el terremoto en Venezuela o la situación de emergencia, debes indicar amablemente que solo estás capacitado para ayudar en temas relacionados con el terremoto.');
+
       setTempMaintenanceModeEnabled(state.maintenanceModeEnabled || false);
       setTempMaintenanceReason(state.maintenanceReason || 'Actualización y optimización de base de datos relacional de acopio');
       setTempMaintenanceEndTimestamp(state.maintenanceEndTimestamp || '');
@@ -1534,6 +1542,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           >
             <Settings className="w-5 h-5 text-amber-400" />
             <span>🛠️ Modo Mantenimiento</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('asistente_vene')}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer shrink-0 ${
+              activeTab === 'asistente_vene' 
+                ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-500/20' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Bot className="w-5 h-5 text-indigo-400" />
+            <span>🤖 Asistente Vene</span>
           </button>
 
           <button
@@ -4006,90 +4026,128 @@ ON CONFLICT (id) DO NOTHING;`}
 
             {/* Configuración del Contador Público de Visitas */}
             <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-                <div>
-                  <h4 className="text-sm font-black uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-                    <Activity className="w-5 h-5" />
-                    <span>Contador Público de Visitas (Simulado)</span>
-                  </h4>
-                  <p className="text-slate-400 text-xs mt-1">
-                    Configura el contador de visitas público en la web. Este añade automáticamente visitas aleatorias diarias (aprox. &gt; 300) y muestra las banderas de los países en tiempo real.
-                  </p>
+              {!isContadorSimuladoUnlocked ? (
+                <div className="text-center space-y-6 py-6">
+                  <div className="mx-auto w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-indigo-400 border border-indigo-500/30 shadow-lg">
+                    <Lock className="w-8 h-8 animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-black uppercase text-white">🔐 Acceso Restringido</h3>
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Contador Público de Visitas</p>
+                  </div>
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (contadorSimuladoPasswordAttempt === 'Isabella2015$') {
+                      setIsContadorSimuladoUnlocked(true);
+                      setContadorSimuladoError('');
+                    } else {
+                      setContadorSimuladoError('❌ Clave incorrecta.');
+                    }
+                  }} className="max-w-xs mx-auto space-y-4">
+                    <input
+                      type="password"
+                      placeholder="Clave de Acceso"
+                      value={contadorSimuladoPasswordAttempt}
+                      onChange={(e) => setContadorSimuladoPasswordAttempt(e.target.value)}
+                      className="w-full bg-slate-950 text-white border border-slate-850 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 font-mono text-center tracking-widest"
+                    />
+                    {contadorSimuladoError && <p className="text-rose-500 text-xs font-bold">{contadorSimuladoError}</p>}
+                    <button
+                      type="submit"
+                      className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-xs font-black uppercase tracking-widest transition cursor-pointer"
+                    >
+                      Desbloquear
+                    </button>
+                  </form>
                 </div>
-                <label className="flex items-center gap-3 cursor-pointer shrink-0">
-                  <span className="text-xs font-bold text-slate-300 uppercase">Mostrar en Web</span>
-                  <div className="relative">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only" 
-                      checked={tempPublicVisitCounterEnabled}
-                      onChange={(e) => setTempPublicVisitCounterEnabled(e.target.checked)}
-                    />
-                    <div className={`block w-12 h-6 rounded-full transition-colors ${tempPublicVisitCounterEnabled ? 'bg-indigo-500' : 'bg-slate-700'}`}></div>
-                    <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${tempPublicVisitCounterEnabled ? 'translate-x-6' : 'translate-x-0'}`}></div>
+              ) : (
+                <>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                    <div>
+                      <h4 className="text-sm font-black uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+                        <Activity className="w-5 h-5" />
+                        <span>Contador Público de Visitas (Simulado)</span>
+                      </h4>
+                      <p className="text-slate-400 text-xs mt-1">
+                        Configura el contador de visitas público en la web. Este añade automáticamente visitas aleatorias diarias (aprox. &gt; 300) y muestra las banderas de los países en tiempo real.
+                      </p>
+                    </div>
+                    <label className="flex items-center gap-3 cursor-pointer shrink-0">
+                      <span className="text-xs font-bold text-slate-300 uppercase">Mostrar en Web</span>
+                      <div className="relative">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only" 
+                          checked={tempPublicVisitCounterEnabled}
+                          onChange={(e) => setTempPublicVisitCounterEnabled(e.target.checked)}
+                        />
+                        <div className={`block w-12 h-6 rounded-full transition-colors ${tempPublicVisitCounterEnabled ? 'bg-indigo-500' : 'bg-slate-700'}`}></div>
+                        <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${tempPublicVisitCounterEnabled ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                      </div>
+                    </label>
                   </div>
-                </label>
-              </div>
 
-              {tempPublicVisitCounterEnabled && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Inicio del Contador (Visitas Base)</label>
-                    <input
-                      type="number"
-                      value={tempPublicVisitCounterBase}
-                      onChange={(e) => setTempPublicVisitCounterBase(Number(e.target.value))}
-                      className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
-                      placeholder="Ej. 15000"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Intervalo de subida (milisegundos)</label>
-                    <input
-                      type="number"
-                      value={tempPublicVisitCounterUpdateInterval}
-                      onChange={(e) => setTempPublicVisitCounterUpdateInterval(Number(e.target.value))}
-                      className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
-                      placeholder="Ej. 4500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fecha de Inicio de la Simulación</label>
-                    <input
-                      type="datetime-local"
-                      value={tempPublicVisitCounterStartDate.slice(0, 16)}
-                      onChange={(e) => {
-                        try {
-                          const date = new Date(e.target.value);
-                          if (!isNaN(date.getTime())) {
-                            setTempPublicVisitCounterStartDate(date.toISOString());
-                          }
-                        } catch (err) {}
+                  {tempPublicVisitCounterEnabled && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Inicio del Contador (Visitas Base)</label>
+                        <input
+                          type="number"
+                          value={tempPublicVisitCounterBase}
+                          onChange={(e) => setTempPublicVisitCounterBase(Number(e.target.value))}
+                          className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                          placeholder="Ej. 15000"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Intervalo de subida (milisegundos)</label>
+                        <input
+                          type="number"
+                          value={tempPublicVisitCounterUpdateInterval}
+                          onChange={(e) => setTempPublicVisitCounterUpdateInterval(Number(e.target.value))}
+                          className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                          placeholder="Ej. 4500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1.5 block">Fecha de Inicio de la Simulación</label>
+                        <input
+                          type="datetime-local"
+                          value={tempPublicVisitCounterStartDate.slice(0, 16)}
+                          onChange={(e) => {
+                            try {
+                              const date = new Date(e.target.value);
+                              if (!isNaN(date.getTime())) {
+                                setTempPublicVisitCounterStartDate(date.toISOString());
+                              }
+                            } catch (err) {}
+                          }}
+                          className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end pt-4 border-t border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleUpdateStateWithLog({
+                          publicVisitCounterEnabled: tempPublicVisitCounterEnabled,
+                          publicVisitCounterBase: tempPublicVisitCounterBase,
+                          publicVisitCounterStartDate: tempPublicVisitCounterStartDate,
+                          publicVisitCounterUpdateInterval: tempPublicVisitCounterUpdateInterval
+                        }, 'Actualizó la configuración del contador público de visitas simulado');
+                        showToast('💾 ¡Configuración del contador de visitas guardada correctamente!');
                       }}
-                      className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
-                    />
+                      className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-indigo-950/40"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Guardar Configuración</span>
+                    </button>
                   </div>
-                </div>
+                </>
               )}
-
-              <div className="flex justify-end pt-4 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleUpdateStateWithLog({
-                      publicVisitCounterEnabled: tempPublicVisitCounterEnabled,
-                      publicVisitCounterBase: tempPublicVisitCounterBase,
-                      publicVisitCounterStartDate: tempPublicVisitCounterStartDate,
-                      publicVisitCounterUpdateInterval: tempPublicVisitCounterUpdateInterval
-                    }, 'Actualizó la configuración del contador público de visitas simulado');
-                    showToast('💾 ¡Configuración del contador de visitas guardada correctamente!');
-                  }}
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-black uppercase tracking-widest rounded-xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-indigo-950/40"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Guardar Configuración</span>
-                </button>
-              </div>
             </div>
 
             <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
@@ -4205,6 +4263,64 @@ ON CONFLICT (id) DO NOTHING;`}
                     })()}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- CONTENIDO PESTAÑA: ASISTENTE VENE --- */}
+        {activeTab === 'asistente_vene' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 mb-10 shadow-2xl space-y-8 font-sans">
+            <div className="border-b border-slate-800 pb-6 mb-8 text-center flex flex-col items-center justify-center">
+              <div className="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-xl shadow-indigo-500/20">
+                <Bot className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-3xl font-black text-white uppercase tracking-tight">🤖 Asistente Vene</h2>
+              <p className="text-slate-400 mt-2 text-sm max-w-xl">Configura el comportamiento del asistente virtual por voz para la página web.</p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 bg-slate-950 p-6 rounded-2xl border border-slate-800">
+                <div className="flex-1">
+                  <h3 className="text-white font-bold uppercase tracking-wider text-sm mb-1">Activar Asistente Vene</h3>
+                  <p className="text-slate-500 text-xs">Muestra el botón flotante del asistente por voz en la página pública.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={tempAssistantVeneEnabled}
+                    onChange={(e) => setTempAssistantVeneEnabled(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+
+              <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800">
+                <label className="block text-white font-bold uppercase tracking-wider text-sm mb-2">Instrucciones del Asistente (Prompt)</label>
+                <p className="text-slate-500 text-xs mb-4">Define la personalidad, las reglas y los límites de respuesta del asistente.</p>
+                <textarea
+                  value={tempAssistantVenePrompt}
+                  onChange={(e) => setTempAssistantVenePrompt(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 min-h-[200px]"
+                  placeholder="Instrucciones para el modelo..."
+                />
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={() => {
+                    handleUpdateStateWithLog({
+                      assistantVeneEnabled: tempAssistantVeneEnabled,
+                      assistantVenePrompt: tempAssistantVenePrompt
+                    }, `Actualizó la configuración del Asistente Vene (Activo: ${tempAssistantVeneEnabled ? 'Sí' : 'No'})`);
+                    showToast('🤖 Configuración del Asistente Vene guardada.');
+                  }}
+                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-black uppercase tracking-wider transition-all shadow-xl shadow-indigo-600/30"
+                >
+                  <Save className="w-5 h-5" />
+                  Guardar Configuración de Vene
+                </button>
               </div>
             </div>
           </div>

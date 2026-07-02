@@ -2,7 +2,8 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
+import { WebSocketServer } from 'ws';
 import { INITIAL_STATE } from './src/data/initialData';
 import { GlobalState, DonorPledge, SyncLog, NewsItem, SuggestionItem, WebAccessLog } from './src/types';
 import dotenv from 'dotenv';
@@ -193,7 +194,8 @@ function mergeStates(local: GlobalState, db: GlobalState): GlobalState {
     "introVideoEnabled", "introVideoYoutubeUrl", "introVideoBadgeText",
     "introVideoTitle", "introVideoSubtitle", "introVideoBtnText",
     "celebrationType", "progressBarStyle", "donationsEurosEnabled", "donationsEuros", "donationsEurosPhase1", "donationsEurosPhase2", "donationsEurosPhase3", "donationPotTemplate", "showRecentDonors",
-    "publicVisitCounterEnabled", "publicVisitCounterBase", "publicVisitCounterStartDate", "publicVisitCounterUpdateInterval"
+    "publicVisitCounterEnabled", "publicVisitCounterBase", "publicVisitCounterStartDate", "publicVisitCounterUpdateInterval",
+    "assistantVeneEnabled", "assistantVenePrompt"
   ];
 
   scalarKeys.forEach(key => {
@@ -1337,7 +1339,88 @@ donante,kilos,ciudad,categoria,fecha,mensaje,email
 
   // Only start listening if we are not in a Serverless environment like Vercel
   if (!process.env.VERCEL) {
-    app.listen(PORT, '0.0.0.0', () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`Servidor Humanitario Por 1T ejecutándose en http://localhost:${PORT}`);
     });
+
+    const wss = new WebSocketServer({ server });
+    
+    wss.on("connection", async (clientWs, req) => {
+      if (req.url !== '/api/live-vene') {
+        clientWs.close();
+        return;
+      }
+
+      if (!appState.assistantVeneEnabled) {
+        clientWs.send(JSON.stringify({ error: "Asistente desactivado" }));
+        clientWs.close();
+        return;
+      }
+
+      try {
+        const ai = new GoogleGenAI({
+          apiKey: process.env.GEMINI_API_KEY,
+          httpOptions: {
+            headers: { 'User-Agent': 'aistudio-build' }
+          }
+        });
+
+        const sessionPromise = ai.live.connect({
+          model: "gemini-3.1-flash-live-preview",
+          config: {
+            responseModalities: [Modality.AUDIO],
+            speechConfig: {
+              voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } }, // Let's use Aoede or Puck for Vene
+            },
+            systemInstruction: appState.assistantVenePrompt + `\n\nREGLA ESTRICTA DE LA APP:\n- Cuando pregunten cómo van a hacer con el envío a Venezuela, DEBES responder exactamente o algo muy similar a: "Estamos buscando la forma más rápida y segura de hacer llegar los medicamentos y el pack zona 0 lo más rápido posible."\n- Si preguntan cuántos kg (kilos) o toneladas llevamos (Contador Navarra en Vivo), diles el número exacto que tiene la web en el Contador Navarra en Vivo, que ahora mismo es: ${appState.globalTargetTons} toneladas. No inventes otros números.`,
+            tools: [{ googleSearch: {} }],
+          },
+          callbacks: {
+            onmessage: (message: LiveServerMessage) => {
+              const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+              if (audio) {
+                if (clientWs.readyState === clientWs.OPEN) {
+                   clientWs.send(JSON.stringify({ audio }));
+                }
+              }
+              if (message.serverContent?.interrupted) {
+                if (clientWs.readyState === clientWs.OPEN) {
+                   clientWs.send(JSON.stringify({ interrupted: true }));
+                }
+              }
+            },
+          },
+        });
+
+        clientWs.on("message", (data) => {
+          try {
+            const { audio, text } = JSON.parse(data.toString());
+            if (audio) {
+              sessionPromise.then(session => {
+                session.sendRealtimeInput({
+                  audio: { data: audio, mimeType: "audio/pcm;rate=16000" }
+                });
+              }).catch(err => console.error("Error sending audio input:", err));
+            }
+            if (text) {
+              sessionPromise.then(session => {
+                session.sendRealtimeInput({
+                  text: text
+                });
+              }).catch(err => console.error("Error sending text input:", err));
+            }
+          } catch (err) {
+            console.error("Live API WS parse error:", err);
+          }
+        });
+
+        clientWs.on("close", () => {
+          console.log("Client disconnected from Live API");
+        });
+      } catch (err) {
+        console.error("Error setting up Live API session:", err);
+        clientWs.close();
+      }
+    });
   }
+

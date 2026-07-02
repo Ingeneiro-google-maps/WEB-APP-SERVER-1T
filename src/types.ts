@@ -161,6 +161,8 @@ export interface GlobalState {
   publicVisitCounterBase?: number;
   publicVisitCounterStartDate?: string;
   publicVisitCounterUpdateInterval?: number;
+  assistantVeneEnabled?: boolean;
+  assistantVenePrompt?: string;
 }
 
 export interface WebAccessLog {
